@@ -1,0 +1,4 @@
+"0","p9 <- ggplot(ki_hfish.ac, aes(Site, AB_graz)) + geom_bar(aes(fill = Year), stat = ""identity"", position = ""dodge"")"
+"0","p9 <- p9 + xlab(""Site"") + ylab(""Mean Abundance"") + labs(title = ""Grazer Abundance"")"
+"0","p9 <- p9 + scale_fill_manual(values = c(""#3399CC"", ""#99CCFF"", ""#006699""))"
+"0","p9"

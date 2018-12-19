@@ -1,0 +1,4 @@
+"0","p9b <- ggplot(ki_hfish.ac, aes(Year, AB_graz)) + geom_boxplot(aes(fill = Year))"
+"0","p9b <- p9b + xlab(""Year"") + ylab(""Mean Abundance"") + labs(title = ""Grazer Abundance"")"
+"0","p9b <- p9b + guides(fill = FALSE) + scale_fill_manual(values = c(""#3399CC"", ""#99CCFF"", ""#006699""))"
+"0","p9b"
