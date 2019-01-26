@@ -6,9 +6,11 @@
 *The purpose of this project is to explore and find explanations for the diurnal and fish call patterns found in the sound at 5 sites at Kiritimati recorded in both 2017 and 2018.*  
 
 ## **Directory**  ##
-=========================================================
+-----------------------------
 [Project_Plan](#Project_Plan)
+
 [R_Scripts](#R_Scripts)
+
 [Raw_Data](#raw_Data)
 
 ### Project_Plan ###
