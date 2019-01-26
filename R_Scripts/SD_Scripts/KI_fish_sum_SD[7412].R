@@ -3,9 +3,8 @@
 
 # Set wd
 
-
 # Load data
-load("C:/Users/Sdimo/Documents/GitHub/ki-fish/Sean_Acoustics/KI_UVC_17_18.Rdata")
+load("C:/Users/Sdimo/Documents/GitHub/Sean_Acoustics/R_Scripts/SD_Scripts/Output_R_Files/KI_UVC_17_18.Rdata")
 
 # Load necessary packages
 library(dplyr)
@@ -186,7 +185,7 @@ any(is.na(ki_fish))
 #renaming ki_fish for herbivore-breakdown data set
 ki_hfish <- ki_fish
 ## Save and quit
-save(ki_hfish, file = "KI_UVC_17_18_obs_herb_sum.Rdata") # Values summed by Observer
+save(ki_hfish, file = "R_Scripts/SD_Scripts/Output_R_Files/KI_UVC_17_18_obs_herb_sum.Rdata") # Values summed by Observer
 
 
 ###############
@@ -251,4 +250,4 @@ ki_fish_BM$BM_plank[is.na(ki_fish_BM$BM_plank)] <- 0
 any(is.na(ki_fish_BM))
 
 ## Save and quit
-save(ki_fish_BM, file = "KI_UVC_13_15_17_BM_obs_sum_ALL.Rdata") # Values summed by Observer
+save(ki_fish_BM, file = "R_Scripts/SD_Scripts/Output_R_Files/KI_UVC_13_15_17_BM_obs_sum_ALL.Rdata") # Values summed by Observer

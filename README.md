@@ -19,14 +19,16 @@
 
 ### R_Scripts ###
 ---------------------------------------------------------
-* Cleaning Scripts
- * KI_fish_clean_13_15_17_18_JM[7414]
+* Cleaning_Scripts
+ * KI_fish_clean_13_15_17_18_SD
 * R_markdown
  * KI_fish_explore_box_JM.Rmd
  * KI_fish_explore_box_SD.html
  * KI_fish_explore_box_SD.Rmd
  * KI_fish_models_final_JM.Rmd
 * SD_Scripts
+ * Input_R_Files
+  * TMPwd R Workspace - *length and weight data used for biomass - From James Robinson*
  * Output_R_Files
   * KI_UVC_13_15_17_18
   * KI_UVC_17_18
@@ -36,7 +38,7 @@
 * R workspace
 * .Rhistory
 * Sean_Acoustics R Project
-* TMPwd R Workspace
+
 
 ### Raw_Data ###
 ----------------------------------------------------------

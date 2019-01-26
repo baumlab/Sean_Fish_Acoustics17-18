@@ -177,7 +177,7 @@ unique(ki_full$Species)
 
 
 ### Add length-weight data
-load('R_Scripts/TMPwd.Rdata')
+load('R_Scripts/SD_Scripts/Input_R_Files/TMPwd.Rdata')
 cred <- wd
 
 ki_full$lw_a <- cred$LW_A[match(ki_full$Species, cred$SCIENTIFIC_NAME)]
@@ -553,5 +553,5 @@ ki_full <- rbind(ki_small, ki_large)
 ### DATA IS CLEAN!!! ###
 
 ### Save and quit
-save(ki_full, file = "KI_UVC_17_18.Rdata")
+save(ki_full, file = "R_Scripts/SD_Scripts/Output_R_Files/KI_UVC_17_18.Rdata")
 
