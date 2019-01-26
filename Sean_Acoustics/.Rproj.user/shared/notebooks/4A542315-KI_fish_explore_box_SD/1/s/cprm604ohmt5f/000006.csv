@@ -1,4 +1,0 @@
-"0","p9c <- ggplot(ki_hfish.ac, aes(f.pressure, AB_exca)) + geom_boxplot(aes(fill = f.pressure))"
-"0","p9c <- p9c + xlab(""Human Disturbance"") + ylab(""Mean Abundance"") + labs(title = ""Grazer Abundance"")"
-"0","p9c <- p9c + guides(fill = FALSE) + scale_fill_manual(values = c(""#01665E"", ""#80CDC1"", ""#DFC27D"", ""#BF812D"", ""#663300""))"
-"0","p9c"

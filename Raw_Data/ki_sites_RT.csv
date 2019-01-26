@@ -1,0 +1,41 @@
+"","f.pressure","site","area","f.level","smw.region","smw.fp","smw.prod","surveyed.2007","surveyed.2009","PMQ","notes","fish.prod","lat","lon","loc.year"
+"1","Low medium","1","Captain cook",3,"NOR","L","L","X","X",NA,NA,"LowF/LowChl",1.99588,-157.35986,2009
+"2","Low medium","2","Captain cook",3,"NOR","H","L","X","X","X",NA,"HighF/LowChl",2.01156,-157.39442,2009
+"3","High","3","North-west",5,"NOR","H","L","X","X","X",NA,"HighF/LowChl",2.0519,-157.45602,2009
+"4","Low","4","South bay",2,"VAS","L","L","X",NA,NA,NA,"LowF/LowChl",1.853,-157.507,2007
+"5","Low","5","South bay",2,"VAS","L","L","X",NA,NA,NA,"LowF/LowChl",1.84,-157.481,2007
+"6","High medium","6","Poland",4,"POL","L","H","X","X",NA,NA,"LowF/HighChl",1.86079,-157.55716,2009
+"7","Low","7","Poland",2,"POL","L","H","X","X",NA,NA,"LowF/HighChl",1.84306,-157.53719,2009
+"8","High medium","8","South west",4,"LON","L","H","X",NA,NA,NA,"LowF/HighChl",1.886,-157.552,2007
+"9","High medium","9","South west",4,"LON","H","H","X","X","X",NA,"HighF/HighChl",1.92581,-157.50996,2009
+"10","Very low","10","Bay of wrecks",1,"BOW","L","L","X","X",NA,NA,"LowF/LowChl",1.94902,-157.30957,2009
+"11","Very low","11","Bay of wrecks",1,"BOW","L","L","X",NA,NA,NA,"LowF/LowChl",1.914,-157.341,2007
+"12","Low","12","South bay",2,"VAS","L","L","X","X",NA,NA,"LowF/LowChl",1.85165,-157.51447,2009
+"13","Low","13","South bay",2,"VAS","L","L","X",NA,NA,NA,"LowF/LowChl",1.848,-157.526,2007
+"14","High medium","14","South west/poland",4,"POL","L","H","X","X",NA,NA,"LowF/HighChl",1.87482,-157.56383,2009
+"15","Very low","15","North wang",1,"BOW","L","L","X","X","X",NA,"LowF/LowChl",1.82843,-157.32182,2009
+"16","Very low","16","North wang",1,"BOW","L","L","X","X",NA,NA,"LowF/LowChl",1.84793,-157.34068,2009
+"17","Very low","17","North wang",1,"NWA","L","L","X","X",NA,NA,"LowF/LowChl",1.77606,-157.21608,2009
+"18","Very low","18","North wang",1,"NWA","L","L","X","X",NA,NA,"LowF/LowChl",1.79129,-157.24971,2009
+"19","Very low","19","North wang",1,"NWA","L","L","X","X","X",NA,"LowF/LowChl",1.80255,-157.27339,2009
+"20","Very low","20","Bay of wrecks",1,"BOW","L","L","X",NA,NA,NA,"LowF/LowChl",1.864,-157.343,2007
+"21","Very low","21","Bay of wrecks",1,"BOW","L","L","X",NA,NA,NA,"LowF/LowChl",1.944,-157.319,2007
+"22","Low medium","22","Captain cook",3,"NOR","H","L","X","X",NA,NA,"HighF/LowChl",1.99958,-157.37544,2009
+"23","Low medium","23","Captain cook",3,"NOR","L","L","X","X",NA,NA,"LowF/LowChl",1.99243,-157.33113,2009
+"24","High","24","North-west",5,"NOR","H","L","X","X",NA,NA,"HighF/LowChl",2.03144,-157.41678,2009
+"25","High","25","North-west",5,"NOR","H","L","X","X","X",NA,"HighF/LowChl",2.05002,-157.48611,2009
+"26","Very high","26","London",6,"LON","H","L","X","X","X",NA,"HighF/LowChl",2.03889,-157.49905,2009
+"27","Very high","27","London",6,"LON","H","H","X","X","X",NA,"HighF/HighChl",2.00973,-157.48941,2009
+"28","Very low","28","South wang",1,"KWR","L","L","X",NA,NA,NA,"LowF/LowChl",1.715,-157.251,2007
+"29","Very low","29","South wang",1,"KWR","L","L","X",NA,NA,NA,"LowF/LowChl",1.719,-157.254,2007
+"30","Very high","30","London",6,"LON","H","H","X","X",NA,NA,"HighF/HighChl",2.02572,-157.498,2009
+"31","Very high","31","Lagoon mouth/london",6,"LON","H","H","X","X",NA,NA,"HighF/HighChl",1.9921,-157.48289,2009
+"32","Very high","32","Lagoon mouth/london",6,"LON","H","H","X","X",NA,NA,"HighF/HighChl",1.984,-157.482,2009
+"33","Very high","33","Lagoon mouth/south west",6,"LON","H","H","X","X",NA,NA,"HighF/HighChl",1.93884,-157.49638,2009
+"34","High medium","34","South west",4,"LON","L","H","X","X","X",NA,"LowF/HighChl",1.90992,-157.53456,2009
+"35","High medium","35","South west",4,"LON","L","H","X","X","X",NA,"LowF/HighChl",1.89417,-157.54283,2009
+"36","Low","36","South bay",2,"VAS","L","L","X","X",NA,NA,"LowF/LowChl",1.84967,-157.49196,2009
+"37","Low","37","South bay",2,"VAS","L","L","X","X",NA,NA,"LowF/LowChl",1.82799,-157.47693,2009
+"38","High","38","North-west",5,"NOR","H","L",NA,"X",NA,NA,"HighF/LowChl",2.04572,-157.43373,2009
+"39","Very low","39","North wang",1,"NWA","L","L",NA,"X",NA,NA,"LowF/LowChl",1.81111,-157.30023,2009
+"40","Very high","40","Lagoon mouth",6,"LON","H","H",NA,"X",NA,NA,"HighF/HighChl",1.96364,-157.48775,2009

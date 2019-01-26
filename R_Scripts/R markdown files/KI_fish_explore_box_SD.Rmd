@@ -1,0 +1,263 @@
+---
+title: "KI Fish Acoustics - Exploratory Plots"
+author: "Sean Dimoff"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+---
+
+Summary plots for the 2017 and 2018 Kiritimati reef fish survey data at 5 acoustic sites
+
+```{r setup, include = FALSE}
+## Load data (CHANGE TO MY DATA EXPORTED BY THE CLEANING)
+#load("../Data/KI_UVC_13_15_17_trans.Rdata")
+#load("../Data/KI_UVC_13_15_17.Rdata")
+#load("../Data/KI_UVC_13_15_17_BM_trans.Rdata")
+load("C:/Users/Sdimo/Documents/GitHub/ki-fish/Sean_Acoustics/KI_UVC_17_18.Rdata")
+load("C:/Users/Sdimo/Documents/GitHub/ki-fish/Sean_Acoustics/KI_UVC_17_18_obs_sum.Rdata")
+load("C:/Users/Sdimo/Documents/GitHub/ki-fish/Sean_Acoustics/KI_UVC_17_18_obs_herb_sum.Rdata")
+library(here)
+
+## Load necessary packages
+library(dplyr)
+library(ggplot2)
+library(RColorBrewer)
+
+## Set theme for plots
+theme_set(theme_bw() + theme(plot.title = element_text(hjust = 0.5)) + 
+            theme(axis.text.x = element_text(size = 14, color = "black"), 
+                 axis.text.y = element_text(size = 14, color = "black"), 
+                 axis.ticks = element_blank(),
+                 axis.title.y = element_text(size = 17, margin = margin(0,20,0,0)),
+                 axis.title.x = element_text(size = 17, margin = margin(20,0,0,0)),
+                 plot.title = element_text(size = 20, margin = margin(0,0,15,0)),
+                 plot.margin = margin(10,10,10,20), 
+                 strip.background = element_rect(fill = "black"),
+                 strip.text = element_text(colour = "white", size = 12),
+                 panel.border = element_rect(color = "black", fill = NA, size = 1),
+                 panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+
+## Find which sites are present at each time point
+#sites_13 <- unique(ki_fish$Site[ki_fish$Year == "2013"])
+#sites_15 <- unique(ki_fish$Site[ki_fish$Year == "2015"])
+#sites_17 <- unique(ki_fish$Site[ki_fish$Year == "2017"])
+
+
+# Sites surveyed before/during the El Nino
+#sites_BD <- intersect(sites_13, sites_15)
+# Sites surveyed before/after the El Nino
+#sites_BA <- intersect(sites_13, sites_17)
+# Sites surveyed in all three time points
+#sites_BDA <- Reduce(intersect, list(sites_13, sites_15, sites_17))
+
+
+#Filter for only my 5 hydrophone sites
+fsites.to.keep <- c(5,35,8,40,32)
+fish.ac <- ki_fish[ki_fish$Site%in%fsites.to.keep,]
+fish.ac <- droplevels(fish.ac)
+
+ki_hfish.ac <- ki_hfish[ki_hfish$Site%in%fsites.to.keep,]
+ki_hfish.ac <- droplevels(ki_hfish.ac)
+
+ki_full.ac <- ki_full[ki_full$Site%in%fsites.to.keep,]
+ki_full.ac <- droplevels(ki_full.ac)
+
+#create one dataframe for each of my 5 sites
+site5 <- c(5)
+site8 <- c(8)
+site32 <- c(32)
+site35 <- c(35)
+site40 <- c(40)
+
+ki.5 <- ki_full.ac[ki_full.ac$Site%in%site5,]
+ki.5 <- droplevels(ki.5)
+ki.8 <- ki_full.ac[ki_full.ac$Site%in%site8,]
+ki.8 <- droplevels(ki.8)
+ki.32 <- ki_full.ac[ki_full.ac$Site%in%site32,]
+ki.32 <- droplevels(ki.32)
+ki.35 <- ki_full.ac[ki_full.ac$Site%in%site35,]
+ki.35 <- droplevels(ki.35)
+ki.40 <- ki_full.ac[ki_full.ac$Site%in%site40,]
+ki.40 <- droplevels(ki.40)
+
+#Grouping and summarizing each site by species abundance
+ki.5abo <- ki.5 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.5ab <- ki.5 %>% group_by(Year, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+
+ki.8abo <- ki.8 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.8ab <- ki.8 %>% group_by(Year, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+
+ki.32abo <- ki.32 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.32ab <- ki.32 %>% group_by(Year, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+
+ki.35abo <- ki.35 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.35ab <- ki.35 %>% group_by(Year, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+
+ki.40abo <- ki.40 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.40ab <- ki.40 %>% group_by(Year, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+
+#pulling excavators for some sites
+Excavators <- c("Excavator", "Scraper")
+ki.32ex <- ki.32ab[ki.32ab$FineFG%in%Excavators,]
+ki.35ex <- ki.35ab[ki.35ab$FineFG%in%Excavators,]
+ki.40ex <- ki.40ab[ki.40ab$FineFG%in%Excavators,]
+
+## Filter for sites present in all years
+#ki_fish <- filter(ki_fish, Site %in% sites_BDA)
+#ki_fish_BM <- filter(ki_fish_BM, Site %in% sites_BDA)
+
+## Order human disturbance levels
+levels(fish.ac$f.pressure)
+fish.ac$f.pressure <- factor(fish.ac$f.pressure, levels(factor(fish.ac$f.pressure))[c(5,2,3,1,4)])
+
+
+
+#levels(ki_fish_BM$f.pressure)
+#ki_fish_BM$f.pressure <- factor(ki_fish_BM$f.pressure, #levels(factor(ki_fish_BM$f.pressure))[c(5,2,3,1,4)])
+
+## Order sites for plotting (WILL NEED TO CHANGE TO MY 5 SITES)
+levels(fish.ac$Site)
+fish.ac$Site <- factor(fish.ac$Site, levels(factor(fish.ac$Site))[c(1,2,4,3,5)])
+
+
+#levels(ki_fish_BM$Site)
+#ki_fish_BM$Site <- factor(ki_fish_BM$Site, #levels(factor(ki_fish_BM$Site))[c(4,5,7,10,1,11,3,6,13,12,2,8,9)])
+#ki_fish_BM$Site <- factor(ki_fish_BM$Site, levels(factor(ki_fish_BM$Site))[c(8,3,11,1,2,10,9,5,7,12,13,4,6)])
+```
+
+
+# Total Abundance
+## All Fish
+
+```{r RF_AB, echo = FALSE}
+p1 <- ggplot(fish.ac, aes(Site, AB_total)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p1 <- p1 + xlab("Site") + ylab("Mean Abundance") + labs(title = "Total Fish Abundance")
+p1 <- p1 + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p1
+
+p1b <- ggplot(fish.ac, aes(Year, AB_total)) + geom_boxplot(aes(fill = Year))
+p1b <- p1b + xlab("Year") + ylab("Mean Abundance") + labs(title = "Total Fish Abundance")
+p1b <- p1b + guides(fill = FALSE) + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+#p1b <- p1b + ylim(0,3000)
+p1b
+
+p1c <- ggplot(fish.ac, aes(f.pressure, AB_total)) + geom_boxplot(aes(fill = f.pressure))
+p1c <- p1c + xlab("Human Disturbance") + ylab("Mean Abundance") + labs(title = "Total Fish Abundance")
+p1c <- p1c +guides(fill = FALSE) + scale_fill_manual(values = c("#01665E", "#80CDC1", "#DFC27D", "#BF812D", "#663300"))
+#p1c <- p1c + ylim(0,3000)
+p1c
+
+p1d <- ggplot(ki.32ab, aes(Family, Abundance)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p1d <- p1d + theme(axis.text.x = element_text(angle = 90, hjust = 0, size = 6))
+p1d <- p1d + labs(title = "Total Species Abundance at Site 32")
+p1d
+
+p1e <- ggplot(ki.40ab, aes(Family, Abundance)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p1e <- p1e + theme(axis.text.x = element_text(angle = 90, hjust = 0, size = 8))
+p1e <- p1e + labs(title = "Total Species Abundance at Site 40")
+p1e
+```
+
+
+# Herbivore Fine Functional Group Abundance
+
+## Total Herbivores
+
+```{r RF_AB_herb, echo = FALSE}
+p7 <- ggplot(fish.ac, aes(Site, AB_herb)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p7 <- p7 + xlab("Site") + ylab("Mean Abundance") + labs(title = "Herbivore Abundance")
+p7 <- p7 + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p7
+
+p7b <- ggplot(fish.ac, aes(Year, AB_herb)) + geom_boxplot(aes(fill = Year))
+p7b <- p7b + xlab("Year") + ylab("Mean Abundance") + labs(title = "Herbivore Abundance")
+p7b <- p7b + guides(fill = FALSE) + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p7b
+
+
+p7c <- ggplot(fish.ac, aes(f.pressure, AB_herb)) + geom_boxplot(aes(fill = f.pressure))
+p7c <- p7c + xlab("Human Disturbance") + ylab("Mean Abundance") + labs(title = "Herbivore Abundance")
+p7c <- p7c + guides(fill = FALSE) + scale_fill_manual(values = c("#01665E", "#80CDC1", "#DFC27D", "#BF812D", "#663300"))
+p7c
+
+p7d <- ggplot(fish.ac, aes(Site, AB_herb)) + geom_boxplot(aes(fill = Year))
+p7d <- p7d + xlab("Site") + ylab("Mean Abundance") + labs(title = "Herbivore Abundance")
+p7d <- p7d + guides(fill = FALSE) + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p7d
+```
+
+
+## Excavators
+```{r RF_AB_exc, echo = FALSE}
+p8 <- ggplot(ki_hfish.ac, aes(Site, AB_exca)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p8 <- p8 + xlab("Site") + ylab("Mean Abundance") + labs(title = "Excavator Abundance")
+p8 <- p8 + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p8
+
+p8b <- ggplot(ki_hfish.ac, aes(Year, AB_exca)) + geom_boxplot(aes(fill = Year))
+p8b <- p8b + xlab("Year") + ylab("Mean Abundance") + labs(title = "Excavator Abundance")
+p8b <- p8b + guides(fill = FALSE) + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p8b
+
+p8c <- ggplot(ki_hfish.ac, aes(f.pressure, AB_exca)) + geom_boxplot(aes(fill = f.pressure))
+p8c <- p8c + xlab("Human Disturbance") + ylab("Mean Abundance") + labs(title = "Excavator Abundance")
+p8c <- p8c + guides(fill = FALSE) + scale_fill_manual(values = c("#01665E", "#80CDC1", "#DFC27D", "#BF812D", "#663300"))
+p8c
+
+p8d <- ggplot(ki.32ex, aes(Species, Abundance)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p8d <- p8d + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+p8d <- p8d + labs(title = "Site 32 Excavator Abundance")
+p8d
+
+p8e <- ggplot(ki.35ex, aes(Species, Abundance)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p8e <- p8e + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+p8e <- p8e + labs(title = "Site 35 Excavator Abundance")
+p8e
+
+p8f <- ggplot(ki.40ex, aes(Species, Abundance)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p8f <- p8f + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+p8f <- p8f + labs(title = "Site 40 Excavator Abundance")
+p8f
+
+```
+
+## Grazers
+```{r RF_AB_graz, echo = FALSE}
+p9 <- ggplot(ki_hfish.ac, aes(Site, AB_graz)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p9 <- p9 + xlab("Site") + ylab("Mean Abundance") + labs(title = "Grazer Abundance")
+p9 <- p9 + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p9
+
+p9b <- ggplot(ki_hfish.ac, aes(Year, AB_graz)) + geom_boxplot(aes(fill = Year))
+p9b <- p9b + xlab("Year") + ylab("Mean Abundance") + labs(title = "Grazer Abundance")
+p9b <- p9b + guides(fill = FALSE) + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p9b
+
+p9c <- ggplot(ki_hfish.ac, aes(f.pressure, AB_exca)) + geom_boxplot(aes(fill = f.pressure))
+p9c <- p9c + xlab("Human Disturbance") + ylab("Mean Abundance") + labs(title = "Grazer Abundance")
+p9c <- p9c + guides(fill = FALSE) + scale_fill_manual(values = c("#01665E", "#80CDC1", "#DFC27D", "#BF812D", "#663300"))
+p9c
+```
+
+
+## Browsers
+```{r RF_AB_brows, echo = FALSE}
+p10 <- ggplot(ki_hfish.ac, aes(Site, AB_brows)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
+p10 <- p10 + xlab("Site") + ylab("Mean Abundance") + labs(title = "Browser Abundance")
+p10 <- p10 + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+p10
+
+#p9b <- ggplot(ki_hfish.ac, aes(Year, AB_graz)) + geom_boxplot(aes(fill = Year))
+#p9b <- p9b + xlab("Year") + ylab("Mean Abundance") + labs(title = "Grazer Abundance")
+#p9b <- p9b + guides(fill = FALSE) + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+#p9b
+
+#p9c <- ggplot(ki_hfish.ac, aes(f.pressure, AB_exca)) + geom_boxplot(aes(fill = f.pressure))
+#p9c <- p9c + xlab("Human Disturbance") + ylab("Mean Abundance") + labs(title = "Grazer Abundance")
+#p9c <- p9c + guides(fill = FALSE) + scale_fill_manual(values = c("#01665E", "#80CDC1", "#DFC27D", "#BF812D", "#663300"))
+#p9c
+
+```
