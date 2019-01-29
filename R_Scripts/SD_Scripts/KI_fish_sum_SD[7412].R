@@ -87,12 +87,31 @@ ki_pisc <- ki_full[ki_full$Trophic == "Piscivore", ]
 ki_plank <- ki_full[ki_full$Trophic == "Planktivore", ]
 
 
+
 ######################
 ### TOTAL ABUNDANCE ###
 ######################
 
 ki_AB <- ki_full %>% group_by(Year, KI.Date, Site, Observer, prod, f.pressure) %>% summarise(AB_total = sum(Number))
 
+
+######################
+### Subsampling to get times ###
+######################
+#Used this to get a list of times at each of the sites so that I would know which acoustic samples to pull
+
+#total abundance keeping time as a variable
+#ki_AB.time <- ki_full %>% group_by(Year, KI.Date, Time, Site, Observer, prod, f.pressure) %>% summarise(AB_total = sum(Number))
+
+#subsampling for 5 acoustic sites
+#ac.to.keep <- c(5, 8, 32, 35, 40)
+#ki_AC <- ki_AB.time[ki_AB.time$Site%in%ac.to.keep,]
+#ki_AC <- droplevels(ki_AC)
+
+#keeping only one observer to keep it easy 
+#obs.to.keep <- c("SD")
+#ki_time <- ki_AC[ki_AC$Observer%in%obs.to.keep,]
+#ki_time <- droplevels(ki_time)
 
 ########################
 ### SPECIES RICHNESS ###

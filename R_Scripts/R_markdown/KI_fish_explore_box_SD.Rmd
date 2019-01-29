@@ -16,15 +16,16 @@ Summary plots for the 2017 and 2018 Kiritimati reef fish survey data at 5 acoust
 #load("../Data/KI_UVC_13_15_17_trans.Rdata")
 #load("../Data/KI_UVC_13_15_17.Rdata")
 #load("../Data/KI_UVC_13_15_17_BM_trans.Rdata")
-load("C:/Users/Sdimo/Documents/GitHub/ki-fish/Sean_Acoustics/KI_UVC_17_18.Rdata")
-load("C:/Users/Sdimo/Documents/GitHub/ki-fish/Sean_Acoustics/KI_UVC_17_18_obs_sum.Rdata")
-load("C:/Users/Sdimo/Documents/GitHub/ki-fish/Sean_Acoustics/KI_UVC_17_18_obs_herb_sum.Rdata")
+load("C:/Users/Sdimo/Documents/GitHub/Sean_Acoustics/R_Scripts/SD_Scripts/Output_R_Files/KI_UVC_17_18.Rdata")
+load("C:/Users/Sdimo/Documents/GitHub/Sean_Acoustics/R_Scripts/SD_Scripts/Output_R_Files/KI_UVC_17_18_obs_sum.Rdata")
+load("C:/Users/Sdimo/Documents/GitHub/Sean_Acoustics/R_Scripts/SD_Scripts/Output_R_Files/KI_UVC_17_18_obs_herb_sum.Rdata")
 library(here)
 
 ## Load necessary packages
 library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
+library(cowplot)
 
 ## Set theme for plots
 theme_set(theme_bw() + theme(plot.title = element_text(hjust = 0.5)) + 
@@ -84,20 +85,25 @@ ki.40 <- ki_full.ac[ki_full.ac$Site%in%site40,]
 ki.40 <- droplevels(ki.40)
 
 #Grouping and summarizing each site by species abundance
-ki.5abo <- ki.5 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
-ki.5ab <- ki.5 %>% group_by(Year, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.5abo <- ki.5 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.5ab <- ki.5 %>% group_by(Year, KI.Date, Time, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 
-ki.8abo <- ki.8 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
-ki.8ab <- ki.8 %>% group_by(Year, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.8abo <- ki.8 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.8ab <- ki.8 %>% group_by(Year, KI.Date, Time, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 
-ki.32abo <- ki.32 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
-ki.32ab <- ki.32 %>% group_by(Year, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.32abo <- ki.32 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.32ab <- ki.32 %>% group_by(Year, KI.Date, Time, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 
-ki.35abo <- ki.35 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
-ki.35ab <- ki.35 %>% group_by(Year, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.35abo <- ki.35 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.35ab <- ki.35 %>% group_by(Year, KI.Date, Time, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ 
+ki.40abo <- ki.40 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.40ab <- ki.40 %>% group_by(Year, KI.Date, Time, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 
-ki.40abo <- ki.40 %>% group_by(Year, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
-ki.40ab <- ki.40 %>% group_by(Year, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+
+#removing the most populous species in sites 32 and 40 to see how impactful they are
+ki.32no <- ki.32abo[!grepl("Ostorhinchus apogonoides", ki.32abo$Species), ]
+ki.40no <- ki.40abo[!grepl("Pterocaesio tile", ki.40abo$Species), ]
 
 #pulling excavators for some sites
 Excavators <- c("Excavator", "Scraper")
@@ -242,7 +248,6 @@ p9c <- p9c + guides(fill = FALSE) + scale_fill_manual(values = c("#01665E", "#80
 p9c
 ```
 
-
 ## Browsers
 ```{r RF_AB_brows, echo = FALSE}
 p10 <- ggplot(ki_hfish.ac, aes(Site, AB_brows)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
@@ -261,3 +266,104 @@ p10
 #p9c
 
 ```
+
+
+#Site abundance at different times of day
+
+```{r setup, include = FALSE}
+#Grouping all site abundances by Date
+ki.5d <- ki.5 %>% group_by(Year, KI.Date, Site, CoarseFG, Family) %>% summarise(Abundance = sum(Number))
+ki.8d <- ki.8 %>% group_by(Year, KI.Date, Site, CoarseFG, Family) %>% summarise(Abundance = sum(Number))
+ki.32d <- ki.32 %>% group_by(Year, KI.Date, Site, CoarseFG, Family) %>% summarise(Abundance = sum(Number))
+ki.35d <- ki.35 %>% group_by(Year, KI.Date, Site, CoarseFG, Family) %>% summarise(Abundance = sum(Number))
+ki.40d <- ki.40 %>% group_by(Year, KI.Date, Site, CoarseFG, Family) %>% summarise(Abundance = sum(Number))
+
+#Separating 2017 and 2018
+y17 <- c(2017)
+ki17.5 <- ki.5d[ki.5d$Year%in%y17,]
+ki17.5 <- droplevels(ki17.5)
+
+ki17.8 <- ki.8d[ki.8d$Year%in%y17,]
+ki17.8 <- droplevels(ki17.8)
+
+ki17.32 <- ki.32d[ki.32d$Year%in%y17,]
+ki17.32 <- droplevels(ki17.32)
+
+ki17.35 <- ki.35d[ki.35d$Year%in%y17,]
+ki17.35 <- droplevels(ki17.35)
+
+ki17.40 <- ki.40d[ki.40d$Year%in%y17,]
+ki17.40 <- droplevels(ki17.40)
+
+#binding all dataframes together for plotting
+
+
+y18 <- c(2018)
+ki18.5 <- ki.5d[ki.5d$Year%in%y18,]
+ki18.5 <- droplevels(ki18.5)
+
+ki18.8 <- ki.8d[ki.8d$Year%in%y18,]
+ki18.8 <- droplevels(ki18.8)
+
+ki18.32 <- ki.32d[ki.32d$Year%in%y18,]
+ki18.32 <- droplevels(ki18.32)
+
+ki18.35 <- ki.35d[ki.35d$Year%in%y18,]
+ki18.35 <- droplevels(ki18.35)
+
+ki18.40 <- ki.40d[ki.40d$Year%in%y18,]
+ki18.40 <- droplevels(ki18.40)
+
+#binding all dataframes together for plotting
+ki.ac2018 <- rbind(ki18.5, ki18.8, ki18.32, ki18.35, ki18.40)
+str(ki.ac2018)
+#note: assign the legend to be the time
+
+
+
+
+```
+## Site abundance 2018
+```{r, echo = FALSE}
+d1 <- ggplot(ki18.5, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
+d1
+
+d2 <- ggplot(ki18.8, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
+d2
+
+d3 <- ggplot(ki18.32, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
+d3
+
+d4 <- ggplot(ki18.35, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
+d4
+
+d5 <- ggplot(ki18.40, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
+d5
+
+
+#Tot1 <- ggplot(ki.ac2018, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+#  facet_wrap(~Site, ncol = 1) +
+#  theme(axis.text.x = element_text(angle=90, vjust=0))
+#Tot1
+
+#dTOT <- plot_grid(d1,d2,d3,d4,d5, labels = c("Site 5", "Site 8", "Site 32",
+#                                                      "Site 35", "Site 40"), nrow = 5, align = "v")
+#dTOT
+
+#p9b <- ggplot(ki_hfish.ac, aes(Year, AB_graz)) + geom_boxplot(aes(fill = Year))
+#p9b <- p9b + xlab("Year") + ylab("Mean Abundance") + labs(title = "Grazer Abundance")
+#p9b <- p9b + guides(fill = FALSE) + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
+#p9b
+
+#p9c <- ggplot(ki_hfish.ac, aes(f.pressure, AB_exca)) + geom_boxplot(aes(fill = f.pressure))
+#p9c <- p9c + xlab("Human Disturbance") + ylab("Mean Abundance") + labs(title = "Grazer Abundance")
+#p9c <- p9c + guides(fill = FALSE) + scale_fill_manual(values = c("#01665E", "#80CDC1", "#DFC27D", "#BF812D", "#663300"))
+#p9c
+
+```
+
