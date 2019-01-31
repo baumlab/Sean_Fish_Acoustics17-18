@@ -11,7 +11,7 @@ output:
 
 Summary plots for the 2017 and 2018 Kiritimati reef fish survey data at 5 acoustic sites
 
-```{r setup, include = FALSE}
+```{r include = FALSE}
 ## Load data (CHANGE TO MY DATA EXPORTED BY THE CLEANING)
 #load("../Data/KI_UVC_13_15_17_trans.Rdata")
 #load("../Data/KI_UVC_13_15_17.Rdata")
@@ -85,19 +85,19 @@ ki.40 <- ki_full.ac[ki_full.ac$Site%in%site40,]
 ki.40 <- droplevels(ki.40)
 
 #Grouping and summarizing each site by species abundance
-ki.5abo <- ki.5 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
-ki.5ab <- ki.5 %>% group_by(Year, KI.Date, Time, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.5abo <- ki.5 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.5ab <- ki.5 %>% group_by(Year, KI.Date, Time, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 
-ki.8abo <- ki.8 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
-ki.8ab <- ki.8 %>% group_by(Year, KI.Date, Time, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.8abo <- ki.8 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.8ab <- ki.8 %>% group_by(Year, KI.Date, Time, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 
-ki.32abo <- ki.32 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.32abo <- ki.32 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 ki.32ab <- ki.32 %>% group_by(Year, KI.Date, Time, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 
-ki.35abo <- ki.35 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
-ki.35ab <- ki.35 %>% group_by(Year, KI.Date, Time, Site, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.35abo <- ki.35 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.35ab <- ki.35 %>% group_by(Year, KI.Date, Time, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
  
-ki.40abo <- ki.40 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
+ki.40abo <- ki.40 %>% group_by(Year, KI.Date, Time, Site, Observer, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 ki.40ab <- ki.40 %>% group_by(Year, KI.Date, Time, Site, Species, Family, CoarseFG, FineFG) %>% summarise(Abundance = sum(Number))
 
 
@@ -232,6 +232,7 @@ p8f
 
 ## Grazers
 ```{r RF_AB_graz, echo = FALSE}
+
 p9 <- ggplot(ki_hfish.ac, aes(Site, AB_graz)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
 p9 <- p9 + xlab("Site") + ylab("Mean Abundance") + labs(title = "Grazer Abundance")
 p9 <- p9 + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
@@ -250,6 +251,7 @@ p9c
 
 ## Browsers
 ```{r RF_AB_brows, echo = FALSE}
+
 p10 <- ggplot(ki_hfish.ac, aes(Site, AB_brows)) + geom_bar(aes(fill = Year), stat = "identity", position = "dodge")
 p10 <- p10 + xlab("Site") + ylab("Mean Abundance") + labs(title = "Browser Abundance")
 p10 <- p10 + scale_fill_manual(values = c("#3399CC", "#99CCFF", "#006699"))
@@ -270,7 +272,8 @@ p10
 
 #Site abundance at different times of day
 
-```{r setup, include = FALSE}
+```{r include = FALSE}
+
 #Grouping all site abundances by Date
 ki.5d <- ki.5 %>% group_by(Year, KI.Date, Site, CoarseFG, Family) %>% summarise(Abundance = sum(Number))
 ki.8d <- ki.8 %>% group_by(Year, KI.Date, Site, CoarseFG, Family) %>% summarise(Abundance = sum(Number))
@@ -316,35 +319,145 @@ ki18.40 <- droplevels(ki18.40)
 
 #binding all dataframes together for plotting
 ki.ac2018 <- rbind(ki18.5, ki18.8, ki18.32, ki18.35, ki18.40)
-str(ki.ac2018)
+
 #note: assign the legend to be the time
 
 
 
 
 ```
-## Site abundance 2018
-```{r, echo = FALSE}
-d1 <- ggplot(ki18.5, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+
+
+### Site 5
+```{r echo = FALSE}
+
+d1 <- ggplot(ki.5ab, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
   theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
 d1
 
-d2 <- ggplot(ki18.8, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+#Subsetting for Pomacentridae
+pom5 <- ki.5ab[ki.5ab$Family%in%"Pomacentridae",]
+pom5 <- droplevels(pom5)
+
+pomp5 <- ggplot(pom5, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+pomp5
+
+
+#Subsetting for Pomacentridae at site 5
+ser5 <- ki.5ab[ki.5ab$Family%in%"Serranidae",]
+ser5 <- droplevels(ser5)
+
+serp5 <- ggplot(ser5, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+serp5
+
+```
+
+###Site 8
+```{r echo = FALSE}
+
+d2 <- ggplot(ki.8ab, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
   theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
 d2
 
-d3 <- ggplot(ki18.32, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+#Subsetting for Pomacentridae
+pom8 <- ki.8ab[ki.8ab$Family%in%"Pomacentridae",]
+pom8 <- droplevels(pom8)
+
+
+pomp8 <- ggplot(pom8, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+pomp8
+
+#Subsetting for Pomacentridae at site 5
+ser8 <- ki.8ab[ki.8ab$Family%in%"Serranidae",]
+ser8 <- droplevels(ser8)
+
+serp8 <- ggplot(ser8, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+serp8
+```
+
+###Site 32
+```{r echo = FALSE}
+d3 <- ggplot(ki.32ab, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
   theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
 d3
 
-d4 <- ggplot(ki18.35, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+#Subsetting for Apogonidae
+apo32 <- ki.32ab[ki.32ab$Family%in%"Apogonidae",]
+apo32 <- droplevels(apo32)
+
+
+apop32 <- ggplot(apo32, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+apop32
+
+#Subsetting for Pomacentridae at site 5
+ser32 <- ki.32ab[ki.32ab$Family%in%"Serranidae",]
+ser32 <- droplevels(ser32)
+
+serp32 <- ggplot(ser32, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+serp32
+```
+
+###Site 35
+```{r echo = FALSE}
+d4 <- ggplot(ki.35ab, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
   theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
 d4
 
-d5 <- ggplot(ki18.40, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+#Subsetting for Pomacentridae
+pom35 <- ki.35ab[ki.35ab$Family%in%"Pomacentridae",]
+pom35 <- droplevels(pom35)
+
+
+pomp35 <- ggplot(pom35, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+pomp35
+
+#Subsetting for Pomacentridae at site 5
+ser35 <- ki.35ab[ki.35ab$Family%in%"Serranidae",]
+ser35 <- droplevels(ser35)
+
+serp35 <- ggplot(ser35, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+serp35
+```
+
+###Site 40
+```{r echo = FALSE}
+d5 <- ggplot(ki.40ab, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
   theme(axis.text.x = element_text(angle=90, vjust=0, size = 9))
 d5
 
+#Subsetting for Pomacentridae
+pom40 <- ki.40ab[ki.40ab$Family%in%"Pomacentridae",]
+pom40 <- droplevels(pom40)
+
+
+pomp40 <- ggplot(pom40, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+pomp40
+
+#Subsetting for Serranidae
+ser40 <- ki.40ab[ki.40ab$Family%in%"Serranidae",]
+ser40 <- droplevels(ser40)
+
+serp40 <- ggplot(ser40, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+serp40
+
+#Subsetting for Caesionidae
+cae40 <- ki.40ab[ki.40ab$Family%in%"Caesionidae",]
+cae40 <- droplevels(cae40)
+
+caep40 <- ggplot(cae40, aes(Species, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
+                  theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 9))
+caep40
+#Serranidae, Pomacentridae, Apogonidae, and Caesionidae
 
 #Tot1 <- ggplot(ki.ac2018, aes(Family, Abundance)) + geom_bar(aes(fill = KI.Date), stat = "identity", position = "dodge") +
 #  facet_wrap(~Site, ncol = 1) +
