@@ -14,11 +14,11 @@ output:
 library(stringr)
 library(tidyr)
 #read in data
-s5.18 <- read.csv(file ="C:/Users/Sean Dimoff/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_5.csv", header=TRUE, stringsAsFactors=FALSE)
-s8.18 <- read.csv(file ="C:/Users/Sean Dimoff/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_8.csv", header=TRUE, stringsAsFactors=FALSE)
-s32.18 <- read.csv(file ="C:/Users/Sean Dimoff/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_32.csv", header=TRUE, stringsAsFactors=FALSE)
-s35.18 <- read.csv(file ="C:/Users/Sean Dimoff/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_35.csv", header=TRUE, stringsAsFactors=FALSE)
-s40.18 <- read.csv(file ="C:/Users/Sean Dimoff/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_40.csv", header=TRUE, stringsAsFactors=FALSE)
+s5.18 <- read.csv(file ="C:/Users/sdimo/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_5.csv", header=TRUE, stringsAsFactors=FALSE)
+s8.18 <- read.csv(file ="C:/Users/sdimo/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_8.csv", header=TRUE, stringsAsFactors=FALSE)
+s32.18 <- read.csv(file ="C:/Users/sdimo/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_32.csv", header=TRUE, stringsAsFactors=FALSE)
+s35.18 <- read.csv(file ="C:/Users/sdimo/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_35.csv", header=TRUE, stringsAsFactors=FALSE)
+s40.18 <- read.csv(file ="C:/Users/sdimo/Documents/GitHub/Sean_Acoustics/Raw_Data/SPL.ACI_2018_MP_40.csv", header=TRUE, stringsAsFactors=FALSE)
 
 #adding new column to each dataframe for site
 s5.18$Site <- "5"
@@ -40,7 +40,8 @@ all.18 <- rbind(s5.18, s8.18, s32.18, s35.18, s40.18)
 #seperating first column
 T.5 <- c(s5.18$T.stamp)
 
-T.5 %>% seperate(T.5, sep = 6)
+T.5 <- as.numeric(s, "")
+T.5 %>% separate(T.5, sep = 6)
 #T.5 <- str_split_fixed(T.5, "18", 2)
 #T.5 <- str_split(T.5, "18", simplify = TRUE)
 ```
