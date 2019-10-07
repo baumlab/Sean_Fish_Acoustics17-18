@@ -6,25 +6,243 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(plotly)
+#loading in the data
+#hourdata
+load("../Raw_Data/ACI_BB17hr.Rdata")
+load("../Raw_Data/ACI_BB18hr.Rdata")
+load("../Raw_Data/ACI_HF17hr.Rdata")
+load("../Raw_Data/ACI_HF18hr.Rdata")
+load("../Raw_Data/ACI_MF17hr.Rdata")
+load("../Raw_Data/ACI_MF18hr.Rdata")
+
+load("../Raw_Data/SPL_BB17hr.Rdata")
+load("../Raw_Data/SPL_BB18hr.Rdata")
+load("../Raw_Data/SPL_HF17hr.Rdata")
+load("../Raw_Data/SPL_HF18hr.Rdata")
+load("../Raw_Data/SPL_MF17hr.Rdata")
+load("../Raw_Data/SPL_MF18hr.Rdata")
+
+#daydata
+load("../Raw_Data/ACI_BB17day.Rdata")
+load("../Raw_Data/ACI_BB18day.Rdata")
+load("../Raw_Data/ACI_HF17day.Rdata")
+load("../Raw_Data/ACI_HF18day.Rdata")
+load("../Raw_Data/ACI_MF17day.Rdata")
+load("../Raw_Data/ACI_MF18day.Rdata")
+
+load("../Raw_Data/SPL_BB17day.Rdata")
+load("../Raw_Data/SPL_BB18day.Rdata")
+load("../Raw_Data/SPL_HF17day.Rdata")
+load("../Raw_Data/SPL_HF18day.Rdata")
+load("../Raw_Data/SPL_MF17day.Rdata")
+load("../Raw_Data/SPL_MF18day.Rdata")
+
+#reorganizing data for boxplots
+
+#add site as a new column for each data set - then rbind them to eachother
 ```
 
-## R Markdown
+## ACI Line Plots by day
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r daily average, echo=FALSE}
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+x <- list(title = "ACI")
+y <- list(title = "SPL")
 
-```{r cars}
-summary(cars)
+plot_ly(ACI_BB17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2017", yaxis = x)
+
+plot_ly(ACI_BB18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2018", yaxis = x)
+
+plot_ly(ACI_HF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2017", yaxis = x)
+
+plot_ly(ACI_HF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2018", yaxis = x)
+
+plot_ly(ACI_MF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2017", yaxis = x)
+
+plot_ly(ACI_MF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2018", yaxis = x)
+
 ```
 
-## Including Plots
+## SPL Line Plots by day
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r daily average, echo=FALSE}
+
+x <- list(title = "ACI")
+y <- list(title = "SPL")
+
+plot_ly(SPL_BB17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband SPL at all Sites, 2017", yaxis = y)
+
+plot_ly(SPL_BB18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband SPL at all Sites, 2018", yaxis = y)
+
+plot_ly(SPL_HF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency SPL at all Sites, 2017", yaxis = y)
+
+plot_ly(SPL_HF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency SPL at all Sites, 2018", yaxis = y)
+
+plot_ly(SPL_MF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency SPL at all Sites, 2017", yaxis = y)
+
+plot_ly(SPL_MF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency SPL at all Sites, 2018", yaxis = y)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## ACI Box Plots by day
+```{r daily average, echo=FALSE}
+
+
+
+```
+## SPL Box Plots by day
+```{r daily average, echo=FALSE}
+
+
+
+```
+## ACI Line Plots by hour
+```{r daily average, echo=FALSE}
+
+x <- list(title = "ACI")
+y <- list(title = "SPL")
+
+plot_ly(ACI_BB17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2017", yaxis = x)
+
+plot_ly(ACI_BB18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2018", yaxis = x)
+
+plot_ly(ACI_HF17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2017", yaxis = x)
+
+plot_ly(ACI_HF18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2018", yaxis = x)
+
+plot_ly(ACI_MF17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2017", yaxis = x)
+
+plot_ly(ACI_MF18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2018", yaxis = x)
+
+
+```
+
+## SPL Line Plots by hour
+```{r hourly average, echo=FALSE}
+
+x <- list(title = "ACI")
+y <- list(title = "SPL")
+
+plot_ly(SPL_BB17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband SPL at all Sites, 2017", yaxis = y)
+
+plot_ly(SPL_BB18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband SPL at all Sites, 2018", yaxis = y)
+
+plot_ly(SPL_HF17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency SPL at all Sites, 2017", yaxis = y)
+
+plot_ly(SPL_HF18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency SPL at all Sites, 2018", yaxis = y)
+
+plot_ly(SPL_MF17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency SPL at all Sites, 2017", yaxis = y)
+
+plot_ly(SPL_MF18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency SPL at all Sites, 2018", yaxis = y)
+
+```
+## ACI Box Plots by hour
+```{r daily average, echo=FALSE}
+
+
+
+```
+## SPL Box Plots by hour
+```{r daily average, echo=FALSE}
+
+
+
+```

@@ -5,6 +5,7 @@
 library(tidyr)
 library(dplyr)
 
+
 #Reading in all raw data
 
 #2017 ACI/SPL data
@@ -426,3 +427,110 @@ save(ACI_MF18, file="Raw_Data/ACI_MF18.Rdata")
 save(SPL_BB18, file="Raw_Data/SPL_BB18.Rdata")
 save(SPL_HF18, file="Raw_Data/SPL_HF18.Rdata")
 save(SPL_MF18, file="Raw_Data/SPL_MF18.Rdata")
+
+#writing them as .csv files
+#write.csv(ACI_BB17, file = "Raw_Data/ACI_BB17.csv")
+
+#### Averaging each site by hour ####
+#renaming my columns
+names(ACI_BB17) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(ACI_BB18) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(ACI_HF17) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(ACI_HF18) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(ACI_MF17) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(ACI_MF18) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+
+names(SPL_BB17) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(SPL_BB18) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(SPL_HF17) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(SPL_HF18) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(SPL_MF17) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+names(SPL_MF18) <- c("Date", "T", "s32", "s35", "s40", "s8", "s5", "Year")
+
+#seperating time back into hour and minute
+ACI_BB17 <- ACI_BB17 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+ACI_HF17 <- ACI_HF17 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+ACI_MF17 <- ACI_MF17 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+
+ACI_BB18 <- ACI_BB18 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+ACI_HF18 <- ACI_HF18 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+ACI_MF18 <- ACI_MF18 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+
+SPL_BB17 <- SPL_BB17 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+SPL_HF17 <- SPL_HF17 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+SPL_MF17 <- SPL_MF17 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+
+SPL_BB18 <- SPL_BB18 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+SPL_HF18 <- SPL_HF18 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+SPL_MF18 <- SPL_MF18 %>% separate(T, into = c("Hour", "Minute"), sep = ":")
+
+#aggregating by averaging all days by the hour
+ACI_BB17.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_BB17, FUN=mean)
+ACI_HF17.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_HF17, FUN=mean)
+ACI_MF17.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_MF17, FUN=mean)
+
+ACI_BB18.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_BB17, FUN=mean)
+ACI_HF18.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_HF17, FUN=mean)
+ACI_MF18.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_MF17, FUN=mean)
+
+SPL_BB17.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_BB17, FUN=mean)
+SPL_HF17.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_HF17, FUN=mean)
+SPL_MF17.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_MF17, FUN=mean)
+
+SPL_BB18.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_BB17, FUN=mean)
+SPL_HF18.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_HF17, FUN=mean)
+SPL_MF18.hr <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Hour, data=ACI_MF17, FUN=mean)
+
+#saving the aggregated files
+save(ACI_BB17.hr, file="Raw_Data/ACI_BB17hr.Rdata")
+save(ACI_HF17.hr, file="Raw_Data/ACI_HF17hr.Rdata")
+save(ACI_MF17.hr, file="Raw_Data/ACI_MF17hr.Rdata")
+
+save(SPL_BB17.hr, file="Raw_Data/SPL_BB17hr.Rdata")
+save(SPL_HF17.hr, file="Raw_Data/SPL_HF17hr.Rdata")
+save(SPL_MF17.hr, file="Raw_Data/SPL_MF17hr.Rdata")
+
+#2018
+save(ACI_BB18.hr, file="Raw_Data/ACI_BB18hr.Rdata")
+save(ACI_HF18.hr, file="Raw_Data/ACI_HF18hr.Rdata")
+save(ACI_MF18.hr, file="Raw_Data/ACI_MF18hr.Rdata")
+
+save(SPL_BB18.hr, file="Raw_Data/SPL_BB18hr.Rdata")
+save(SPL_HF18.hr, file="Raw_Data/SPL_HF18hr.Rdata")
+save(SPL_MF18.hr, file="Raw_Data/SPL_MF18hr.Rdata")
+
+#### Averaging each site by day ####
+#aggregating by averaging all days by the hour
+ACI_BB17.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_BB17, FUN=mean)
+ACI_HF17.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_HF17, FUN=mean)
+ACI_MF17.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_MF17, FUN=mean)
+
+ACI_BB18.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_BB17, FUN=mean)
+ACI_HF18.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_HF17, FUN=mean)
+ACI_MF18.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_MF17, FUN=mean)
+ 
+SPL_BB17.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_BB17, FUN=mean)
+SPL_HF17.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_HF17, FUN=mean)
+SPL_MF17.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_MF17, FUN=mean)
+ 
+SPL_BB18.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_BB17, FUN=mean)
+SPL_HF18.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_HF17, FUN=mean)
+SPL_MF18.day <- aggregate(cbind(s32,s35,s40,s8,s5) ~ Date, data=ACI_MF17, FUN=mean)
+
+#saving the aggregated files
+save(ACI_BB17.day, file="Raw_Data/ACI_BB17day.Rdata")
+save(ACI_HF17.day, file="Raw_Data/ACI_HF17day.Rdata")
+save(ACI_MF17.day, file="Raw_Data/ACI_MF17day.Rdata")
+
+save(SPL_BB17.day, file="Raw_Data/SPL_BB17day.Rdata")
+save(SPL_HF17.day, file="Raw_Data/SPL_HF17day.Rdata")
+save(SPL_MF17.day, file="Raw_Data/SPL_MF17day.Rdata")
+
+#2018
+save(ACI_BB18.day, file="Raw_Data/ACI_BB18day.Rdata")
+save(ACI_HF18.day, file="Raw_Data/ACI_HF18day.Rdata")
+save(ACI_MF18.day, file="Raw_Data/ACI_MF18day.Rdata")
+ 
+save(SPL_BB18.day, file="Raw_Data/SPL_BB18day.Rdata")
+save(SPL_HF18.day, file="Raw_Data/SPL_HF18day.Rdata")
+save(SPL_MF18.day, file="Raw_Data/SPL_MF18day.Rdata")
