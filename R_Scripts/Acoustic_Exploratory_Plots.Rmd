@@ -1,248 +1,427 @@
 ---
-title: "Acoustic_Exploratory_Plots"
-author: "SeanDimoff"
-date: "October 2, 2019"
-output: html_document
+title: "Acoustic_2019_Explore"
+author: "Sean Dimoff"
+date: "October 9, 2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
 ---
 
 ```{r setup, include=FALSE}
-library(plotly)
-#loading in the data
-#hourdata
-load("../Raw_Data/ACI_BB17hr.Rdata")
-load("../Raw_Data/ACI_BB18hr.Rdata")
-load("../Raw_Data/ACI_HF17hr.Rdata")
-load("../Raw_Data/ACI_HF18hr.Rdata")
-load("../Raw_Data/ACI_MF17hr.Rdata")
-load("../Raw_Data/ACI_MF18hr.Rdata")
+library(ggplot2)
+library(cowplot)
+library(rmarkdown)
+library(knitr)
+library(RColorBrewer)
+##loading in the ACI/SPL data - wide form
 
-load("../Raw_Data/SPL_BB17hr.Rdata")
-load("../Raw_Data/SPL_BB18hr.Rdata")
-load("../Raw_Data/SPL_HF17hr.Rdata")
-load("../Raw_Data/SPL_HF18hr.Rdata")
-load("../Raw_Data/SPL_MF17hr.Rdata")
-load("../Raw_Data/SPL_MF18hr.Rdata")
+#hourdata
+#load("../Raw_Data/ACI_BB17hr.Rdata")
+#load("../Raw_Data/ACI_BB18hr.Rdata")
+#load("../Raw_Data/ACI_HF17hr.Rdata")
+#load("../Raw_Data/ACI_HF18hr.Rdata")
+#load("../Raw_Data/ACI_MF17hr.Rdata")
+#load("../Raw_Data/ACI_MF18hr.Rdata")
+#
+#load("../Raw_Data/SPL_BB17hr.Rdata")
+#load("../Raw_Data/SPL_BB18hr.Rdata")
+#load("../Raw_Data/SPL_HF17hr.Rdata")
+#load("../Raw_Data/SPL_HF18hr.Rdata")
+#load("../Raw_Data/SPL_MF17hr.Rdata")
+#load("../Raw_Data/SPL_MF18hr.Rdata")
 
 #daydata
-load("../Raw_Data/ACI_BB17day.Rdata")
-load("../Raw_Data/ACI_BB18day.Rdata")
-load("../Raw_Data/ACI_HF17day.Rdata")
-load("../Raw_Data/ACI_HF18day.Rdata")
-load("../Raw_Data/ACI_MF17day.Rdata")
-load("../Raw_Data/ACI_MF18day.Rdata")
+#load("../Raw_Data/ACI_BB17day.Rdata")
+#load("../Raw_Data/ACI_BB18day.Rdata")
+#load("../Raw_Data/ACI_HF17day.Rdata")
+#load("../Raw_Data/ACI_HF18day.Rdata")
+#load("../Raw_Data/ACI_MF17day.Rdata")
+#load("../Raw_Data/ACI_MF18day.Rdata")
+#
+#load("../Raw_Data/SPL_BB17day.Rdata")
+#load("../Raw_Data/SPL_BB18day.Rdata")
+#load("../Raw_Data/SPL_HF17day.Rdata")
+#load("../Raw_Data/SPL_HF18day.Rdata")
+#load("../Raw_Data/SPL_MF17day.Rdata")
+#load("../Raw_Data/SPL_MF18day.Rdata")
 
-load("../Raw_Data/SPL_BB17day.Rdata")
-load("../Raw_Data/SPL_BB18day.Rdata")
-load("../Raw_Data/SPL_HF17day.Rdata")
-load("../Raw_Data/SPL_HF18day.Rdata")
-load("../Raw_Data/SPL_MF17day.Rdata")
-load("../Raw_Data/SPL_MF18day.Rdata")
+#loading ACI/SPL long data for boxplots
+#ACI
+load("../Raw_Data/ACI_BB17hrlong.Rdata")
+load("../Raw_Data/ACI_HF17hrlong.Rdata")
+load("../Raw_Data/ACI_MF17hrlong.Rdata")
+load("../Raw_Data/ACI_BB18hrlong.Rdata")
+load("../Raw_Data/ACI_HF18hrlong.Rdata")
+load("../Raw_Data/ACI_MF18hrlong.Rdata")
 
-#reorganizing data for boxplots
+load("../Raw_Data/ACI_MFhrlong.Rdata")
+load("../Raw_Data/ACI_HFhrlong.Rdata")
+load("../Raw_Data/ACI_BBhrlong.Rdata")
 
-#add site as a new column for each data set - then rbind them to eachother
-```
+##making year a character
+ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
+ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
+ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
 
-## ACI Line Plots by day
+#SPL
+load("../Raw_Data/SPL_BB17hrlong.Rdata")
+load("../Raw_Data/SPL_HF17hrlong.Rdata")
+load("../Raw_Data/SPL_MF17hrlong.Rdata")
+load("../Raw_Data/SPL_BB18hrlong.Rdata")
+load("../Raw_Data/SPL_HF18hrlong.Rdata")
+load("../Raw_Data/SPL_MF18hrlong.Rdata")
 
-```{r daily average, echo=FALSE}
+load("../Raw_Data/SPL_MFhrlong.Rdata")
+load("../Raw_Data/SPL_HFhrlong.Rdata")
+load("../Raw_Data/SPL_BBhrlong.Rdata")
 
-x <- list(title = "ACI")
-y <- list(title = "SPL")
+#making year a character
+SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
+SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
+SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
 
-plot_ly(ACI_BB17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2017", yaxis = x)
+##loading in fish call count data
+#load("../Raw_Data/FC.05hr.Rdata")
+#load("../Raw_Data/FC.08hr.Rdata")
+#load("../Raw_Data/FC.32hr.Rdata")
+#load("../Raw_Data/FC.35hr.Rdata")
+#load("../Raw_Data/FC.40hr.Rdata")
 
-plot_ly(ACI_BB18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2018", yaxis = x)
+load("../Raw_Data/FC.CallperDayALL.Rdata")
+load("../Raw_Data/FC.CallperDay17.Rdata")
+load("../Raw_Data/FC.CallperDay18.Rdata")
 
-plot_ly(ACI_HF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2017", yaxis = x)
-
-plot_ly(ACI_HF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2018", yaxis = x)
-
-plot_ly(ACI_MF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2017", yaxis = x)
-
-plot_ly(ACI_MF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2018", yaxis = x)
-
-```
-
-## SPL Line Plots by day
+load("../Raw_Data/FC.CallperHourALL.Rdata")
+load("../Raw_Data/FC.CallperHour17.Rdata")
+load("../Raw_Data/FC.CallperHour18.Rdata")
 
 
-```{r daily average, echo=FALSE}
 
-x <- list(title = "ACI")
-y <- list(title = "SPL")
 
-plot_ly(SPL_BB17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband SPL at all Sites, 2017", yaxis = y)
+##loading in Boat visitation data
+load("../Raw_Data/BV.all.Rdata")
+load("../Raw_Data/BV.sum.Rdata")
 
-plot_ly(SPL_BB18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband SPL at all Sites, 2018", yaxis = y)
 
-plot_ly(SPL_HF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency SPL at all Sites, 2017", yaxis = y)
 
-plot_ly(SPL_HF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency SPL at all Sites, 2018", yaxis = y)
 
-plot_ly(SPL_MF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency SPL at all Sites, 2017", yaxis = y)
 
-plot_ly(SPL_MF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency SPL at all Sites, 2018", yaxis = y)
+##loading in lunar phase data
+load("../Raw_Data/LunarPhase2017.Rdata")
+load("../Raw_Data/LunarPhase2018.Rdata")
 
-```
 
-## ACI Box Plots by day
-```{r daily average, echo=FALSE}
+##loading in fish data
+load("../Raw_Data/ki_fishabundance.Rdata")
+load("../Raw_Data/ki_fishabundance17.Rdata")
+load("../Raw_Data/ki_fishabundance18.Rdata")
 
+load("../Raw_Data/ki_fishaverage.Rdata")
+load("../Raw_Data/ki_fishaverage17.Rdata")
+load("../Raw_Data/ki_fishaverage18.Rdata")
+
+
+#creating small legend function
+#addSmallLegend <- function(myPlot, pointSize = 0.7, textSize = 5, spaceLegend = 0.2) {
+#    myPlot +
+#        guides(shape = guide_legend(override.aes = list(size = pointSize)),
+#               color = guide_legend(override.aes = list(size = pointSize))) +
+#        theme(legend.title = element_text(size = textSize), 
+#              legend.text  = element_text(size = textSize),
+#              legend.key.size = unit(spaceLegend, "lines"))
+#}
 
 
 ```
-## SPL Box Plots by day
-```{r daily average, echo=FALSE}
+**Exploratory Plots for 2017-2018 Acoustic/Fish Data**
 
+**Purpose** To explore the Acoustic data gathered in 2017 and 2018 to expose important trends between sites, diurnal patterns, fish abundance, lunar phase, and coral reef acoustics.
 
+#Acoustics
+**Acoustics Breakdown** All acoustic metrics (SPL and ACI) are broken down into 3 frequency bands: Broadband (All frequencies), High Frequency (Frequencies between 1 kHz - 22 kHz), and Mid Frequency (Frequencies between 160 Hz and 1 kHz)
 
-```
-## ACI Line Plots by hour
-```{r daily average, echo=FALSE}
+*Note* 2017 had a 10 minute duty cycle with 5 minutes on while 2018 had a 15 minute duty cycle with 5 minutes on, so the number of files averages differs between years
 
-x <- list(title = "ACI")
-y <- list(title = "SPL")
+##SPL (Hourly Averages)
 
-plot_ly(ACI_BB17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2017", yaxis = x)
+### Broadband
+Broadband SPL averaged by hour across all days
+```{r spl broadband, echo=FALSE}
 
-plot_ly(ACI_BB18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2018", yaxis = x)
+p.splbb17<- ggplot(data =SPL_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
 
-plot_ly(ACI_HF17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2017", yaxis = x)
+#making legend smaller
+#p.splbb17 <- addSmallLegend(p.splbb17)
 
-plot_ly(ACI_HF18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2018", yaxis = x)
+p.splbb18<- ggplot(data =SPL_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "none")
 
-plot_ly(ACI_MF17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2017", yaxis = x)
+#Horizontal graph
+#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+#splbb.h
 
-plot_ly(ACI_MF18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2018", yaxis = x)
+splbb.v <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
+
+splbb.v
 
 
 ```
 
-## SPL Line Plots by hour
-```{r hourly average, echo=FALSE}
+### High Frequency
+High Frequency SPL averaged by hour across all days
+```{r spl hf, echo=FALSE}
 
-x <- list(title = "ACI")
-y <- list(title = "SPL")
+p.splhf17<- ggplot(data =SPL_HF17.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
 
-plot_ly(SPL_BB17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband SPL at all Sites, 2017", yaxis = y)
+#making legend smaller
+#p.splbb17 <- addSmallLegend(p.splbb17)
 
-plot_ly(SPL_BB18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband SPL at all Sites, 2018", yaxis = y)
+p.splhf18<- ggplot(data =SPL_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "none")
 
-plot_ly(SPL_HF17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency SPL at all Sites, 2017", yaxis = y)
+#Horizontal graph
+#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+#splbb.h
 
-plot_ly(SPL_HF18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency SPL at all Sites, 2018", yaxis = y)
+splhf.v <- plot_grid(p.splhf17, p.splhf18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
 
-plot_ly(SPL_MF17.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency SPL at all Sites, 2017", yaxis = y)
+splhf.v
+```
 
-plot_ly(SPL_MF18.hr, x = ~Hour, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
-  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
-  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
-  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
-  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency SPL at all Sites, 2018", yaxis = y)
+### Mid Frequency
+Mid Frequency SPL averaged by hour across all days
+```{r spl mf, echo=FALSE}
+
+p.splmf17<- ggplot(data =SPL_MF17.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+
+#making legend smaller
+#p.splbb17 <- addSmallLegend(p.splbb17)
+
+p.splmf18<- ggplot(data =SPL_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "none")
+
+#Horizontal graph
+#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+#splbb.h
+
+splmf.v <- plot_grid(p.splmf17, p.splmf18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
+
+splmf.v
+```
+
+
+### Boxplots
+Distribution of SPL at all frequencies and sites - averaged by hour
+```{r spl bp, echo=FALSE}
+#Boxplot
+
+p.splbb.bp <- ggplot(data = SPL_BB.hr.long, aes(y = Broadband_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
+p.splhf.bp <- ggplot(data = SPL_HF.hr.long, aes(y = HF_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
+p.splmf.bp <- ggplot(data = SPL_MF.hr.long, aes(y = MF_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
+
+p.spl.bp <- plot_grid(p.splbb.bp, p.splhf.bp, p.splmf.bp, labels = c("Broadband", "High Frequency", "Mid Frequency"), nrow = 3, align = "v", label_x = .4)
+
+p.spl.bp
+```
+
+
+##ACI (Hourly Averages)
+
+
+### Broadband
+Broadband ACI averaged by hour across all days
+```{r aci broadband, echo=FALSE}
+
+p.acibb17<- ggplot(data =ACI_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+
+#making legend smaller
+#p.splbb17 <- addSmallLegend(p.splbb17)
+
+p.acibb18<- ggplot(data =ACI_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "none")
+
+#Horizontal graph
+#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+#splbb.h
+
+acibb.v <- plot_grid(p.acibb17, p.acibb18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
+
+acibb.v
+```
+### High Frequency
+High Frequency ACI averaged by hour across all days
+```{r aci hf, echo=FALSE}
+
+p.acihf17<- ggplot(data =ACI_HF17.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+
+#making legend smaller
+#p.splbb17 <- addSmallLegend(p.splbb17)
+
+p.acihf18<- ggplot(data =ACI_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "none")
+
+#Horizontal graph
+#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+#splbb.h
+
+acihf.v <- plot_grid(p.acihf17, p.acihf18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
+
+acihf.v
+```
+### Mid Frequency
+Mid Frequency ACI averaged by hour across all days
+```{r aci mf, echo=FALSE}
+
+p.acimf17<- ggplot(data =ACI_MF17.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+
+#making legend smaller
+#p.splbb17 <- addSmallLegend(p.splbb17)
+
+p.acimf18<- ggplot(data =ACI_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "none")
+
+#Horizontal graph
+#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+#splbb.h
+
+acimf.v <- plot_grid(p.acimf17, p.acimf18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
+
+acimf.v
+```
+### Boxplots
+Distribution of ACI at all frequencies and sites - averaged by hour
+```{r aci bp, echo=FALSE}
+#Boxplot
+
+p.acibb.bp <- ggplot(data = ACI_BB.hr.long, aes(y = Broadband_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
+p.acihf.bp <- ggplot(data = ACI_HF.hr.long, aes(y = HF_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
+p.acimf.bp <- ggplot(data = ACI_MF.hr.long, aes(y = MF_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
+
+p.aci.bp <- plot_grid(p.acibb.bp, p.acihf.bp, p.acimf.bp, labels = c("Broadband", "High Frequency", "Mid Frequency"), nrow = 3, align = "v", label_x = .4)
+
+p.aci.bp
+```
+
+##Fish Sounds
+
+###Total Knocks - Hourly
+Total number of knocks is the sum total of a 5 minute recording from the beginning of each hour
+```{r tkh, echo=FALSE}
+
+##reordering levels for the legend
+FC.sep$Hour <- factor(FC.sep$Hour, levels = c("3", "9", "15", "21"))
+FC.sep17$Hour <- factor(FC.sep17$Hour, levels = c("3", "9", "15", "21"))
+FC.sep18$Hour <- factor(FC.sep18$Hour, levels = c("3", "9", "15", "21"))
+
+fcALL.bp <- ggplot(data = FC.sep, aes(y = Tot_Knocks, x = Site, fill = Hour)) + geom_boxplot() + ylab("# of Knocks") + theme(legend.position = "none", axis.title.x = element_blank())
+
+fc17.bp <- ggplot(data = FC.sep17, aes(y = Tot_Knocks, x = Site, fill = Hour)) + geom_boxplot() + ylab("# of Knocks") + theme (legend.position = "none", axis.title.x = element_blank())
+
+fc18.bp <- ggplot(data = FC.sep18, aes(y = Tot_Knocks, x = Site, fill = Hour)) + geom_boxplot() + ylab("# of Knocks") + theme (legend.position = "none")
+
+p.fc.bp <- plot_grid(fcALL.bp, fc17.bp, fc18.bp, labels = c("All Years", "2017", "2018"), nrow = 3, align = "v", label_x = .5)
+
+p.fc.bp
 
 ```
-## ACI Box Plots by hour
-```{r daily average, echo=FALSE}
 
+The 4 box plots in each site represent each time frame, 3 am, 9 am, 3 pm, and 9 pm - in that order
 
+###Total Knocks - Daily
+Total number of knocks summing all 4 samples to get a daily amount - to compare sites
+```{r tkd, echo=FALSE}
+
+fCALL.bp <- ggplot(data = FC.sd, aes(x = Site, y = Tot_Knocks)) + geom_boxplot() + ylab("# of Knocks") + theme (axis.title.x = element_blank())
+
+fC17.bp <- ggplot(data = FC.sd17, aes(y = Tot_Knocks, x = Site)) + geom_boxplot() + ylab("# of Knocks") + theme (legend.position = "none", axis.title.x = element_blank())
+
+fC18.bp <- ggplot(data = FC.sd18, aes(y = Tot_Knocks, x = Site)) + geom_boxplot() + ylab("# of Knocks")
+
+p.fC.bp <- plot_grid(fCALL.bp, fC17.bp, fC18.bp, labels = c("All Years", "2017", "2018"), nrow = 3, align = "v", label_x = .5)
+
+p.fC.bp
 
 ```
-## SPL Box Plots by hour
-```{r daily average, echo=FALSE}
+
+###Long Calls - Hourly
+Total number of long calls is the sum total of a 5 minute recording from the beginning of each hour
+```{r tlch, echo=FALSE}
+
+##reordering levels for the legend
+flCALL.bp <- ggplot(data = FC.sep, aes(y = Num_L_calls, x = Site, fill = Hour)) + geom_boxplot() + ylab("# of Knocks") + theme(legend.position = "none", axis.title.x = element_blank())
+
+flC17.bp <- ggplot(data = FC.sep17, aes(y = Num_L_calls, x = Site, fill = Hour)) + geom_boxplot() + ylab("# of Knocks") + theme (legend.position = "none", axis.title.x = element_blank())
+
+flC18.bp <- ggplot(data = FC.sep18, aes(y = Num_L_calls, x = Site, fill = Hour)) + geom_boxplot() + ylab("# of Knocks") + theme (legend.position = "none")
+
+p.flC.bp <- plot_grid(flCALL.bp, flC17.bp, flC18.bp, labels = c("All Years", "2017", "2018"), nrow = 3, align = "v", label_x = .5)
+
+p.flC.bp
+
+```
+
+The 4 box plots in each site represent each time frame, 3 am, 9 am, 3 pm, and 9 pm - in that order
+
+###Long Calls - Daily
+Total long calls summing all 4 samples to get a daily amount - to compare sites
+```{r tlcd, echo=FALSE}
+
+flcall.bp <- ggplot(data = FC.sd, aes(x = Site, y = Num_L_calls)) + geom_boxplot() + ylab("# LC") + theme (axis.title.x = element_blank())
+
+flc17.bp <- ggplot(data = FC.sd17, aes(y = Num_L_calls, x = Site)) + geom_boxplot() + ylab("# LC") + theme (legend.position = "none", axis.title.x = element_blank())
+
+flc18.bp <- ggplot(data = FC.sd18, aes(y = Num_L_calls, x = Site)) + geom_boxplot() + ylab("# LC")
+
+p.flc.bp <- plot_grid(flcall.bp, flc17.bp, flc18.bp, labels = c("All Years", "2017", "2018"), nrow = 3, align = "v", label_x = .5)
+
+p.flc.bp
+
+```
+
+#Fish Abundance
+
+**Fish Abundance** is the sum total of fish at that site at each observation that year, averages are made within sites within years when multiple UVC were made.  However, all data has been plotted in addition to any averages to ensure that we know where the averages come from.
+
+##Sum Fish abundance - summed to each UVC
+```{r fish abundance, echo = FALSE}
+FA.ab17 <- ggplot(ki.acab17, aes(x = Site, y = Number, fill = MD)) + geom_bar(stat = "identity", position = "dodge")+  geom_text(aes(label=Number), position = position_dodge(1), vjust = -.5) + scale_fill_brewer(palette = "Paired") + theme(axis.title.x = element_blank(), legend.position = "none") + ylim (0,15000)
+
+FA.ab18 <- ggplot(ki.acab18, aes(x = Site, y = Number, fill = MD)) + geom_bar(stat = "identity", position = "dodge")+  geom_text(aes(label=Number), position = position_dodge(1), vjust = -.5) + scale_fill_brewer(palette = "Paired") + ylim(0, 15000) + theme (legend.position = "none")
+
+p.FA.ab <- plot_grid(FA.ab17, FA.ab18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5 )
+
+p.FA.ab
+```
 
 
 
+##Average Fish abundance
+Fish Abundance - Averaged within years and then across years at all sites
+```{r fish average, echo = FALSE}
+FA.av17 <- ggplot(ki.acav17, aes(x = Site, y = Number)) + geom_bar(stat = "identity", position = "dodge")+  geom_text(aes(label=Number), position = position_dodge(1), vjust = -.5) + scale_fill_brewer(palette = "Set1") + theme(axis.title.x = element_blank(), legend.position = "none") + ylim (0,15000)
+
+FA.av18 <- ggplot(ki.acav18, aes(x = Site, y = Number)) + geom_bar(stat = "identity", position = "dodge")+  geom_text(aes(label=Number), position = position_dodge(1), vjust = -.5) + scale_fill_brewer(palette = "Paired") + ylim(0, 15000) + theme (legend.position = "none")
+
+FA.av <- ggplot(ki.acav, aes(x = Site, y = Number)) + geom_bar(stat = "identity", position = "dodge")+  geom_text(aes(label=Number), position = position_dodge(1), vjust = -.5) + scale_fill_brewer(palette = "Paired") + ylim(0, 15000) + theme (legend.position = "none")
+
+
+p.FA.av <- plot_grid(FA.av17, FA.av18, FA.av, labels = c("2017", "2018", "All Years"), nrow = 3, align = "v", label_x = .5 )
+
+p.FA.av
+```
+#Boat Visitations
+
+**Boat Visitations** is the sum total number of boats detected visiting each site over their entire time deployed
+
+*Note* this is ONLY the 2018 data
+
+Boat Visitation Data for 2018 at each site
+```{r boats, echo = FALSE}
+#making site a character
+BV.sum$Site <- as.character(BV.sum$Site)
+boats <- ggplot(BV.sum, aes(x = Site, y = Visitations)) + geom_bar(stat = "identity", position = "dodge")+  geom_text(aes(label=Visitations), position = position_dodge(1), vjust = -.5) + scale_fill_brewer(palette = "Set1") + ggtitle ("Boat Visitations in 2018") + ylim(0,130)
+
+boats
 ```

@@ -79,13 +79,66 @@ FCt08.hr <- aggregate(cbind(Tot_Knocks, Num_L_calls, Num_Herbivory) ~ st.id, dat
 
 ## Saving everything as .Rdata files ####
 #saving the individual files
-save(FCt32.hr, file="Raw_Data/FC.32hr.Rdata")
-save(FCt35.hr, file="Raw_Data/FC.35hr.Rdata")
-save(FCt40.hr, file="Raw_Data/FC.40hr.Rdata")
-save(FCt05.hr, file="Raw_Data/FC.05hr.Rdata")
-save(FCt08.hr, file="Raw_Data/FC.08hr.Rdata")
+#save(FCt32.hr, file="Raw_Data/FC.32hr.Rdata")
+#save(FCt35.hr, file="Raw_Data/FC.35hr.Rdata")
+#save(FCt40.hr, file="Raw_Data/FC.40hr.Rdata")
+#save(FCt05.hr, file="Raw_Data/FC.05hr.Rdata")
+#save(FCt08.hr, file="Raw_Data/FC.08hr.Rdata")
 
 #saving the grouped data files
 
-save(FC.test.hr, file="Raw_Data/FC.ALL.hr.Rdata")
-save(FC.test.day, file="Raw_Data/FC.ALL.day.Rdata")
+#save(FC.test.hr, file="Raw_Data/FC.ALL.hr.Rdata")
+#save(FC.test.day, file="Raw_Data/FC.ALL.day.Rdata")
+
+
+## Getting the number of calls per day at each site ####
+#creating a column combining date and site - for a unique date-site ID
+FC.test$site.date <- paste(FC.test$Date,FC.test$ï..Site, sep= "-")
+
+#summing by each site.date to get the number of calls per site per day
+FC.site.day <- aggregate(cbind(Tot_Knocks, Num_L_calls, Num_Herbivory) ~ site.date, data=FC.test, FUN=sum)
+
+#separating site and day
+FC.sd <- FC.site.day %>% separate(site.date, into = c("Date", "Site"), sep = "-")
+FC.sdALL <- FC.sd
+#separating MD from year
+FC.sad <- FC.sd %>% separate(Date, into = c("MD", "Year"), sep = 6)
+
+#separating the underscore from the date
+FC.sad <- FC.sad %>% separate(MD, into = c("MD", "del"), sep = 5)
+#removing the underscore row
+FC.sad <- subset(FC.sad, select = -c(del))
+
+#subsetting by year
+FC.sd17 <- FC.sad[which(FC.sad$Year == 17),]
+FC.sd18 <- FC.sad[which(FC.sad$Year == 18),]
+## Getting the number of calls per hour per day at each site ####
+
+#separating hour and site from date
+FC.site.hr <- FC.site.hr %>% separate(st.id, into = c("Date", "Hour_Site"), sep = "-")
+
+#separating hour and site
+FC.site.hr <- FC.site.hr %>% separate(Hour_Site, into = c("Hour", "Site"), sep = "_")
+
+FC.sep <- FC.site.hr
+FC.sepALL <- FC.sep
+#separating MD from year
+FC.sad <- FC.sep %>% separate(Date, into = c("MD", "Year"), sep = 6)
+
+#separating the underscore from the date
+FC.sad <- FC.sad %>% separate(MD, into = c("MD", "del"), sep = 5)
+#removing the underscore row
+FC.sad <- subset(FC.sad, select = -c(del))
+
+#subsetting by year
+FC.sep17 <- FC.sad[which(FC.sad$Year == 17),]
+FC.sep18 <- FC.sad[which(FC.sad$Year == 18),]
+
+#saving the new datafiles
+save(FC.sd, file="Raw_Data/FC.CallperDayALL.Rdata")
+save(FC.sd17, file="Raw_Data/FC.CallperDay17.Rdata")
+save(FC.sd18, file="Raw_Data/FC.CallperDay18.Rdata")
+
+save(FC.sep, file="Raw_Data/FC.CallperHourALL.Rdata")
+save(FC.sep17, file="Raw_Data/FC.CallperHour17.Rdata")
+save(FC.sep18, file="Raw_Data/FC.CallperHour18.Rdata")

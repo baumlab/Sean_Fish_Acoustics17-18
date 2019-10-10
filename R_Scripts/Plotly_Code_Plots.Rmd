@@ -1,0 +1,70 @@
+---
+title: "Plotly Code"
+author: "Sean Dimoff"
+date: "October 9, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+x <- list(title = "ACI")
+y <- list(title = "SPL")
+
+ACI.BB.17<- plot_ly(ACI_BB17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2017", yaxis = x)
+
+ACI.BB.18<- plot_ly(ACI_BB18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Broadband ACI at all Sites, 2018", yaxis = x)
+
+ACI.HF.17<- plot_ly(ACI_HF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2017", yaxis = x)
+
+ACI.HF.18<- plot_ly(ACI_HF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "High Frequency ACI at all Sites, 2018", yaxis = x)
+
+ACI.MF.17<- plot_ly(ACI_MF17.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2017", yaxis = x)
+
+ACI.MF.18<- plot_ly(ACI_MF18.day, x = ~Date, y= ~s32,name = "Site 32", type = "scatter", mode = "lines") %>%
+  add_trace(y = ~s35, name = "Site 35", mode = "lines") %>%
+  add_trace(y = ~s40, name = "Site 40", mode = "lines") %>%
+  add_trace(y = ~s5, name = "Site 5", mode = "lines") %>%
+  add_trace(y = ~s8, name = "Site 8", mode = "lines") %>% layout(title = "Medium Frequency ACI at all Sites, 2018", yaxis = x)
+
+ACI.BB <- subplot(ACI.BB.17, ACI.BB.18, shareY = TRUE)
+ACI.BB
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
