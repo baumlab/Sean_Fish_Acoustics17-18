@@ -760,11 +760,33 @@ ACI_HF.hr.long$Site <- as.character(ACI_HF.hr.long$Site)
 ACI_MF.hr.long$Site <- as.character(ACI_MF.hr.long$Site)
 
 #saving these long files
-save(ACI_BB.hr.long, file="Raw_Data/ACI_BBhrlong.Rdata")
-save(ACI_HF.hr.long, file="Raw_Data/ACI_HFhrlong.Rdata")
-save(ACI_MF.hr.long, file="Raw_Data/ACI_MFhrlong.Rdata")
+#save(ACI_BB.hr.long, file="Raw_Data/ACI_BBhrlong.Rdata")
+#save(ACI_HF.hr.long, file="Raw_Data/ACI_HFhrlong.Rdata")
+#save(ACI_MF.hr.long, file="Raw_Data/ACI_MFhrlong.Rdata")
 
 
+#Averaging sites between years
+
+#creating a column combining hour and site
+ACI_BB.hr.long$h.s <- paste(ACI_BB.hr.long$Hour,ACI_BB.hr.long$Site, sep= "_")
+ACI_HF.hr.long$h.s <- paste(ACI_HF.hr.long$Hour,ACI_HF.hr.long$Site, sep= "_")
+ACI_MF.hr.long$h.s <- paste(ACI_MF.hr.long$Hour,ACI_MF.hr.long$Site, sep= "_")
+
+#aggregating by h.s id so that I get an average for each hour at each site between years
+ACI_BB.hr.av <- aggregate(Broadband_ACI ~ h.s, data=ACI_BB.hr.long, FUN=mean)
+ACI_HF.hr.av <- aggregate(HF_ACI ~ h.s, data=ACI_HF.hr.long, FUN=mean)
+ACI_MF.hr.av <- aggregate(MF_ACI ~ h.s, data=ACI_MF.hr.long, FUN=mean)
+
+#separating hour and site
+ACI_BB.hr.av <- ACI_BB.hr.av %>% separate(h.s, into = c("Hour", "Site"), sep = "_")
+ACI_MF.hr.av <- ACI_MF.hr.av %>% separate(h.s, into = c("Hour", "Site"), sep = "_")
+ACI_HF.hr.av <- ACI_HF.hr.av %>% separate(h.s, into = c("Hour", "Site"), sep = "_")
+
+
+#saving new dataframes
+save(ACI_BB.hr.av, file="Raw_Data/ACI_BBhr_av.Rdata")
+save(ACI_HF.hr.av, file="Raw_Data/ACI_HFhr_av.Rdata")
+save(ACI_MF.hr.av, file="Raw_Data/ACI_MFhr_av.Rdata")
 
 
 
@@ -998,9 +1020,32 @@ SPL_HF.hr.long$Site <- as.character(SPL_HF.hr.long$Site)
 SPL_MF.hr.long$Site <- as.character(SPL_MF.hr.long$Site)
 
 #saving these long files
-save(SPL_BB.hr.long, file="Raw_Data/SPL_BBhrlong.Rdata")
-save(SPL_HF.hr.long, file="Raw_Data/SPL_HFhrlong.Rdata")
-save(SPL_MF.hr.long, file="Raw_Data/SPL_MFhrlong.Rdata")
+#save(SPL_BB.hr.long, file="Raw_Data/SPL_BBhrlong.Rdata")
+#save(SPL_HF.hr.long, file="Raw_Data/SPL_HFhrlong.Rdata")
+#save(SPL_MF.hr.long, file="Raw_Data/SPL_MFhrlong.Rdata")
+
+#Averaging sites between years
+
+#creating a column combining hour and site
+SPL_BB.hr.long$h.s <- paste(SPL_BB.hr.long$Hour,SPL_BB.hr.long$Site, sep= "_")
+SPL_HF.hr.long$h.s <- paste(SPL_HF.hr.long$Hour,SPL_HF.hr.long$Site, sep= "_")
+SPL_MF.hr.long$h.s <- paste(SPL_MF.hr.long$Hour,SPL_MF.hr.long$Site, sep= "_")
+
+#aggregating by h.s id so that I get an average for each hour at each site between years
+SPL_BB.hr.av <- aggregate(Broadband_SPL ~ h.s, data=SPL_BB.hr.long, FUN=mean)
+SPL_HF.hr.av <- aggregate(HF_SPL ~ h.s, data=SPL_HF.hr.long, FUN=mean)
+SPL_MF.hr.av <- aggregate(MF_SPL ~ h.s, data=SPL_MF.hr.long, FUN=mean)
+
+#separating hour and site
+SPL_BB.hr.av <- SPL_BB.hr.av %>% separate(h.s, into = c("Hour", "Site"), sep = "_")
+SPL_MF.hr.av <- SPL_MF.hr.av %>% separate(h.s, into = c("Hour", "Site"), sep = "_")
+SPL_HF.hr.av <- SPL_HF.hr.av %>% separate(h.s, into = c("Hour", "Site"), sep = "_")
+
+
+#saving new dataframes
+save(SPL_BB.hr.av, file="Raw_Data/SPL_BBhr_av.Rdata")
+save(SPL_HF.hr.av, file="Raw_Data/SPL_HFhr_av.Rdata")
+save(SPL_MF.hr.av, file="Raw_Data/SPL_MFhr_av.Rdata")
 
 
 ##### Creating new dataframe that includes date and lunar phase ####

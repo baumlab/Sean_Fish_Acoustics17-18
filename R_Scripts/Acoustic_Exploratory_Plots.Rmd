@@ -60,6 +60,10 @@ load("../Raw_Data/ACI_MFhrlong.Rdata")
 load("../Raw_Data/ACI_HFhrlong.Rdata")
 load("../Raw_Data/ACI_BBhrlong.Rdata")
 
+load("../Raw_Data/ACI_BBhr_av.Rdata")
+load("../Raw_Data/ACI_HFhr_av.Rdata")
+load("../Raw_Data/ACI_MFhr_av.Rdata")
+
 ##making year a character
 ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
 ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
@@ -76,6 +80,10 @@ load("../Raw_Data/SPL_MF18hrlong.Rdata")
 load("../Raw_Data/SPL_MFhrlong.Rdata")
 load("../Raw_Data/SPL_HFhrlong.Rdata")
 load("../Raw_Data/SPL_BBhrlong.Rdata")
+
+load("../Raw_Data/SPL_BBhr_av.Rdata")
+load("../Raw_Data/SPL_HFhr_av.Rdata")
+load("../Raw_Data/SPL_MFhr_av.Rdata")
 
 #making year a character
 SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
@@ -124,14 +132,14 @@ load("../Raw_Data/ki_fishaverage18.Rdata")
 
 
 #creating small legend function
-#addSmallLegend <- function(myPlot, pointSize = 0.7, textSize = 5, spaceLegend = 0.2) {
-#    myPlot +
-#        guides(shape = guide_legend(override.aes = list(size = pointSize)),
-#               color = guide_legend(override.aes = list(size = pointSize))) +
-#        theme(legend.title = element_text(size = textSize), 
-#              legend.text  = element_text(size = textSize),
-#              legend.key.size = unit(spaceLegend, "lines"))
-#}
+addSmallLegend <- function(myPlot, pointSize = 0.7, textSize = 5, spaceLegend = 0.2) {
+    myPlot +
+        guides(shape = guide_legend(override.aes = list(size = pointSize)),
+               color = guide_legend(override.aes = list(size = pointSize))) +
+        theme(legend.title = element_text(size = textSize), 
+              legend.text  = element_text(size = textSize),
+              legend.key.size = unit(spaceLegend, "lines"))
+}
 
 
 ```
@@ -162,9 +170,15 @@ p.splbb18<- ggplot(data =SPL_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_S
 #splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
 #splbb.h
 
+p.splbb<- ggplot(data =SPL_BB.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "none")
+
+p.splbb <- ggplot(data =SPL_BB.hr.av, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged BB SPL")
+
 splbb.v <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
 
 splbb.v
+p.splbb
 
 
 ```
@@ -181,6 +195,9 @@ p.splhf17<- ggplot(data =SPL_HF17.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + 
 p.splhf18<- ggplot(data =SPL_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + scale_color_brewer(palette = "Set1") +
   theme(legend.position = "none")
 
+p.splhf <- ggplot(data =SPL_HF.hr.av, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged HF SPL")
+
+
 #Horizontal graph
 #splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
 #splbb.h
@@ -188,6 +205,7 @@ p.splhf18<- ggplot(data =SPL_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + 
 splhf.v <- plot_grid(p.splhf17, p.splhf18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
 
 splhf.v
+p.splhf
 ```
 
 ### Mid Frequency
@@ -202,6 +220,8 @@ p.splmf17<- ggplot(data =SPL_MF17.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + 
 p.splmf18<- ggplot(data =SPL_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + scale_color_brewer(palette = "Set1") +
   theme(legend.position = "none")
 
+p.splmf <- ggplot(data =SPL_MF.hr.av, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged MF SPL")
+
 #Horizontal graph
 #splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
 #splbb.h
@@ -209,6 +229,7 @@ p.splmf18<- ggplot(data =SPL_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + 
 splmf.v <- plot_grid(p.splmf17, p.splmf18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
 
 splmf.v
+p.splmf
 ```
 
 
@@ -237,10 +258,13 @@ Broadband ACI averaged by hour across all days
 p.acibb17<- ggplot(data =ACI_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
 
 #making legend smaller
-#p.splbb17 <- addSmallLegend(p.splbb17)
+#p.acibb17 <- addSmallLegend(p.acibb17)
 
 p.acibb18<- ggplot(data =ACI_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + scale_color_brewer(palette = "Set1") +
   theme(legend.position = "none")
+
+
+p.acibb <- ggplot(data =ACI_BB.hr.av, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged BB ACI")
 
 #Horizontal graph
 #splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
@@ -249,7 +273,9 @@ p.acibb18<- ggplot(data =ACI_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_A
 acibb.v <- plot_grid(p.acibb17, p.acibb18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
 
 acibb.v
+p.acibb
 ```
+
 ### High Frequency
 High Frequency ACI averaged by hour across all days
 ```{r aci hf, echo=FALSE}
@@ -262,6 +288,7 @@ p.acihf17<- ggplot(data =ACI_HF17.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + 
 p.acihf18<- ggplot(data =ACI_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + scale_color_brewer(palette = "Set1") +
   theme(legend.position = "none")
 
+p.acihf <- ggplot(data =ACI_HF.hr.av, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged HF ACI")
 #Horizontal graph
 #splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
 #splbb.h
@@ -269,7 +296,9 @@ p.acihf18<- ggplot(data =ACI_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + 
 acihf.v <- plot_grid(p.acihf17, p.acihf18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
 
 acihf.v
+p.acihf
 ```
+
 ### Mid Frequency
 Mid Frequency ACI averaged by hour across all days
 ```{r aci mf, echo=FALSE}
@@ -282,6 +311,8 @@ p.acimf17<- ggplot(data =ACI_MF17.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + 
 p.acimf18<- ggplot(data =ACI_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + scale_color_brewer(palette = "Set1") +
   theme(legend.position = "none")
 
+p.acimf <- ggplot(data =ACI_MF.hr.av, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged MF ACI")
+
 #Horizontal graph
 #splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
 #splbb.h
@@ -289,7 +320,9 @@ p.acimf18<- ggplot(data =ACI_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + 
 acimf.v <- plot_grid(p.acimf17, p.acimf18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
 
 acimf.v
+p.acimf
 ```
+
 ### Boxplots
 Distribution of ACI at all frequencies and sites - averaged by hour
 ```{r aci bp, echo=FALSE}
