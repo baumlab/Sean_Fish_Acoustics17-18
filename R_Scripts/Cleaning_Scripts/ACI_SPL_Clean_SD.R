@@ -311,6 +311,9 @@ names(SPL_BB) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
 SPL_BB18 <- SPL_BB
 
+save(SPL_BB17, file = "Raw_Data/SPL_BB17.Rdata")
+save(SPL_BB18, file = "Raw_Data/SPL_BB18.Rdata")
+
 ## HF SPL ####
 #pulling columns before merge
 SPL_HF_32 <- s32.17 %>% select(SPL_HF, Date, Time)

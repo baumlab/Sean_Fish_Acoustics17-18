@@ -32,6 +32,10 @@ library(RColorBrewer)
 #load("../Raw_Data/SPL_MF17hr.Rdata")
 #load("../Raw_Data/SPL_MF18hr.Rdata")
 
+#All time data
+load("../Raw_Data/SPL_BB17.Rdata")
+load("../Raw_Data/SPL_BB18.Rdata")
+
 #daydata
 #load("../Raw_Data/ACI_BB17day.Rdata")
 #load("../Raw_Data/ACI_BB18day.Rdata")
@@ -170,10 +174,8 @@ p.splbb18<- ggplot(data =SPL_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_S
 #splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
 #splbb.h
 
-p.splbb<- ggplot(data =SPL_BB.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + scale_color_brewer(palette = "Set1") +
+p.splbb <- ggplot(data =SPL_BB.hr.av, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged BB SPL") +
   theme(legend.position = "none")
-
-p.splbb <- ggplot(data =SPL_BB.hr.av, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged BB SPL")
 
 splbb.v <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
 
@@ -182,6 +184,18 @@ p.splbb
 
 
 ```
+
+### Broadband by site
+```{r spl broadband, echo=FALSE}
+
+#Need to rename the columns in the dataframe
+
+p1 <- ggplot(data =SPL_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+
+
+
+```
+
 
 ### High Frequency
 High Frequency SPL averaged by hour across all days
