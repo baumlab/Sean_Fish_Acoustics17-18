@@ -136,14 +136,14 @@ load("../Raw_Data/ki_fishaverage18.Rdata")
 
 
 #creating small legend function
-addSmallLegend <- function(myPlot, pointSize = 0.7, textSize = 5, spaceLegend = 0.2) {
-    myPlot +
-        guides(shape = guide_legend(override.aes = list(size = pointSize)),
-               color = guide_legend(override.aes = list(size = pointSize))) +
-        theme(legend.title = element_text(size = textSize), 
-              legend.text  = element_text(size = textSize),
-              legend.key.size = unit(spaceLegend, "lines"))
-}
+#addSmallLegend <- function(myPlot, pointSize = 0.7, textSize = 5, spaceLegend = 0.2) {
+#    myPlot +
+#        guides(shape = guide_legend(override.aes = list(size = pointSize)),
+#               color = guide_legend(override.aes = list(size = pointSize))) +
+#        theme(legend.title = element_text(size = textSize), 
+#              legend.text  = element_text(size = textSize),
+#              legend.key.size = unit(spaceLegend, "lines"))
+#}
 
 
 ```
@@ -188,9 +188,9 @@ p.splbb
 ### Broadband by site
 ```{r spl broadband, echo=FALSE}
 
-#Need to rename the columns in the dataframe
+#Dataframe needs to be shifted to wide format
 
-p1 <- ggplot(data =SPL_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+#p1 <- ggplot(data =SPL_BB17, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
 
 
 

@@ -135,10 +135,200 @@ FC.sep17 <- FC.sad[which(FC.sad$Year == 17),]
 FC.sep18 <- FC.sad[which(FC.sad$Year == 18),]
 
 #saving the new datafiles
-save(FC.sd, file="Raw_Data/FC.CallperDayALL.Rdata")
-save(FC.sd17, file="Raw_Data/FC.CallperDay17.Rdata")
-save(FC.sd18, file="Raw_Data/FC.CallperDay18.Rdata")
+#save(FC.sd, file="Raw_Data/FC.CallperDayALL.Rdata")
+#save(FC.sd17, file="Raw_Data/FC.CallperDay17.Rdata")
+#save(FC.sd18, file="Raw_Data/FC.CallperDay18.Rdata")
+#
+#save(FC.sep, file="Raw_Data/FC.CallperHourALL.Rdata")
+#save(FC.sep17, file="Raw_Data/FC.CallperHour17.Rdata")
+#save(FC.sep18, file="Raw_Data/FC.CallperHour18.Rdata")
 
-save(FC.sep, file="Raw_Data/FC.CallperHourALL.Rdata")
-save(FC.sep17, file="Raw_Data/FC.CallperHour17.Rdata")
-save(FC.sep18, file="Raw_Data/FC.CallperHour18.Rdata")
+### Creating new dataframe including all data from fish count dates ####
+
+#Reading in the data created in ACI_SPL_Clean
+load("Raw_Data/s32.17df.Rdata")
+load("Raw_Data/s35.17df.Rdata")
+load("Raw_Data/s40.17df.Rdata")
+load("Raw_Data/s5.17df.Rdata")
+load("Raw_Data/s8.17df.Rdata")
+
+load("Raw_Data/s32.18df.Rdata")
+load("Raw_Data/s35.18df.Rdata")
+load("Raw_Data/s40.18df.Rdata")
+load("Raw_Data/s5.18df.Rdata")
+load("Raw_Data/s8.18df.Rdata")
+
+#Reformating date so that it matches with Fish Count dataframes
+
+#separating date into month and day
+s32.17 <- s32.17 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+s35.17 <- s35.17 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+s40.17 <- s40.17 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+s5.17 <- s5.17 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+s8.17 <- s8.17 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+
+s32.18 <- s32.18 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+s35.18 <- s35.18 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+s40.18 <- s40.18 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+s5.18 <- s5.18 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+s8.18 <- s8.18 %>% separate(Date, into = c("Day", "Month"), sep = "-")
+
+#pasting month and day back together with underscore to match formatting
+s32.17$Date <- paste(s32.17$Day,s32.17$Month, sep= "_")
+s35.17$Date <- paste(s35.17$Day,s35.17$Month, sep= "_")
+s40.17$Date <- paste(s40.17$Day,s40.17$Month, sep= "_")
+s5.17$Date <- paste(s5.17$Day,s5.17$Month, sep= "_")
+s8.17$Date <- paste(s8.17$Day,s8.17$Month, sep= "_")
+
+s32.18$Date <- paste(s32.18$Day,s32.18$Month, sep= "_")
+s35.18$Date <- paste(s35.18$Day,s35.18$Month, sep= "_")
+s40.18$Date <- paste(s40.18$Day,s40.18$Month, sep= "_")
+s5.18$Date <- paste(s5.18$Day,s5.18$Month, sep= "_")
+s8.18$Date <- paste(s8.18$Day,s8.18$Month, sep= "_")
+
+#pasting year back into date
+s32.17$Date <- paste(s32.17$Date,s32.17$Year, sep= "_")
+s35.17$Date <- paste(s35.17$Date,s35.17$Year, sep= "_")
+s40.17$Date <- paste(s40.17$Date,s40.17$Year, sep= "_")
+s5.17$Date <- paste(s5.17$Date,s5.17$Year, sep= "_")
+s8.17$Date <- paste(s8.17$Date,s8.17$Year, sep= "_")
+
+s32.18$Date <- paste(s32.18$Date,s32.18$Year, sep= "_")
+s35.18$Date <- paste(s35.18$Date,s35.18$Year, sep= "_")
+s40.18$Date <- paste(s40.18$Date,s40.18$Year, sep= "_")
+s5.18$Date <- paste(s5.18$Date,s5.18$Year, sep= "_")
+s8.18$Date <- paste(s8.18$Date,s8.18$Year, sep= "_")
+
+
+#separate Time into Hour and minute
+s32.17 <- s32.17 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+s35.17 <- s35.17 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+s40.17 <- s40.17 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+s5.17 <- s5.17 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+s8.17 <- s8.17 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+
+s32.18 <- s32.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+s35.18 <- s35.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+s40.18 <- s40.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+s5.18 <- s5.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+s8.18 <- s8.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+
+#pasting Date and Hour together
+s32.17$Date <- paste(s32.17$Date,s32.17$Hour, sep= "-")
+s35.17$Date <- paste(s35.17$Date,s35.17$Hour, sep= "-")
+s40.17$Date <- paste(s40.17$Date,s40.17$Hour, sep= "-")
+s5.17$Date <- paste(s5.17$Date,s5.17$Hour, sep= "-")
+s8.17$Date <- paste(s8.17$Date,s8.17$Hour, sep= "-")
+
+s32.18$Date <- paste(s32.18$Date,s32.18$Hour, sep= "-")
+s35.18$Date <- paste(s35.18$Date,s35.18$Hour, sep= "-")
+s40.18$Date <- paste(s40.18$Date,s40.18$Hour, sep= "-")
+s5.18$Date <- paste(s5.18$Date,s5.18$Hour, sep= "-")
+s8.18$Date <- paste(s8.18$Date,s8.18$Hour, sep= "-")
+
+#creating site column
+s32.17$Site <- 32
+s35.17$Site <- 35
+s40.17$Site <- 40
+s5.17$Site <- 5
+s8.17$Site <- 8
+
+s32.18$Site <- 32
+s35.18$Site <- 35
+s40.18$Site <- 40
+s5.18$Site <- 5
+s8.18$Site <- 8
+
+#pasting Date id and site together
+s32.17$Date <- paste(s32.17$Date,s32.17$Site, sep= "_")
+s35.17$Date <- paste(s35.17$Date,s35.17$Site, sep= "_")
+s40.17$Date <- paste(s40.17$Date,s40.17$Site, sep= "_")
+s5.17$Date <- paste(s5.17$Date,s5.17$Site, sep= "_")
+s8.17$Date <- paste(s8.17$Date,s8.17$Site, sep= "_")
+
+s32.18$Date <- paste(s32.18$Date,s32.18$Site, sep= "_")
+s35.18$Date <- paste(s35.18$Date,s35.18$Site, sep= "_")
+s40.18$Date <- paste(s40.18$Date,s40.18$Site, sep= "_")
+s5.18$Date <- paste(s5.18$Date,s5.18$Site, sep= "_")
+s8.18$Date <- paste(s8.18$Date,s8.18$Site, sep= "_")
+
+#remove all minutes except 00 so that we get only the matching hours/minutes
+
+attach(s32.17)
+df32.17 <- s32.17[which(Minute=="00"),]
+detach(s32.17)
+
+attach(s35.17)
+df35.17 <- s35.17[which(Minute=="00"),]
+detach(s35.17)
+
+attach(s40.17)
+df40.17 <- s40.17[which(Minute=="00"),]
+detach(s40.17)
+
+attach(s5.17)
+df5.17 <- s5.17[which(Minute=="00"),]
+detach(s5.17)
+
+attach(s8.17)
+df8.17 <- s8.17[which(Minute=="00"),]
+detach(s8.17)
+
+
+#2018
+
+
+attach(s32.18)
+df32.18 <- s32.18[which(Minute=="00"),]
+detach(s32.18)
+
+attach(s35.18)
+df35.18 <- s35.18[which(Minute=="00"),]
+detach(s35.18)
+
+attach(s40.18)
+df40.18 <- s40.18[which(Minute=="00"),]
+detach(s40.18)
+
+attach(s5.18)
+df5.18 <- s5.18[which(Minute=="00"),]
+detach(s5.18)
+
+attach(s8.18)
+df8.18 <- s8.18[which(Minute=="00"),]
+detach(s8.18)
+
+#renaming columns for matching so that I can merge dataframes
+names(df32.17)[names(df32.17) == "Date"] <- "st.id"
+names(df35.17)[names(df35.17) == "Date"] <- "st.id"
+names(df40.17)[names(df40.17) == "Date"] <- "st.id"
+names(df5.17)[names(df5.17) == "Date"] <- "st.id"
+names(df8.17)[names(df8.17) == "Date"] <- "st.id"
+
+names(df32.18)[names(df32.18) == "Date"] <- "st.id"
+names(df35.18)[names(df35.18) == "Date"] <- "st.id"
+names(df40.18)[names(df40.18) == "Date"] <- "st.id"
+names(df5.18)[names(df5.18) == "Date"] <- "st.id"
+names(df8.18)[names(df8.18) == "Date"] <- "st.id"
+
+#stacking by site
+df32 <- rbind(df32.17, df32.18)
+df35 <- rbind(df35.17, df35.18)
+df40 <- rbind(df40.17, df40.18)
+df5 <- rbind(df5.17, df5.18)
+df8 <- rbind(df8.17, df8.18)
+
+
+#matching dataframes
+FC.DF32 <- merge(df32, FCt32.hr, by = "st.id")
+FC.DF35 <- merge(df35, FCt35.hr, by = "st.id")
+FC.DF40 <- merge(df40, FCt40.hr, by = "st.id")
+FC.DF5 <- merge(df5, FCt05.hr, by = "st.id")
+FC.DF8 <- merge(df8, FCt08.hr, by = "st.id")
+
+### Problem here - only pulling dates that are 2 digits long because one dataframe uses hours that are one digit and one uses hours that are 2 digits
+
+#rbinding all dataframes into one HUGE (but not really) dataframe
+AC.DF <- rbind(FC.DF32, FC.DF35, FC.DF40, FC.DF5, FC.DF8)
+
+

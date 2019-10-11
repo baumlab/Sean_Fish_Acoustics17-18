@@ -153,7 +153,18 @@ s40.18 <- subset(s40.18, select = -c(Month, Day, Hour, Minute, Seconds))
 s8.18 <- subset(s8.18, select = -c(Month, Day, Hour, Minute, Seconds))
 s5.18 <- subset(s5.18, select = -c(Month, Day, Hour, Minute, Seconds))
 
+#saving all of these dataframes
+save(s32.17, file="Raw_Data/s32.17df.Rdata")
+save(s35.17, file="Raw_Data/s35.17df.Rdata")
+save(s40.17, file="Raw_Data/s40.17df.Rdata")
+save(s8.17, file="Raw_Data/s8.17df.Rdata")
+save(s5.17, file="Raw_Data/s5.17df.Rdata")
 
+save(s32.18, file="Raw_Data/s32.18df.Rdata")
+save(s35.18, file="Raw_Data/s35.18df.Rdata")
+save(s40.18, file="Raw_Data/s40.18df.Rdata")
+save(s8.18, file="Raw_Data/s8.18df.Rdata")
+save(s5.18, file="Raw_Data/s5.18df.Rdata")
 
 
 #### Merging Columns into larger ACI and SPL Dataframes for all sites ####
