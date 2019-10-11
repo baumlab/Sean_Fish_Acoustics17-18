@@ -158,7 +158,7 @@ load("Raw_Data/s40.18df.Rdata")
 load("Raw_Data/s5.18df.Rdata")
 load("Raw_Data/s8.18df.Rdata")
 
-#Reformating date so that it matches with Fish Count dataframes
+## Reformating date so that it matches with Fish Count dataframes ####
 
 #separating date into month and day
 s32.17 <- s32.17 %>% separate(Date, into = c("Day", "Month"), sep = "-")
@@ -212,6 +212,20 @@ s35.18 <- s35.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
 s40.18 <- s40.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
 s5.18 <- s5.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
 s8.18 <- s8.18 %>% separate(Time, into = c("Hour", "Minute"), sep = ":")
+
+#removing leading zeroes from hours with a single digit to match the Fish count dataframe
+s32.17$Hour <- gsub("(?<![0-9])0+", "", s32.17$Hour, perl = TRUE) # this removes all zero hours which is OK because they weren't sampled
+s35.17$Hour <- gsub("(?<![0-9])0+", "", s35.17$Hour, perl = TRUE)
+s40.17$Hour <- gsub("(?<![0-9])0+", "", s40.17$Hour, perl = TRUE)
+s5.17$Hour <- gsub("(?<![0-9])0+", "", s5.17$Hour, perl = TRUE)
+s8.17$Hour <- gsub("(?<![0-9])0+", "", s8.17$Hour, perl = TRUE)
+
+#2018
+s32.18$Hour <- gsub("(?<![0-9])0+", "", s32.18$Hour, perl = TRUE) # this removes all zero hours which is OK because they weren't sampled
+s35.18$Hour <- gsub("(?<![0-9])0+", "", s35.18$Hour, perl = TRUE)
+s40.18$Hour <- gsub("(?<![0-9])0+", "", s40.18$Hour, perl = TRUE)
+s5.18$Hour <- gsub("(?<![0-9])0+", "", s5.18$Hour, perl = TRUE)
+s8.18$Hour <- gsub("(?<![0-9])0+", "", s8.18$Hour, perl = TRUE)
 
 #pasting Date and Hour together
 s32.17$Date <- paste(s32.17$Date,s32.17$Hour, sep= "-")
@@ -319,6 +333,7 @@ df5 <- rbind(df5.17, df5.18)
 df8 <- rbind(df8.17, df8.18)
 
 
+
 #matching dataframes
 FC.DF32 <- merge(df32, FCt32.hr, by = "st.id")
 FC.DF35 <- merge(df35, FCt35.hr, by = "st.id")
@@ -328,7 +343,27 @@ FC.DF8 <- merge(df8, FCt08.hr, by = "st.id")
 
 ### Problem here - only pulling dates that are 2 digits long because one dataframe uses hours that are one digit and one uses hours that are 2 digits
 
-#rbinding all dataframes into one HUGE (but not really) dataframe
+#rbinding all dataframes into one dataframe with 200 rows
 AC.DF <- rbind(FC.DF32, FC.DF35, FC.DF40, FC.DF5, FC.DF8)
+
+
+## Recreating a date column so that I can plot by date
+
+
+#creating a day-month column
+AC.DF$Date <- paste(AC.DF$Day,AC.DF$Month, sep= "_")
+
+#binding year2 and date together to get a full date column
+AC.DF$Date <- paste(AC.DF$Date,AC.DF$Year, sep= "_")
+
+#dropping columns that are not of use
+colnames(AC.DF)
+drop <- c("Minute", "Day", "Month")
+AC.DF = AC.DF[,!names(AC.DF) %in% drop]
+colnames(AC.DF)
+
+#saving my total dataframe
+
+#save(AC.DF, file="Raw_Data/AC.DF.Rdata")
 
 
