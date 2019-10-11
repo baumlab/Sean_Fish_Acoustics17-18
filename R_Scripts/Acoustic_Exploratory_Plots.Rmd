@@ -15,6 +15,10 @@ library(cowplot)
 library(rmarkdown)
 library(knitr)
 library(RColorBrewer)
+library(GGally)
+library(mctest)
+library(usdm)
+
 ##loading in the ACI/SPL data - wide form
 
 #hourdata
@@ -69,9 +73,9 @@ load("../Raw_Data/SPL_BB18.Rdata")
 #load("../Raw_Data/ACI_MFhr_av.Rdata")
 
 ##making year a character
-ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
-ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
-ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
+#ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
+#ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
+#ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
 
 #SPL
 load("../Raw_Data/SPL_BB17hrlong.Rdata")
@@ -90,9 +94,9 @@ load("../Raw_Data/SPL_HFhr_av.Rdata")
 load("../Raw_Data/SPL_MFhr_av.Rdata")
 
 #making year a character
-SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
-SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
-SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
+#SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
+#SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
+#SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
 
 ##loading in fish call count data
 #load("../Raw_Data/FC.05hr.Rdata")
@@ -476,16 +480,3 @@ boats <- ggplot(BV.sum, aes(x = Site, y = Visitations)) + geom_bar(stat = "ident
 boats
 ```
 
-#Matched Dataframe
-``` {r total df, echo = FALSE}
-#rough draft model formula
-
-
-
-#fit1 <- lm(MF_SPL ~ Knocks + Long Calls + Site + Hour, data = AC.DF) - just a draft not using actual column names
-colnames(AC.DF)
-fit1 <- lm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Site + Hour, data = AC.DF)
-summary(fit1)
-
-
-```
