@@ -67,10 +67,10 @@ ki.acav18 <- ki.acav1[which(ki.acav1$Year == 2018),]
 #averaging by site with all years included
 ki.acav <- aggregate(Number~ Site, data=ki.acav1, FUN=mean)
 #### Saving dataframes ####
-save(ki.acab, file="Raw_Data/ki_fishabundance.Rdata")
-save(ki.acab17, file="Raw_Data/ki_fishabundance17.Rdata")
-save(ki.acab18, file="Raw_Data/ki_fishabundance18.Rdata")
+#save(ki.acab, file="Raw_Data/ki_fishabundance.Rdata")
+#save(ki.acab17, file="Raw_Data/ki_fishabundance17.Rdata")
+#save(ki.acab18, file="Raw_Data/ki_fishabundance18.Rdata")
 
-save(ki.acav, file="Raw_Data/ki_fishaverage.Rdata")
-save(ki.acav17, file="Raw_Data/ki_fishaverage17.Rdata")
-save(ki.acav18, file="Raw_Data/ki_fishaverage18.Rdata")
+#save(ki.acav, file="Raw_Data/ki_fishaverage.Rdata")
+#save(ki.acav17, file="Raw_Data/ki_fishaverage17.Rdata")
+#save(ki.acav18, file="Raw_Data/ki_fishaverage18.Rdata")

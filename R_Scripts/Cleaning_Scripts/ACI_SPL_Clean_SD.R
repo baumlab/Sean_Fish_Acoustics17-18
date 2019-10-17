@@ -154,17 +154,17 @@ s8.18 <- subset(s8.18, select = -c(Month, Day, Hour, Minute, Seconds))
 s5.18 <- subset(s5.18, select = -c(Month, Day, Hour, Minute, Seconds))
 
 #saving all of these dataframes
-save(s32.17, file="Raw_Data/s32.17df.Rdata")
-save(s35.17, file="Raw_Data/s35.17df.Rdata")
-save(s40.17, file="Raw_Data/s40.17df.Rdata")
-save(s8.17, file="Raw_Data/s8.17df.Rdata")
-save(s5.17, file="Raw_Data/s5.17df.Rdata")
+#save(s32.17, file="Raw_Data/s32.17df.Rdata")
+#save(s35.17, file="Raw_Data/s35.17df.Rdata")
+#save(s40.17, file="Raw_Data/s40.17df.Rdata")
+#save(s8.17, file="Raw_Data/s8.17df.Rdata")
+#save(s5.17, file="Raw_Data/s5.17df.Rdata")
 
-save(s32.18, file="Raw_Data/s32.18df.Rdata")
-save(s35.18, file="Raw_Data/s35.18df.Rdata")
-save(s40.18, file="Raw_Data/s40.18df.Rdata")
-save(s8.18, file="Raw_Data/s8.18df.Rdata")
-save(s5.18, file="Raw_Data/s5.18df.Rdata")
+#save(s32.18, file="Raw_Data/s32.18df.Rdata")
+#save(s35.18, file="Raw_Data/s35.18df.Rdata")
+#save(s40.18, file="Raw_Data/s40.18df.Rdata")
+#save(s8.18, file="Raw_Data/s8.18df.Rdata")
+#save(s5.18, file="Raw_Data/s5.18df.Rdata")
 
 
 #### Merging Columns into larger ACI and SPL Dataframes for all sites ####
@@ -1057,9 +1057,9 @@ SPL_HF.hr.av <- SPL_HF.hr.av %>% separate(h.s, into = c("Hour", "Site"), sep = "
 
 
 #saving new dataframes
-save(SPL_BB.hr.av, file="Raw_Data/SPL_BBhr_av.Rdata")
-save(SPL_HF.hr.av, file="Raw_Data/SPL_HFhr_av.Rdata")
-save(SPL_MF.hr.av, file="Raw_Data/SPL_MFhr_av.Rdata")
+#save(SPL_BB.hr.av, file="Raw_Data/SPL_BBhr_av.Rdata")
+#save(SPL_HF.hr.av, file="Raw_Data/SPL_HFhr_av.Rdata")
+#save(SPL_MF.hr.av, file="Raw_Data/SPL_MFhr_av.Rdata")
 
 
 ##### Creating new dataframe that includes date and lunar phase ####
@@ -1088,3 +1088,5 @@ lp2017$Date <- paste(lp2017$Day,lp2017$Month, sep= "-0")
 #saving these dataframes
 ##save(lp2017, file="Raw_Data/LunarPhase2017.Rdata")
 #save(lp2018, file="Raw_Data/LunarPhase2018.Rdata")
+
+##### 
