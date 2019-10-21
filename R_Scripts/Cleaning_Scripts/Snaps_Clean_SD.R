@@ -40,6 +40,8 @@ snap.18 <- rbind(sn5.18, sn8.18, sn32.18, sn35.18, sn40.18)
 #adding a year to the entire dataframe
 snap.18$yr <- 18
 
+#adding leading zeroes to months with one digit to match format of AC.DF dataframe
+snap.18$Month <- sprintf("%02d", snap.18$Month)
 
 #Pasting date together in a format that matches AC.DF st.id column format
 snap.18$st.id <- paste(snap.18$Day,snap.18$Month, sep= "_")
@@ -137,5 +139,44 @@ snaps <- rbind(snap.17, snap.18)
 ##### Merge snaps and AC.DF ####
 AC.DF1 <- merge(AC.DF, snaps, by = "st.id")
 
+
 # I am losing rows here - 113 of them, so I gotta figure out why this is
-## its happening in 2017 snap files - I only have 2000 compared to almost 20,000 in 2018
+## its happening in 2017 snap files - I only have 2000 compared to almost 20,000 in 2018 - fixed this with above step - needed to fix Month format in 2018
+
+#figuring out which 3 files are missing from 2017
+difs <- setdiff(AC.DF$st.id, snap.17$st.id)
+difs
+
+#making a list of the three files
+dm <- c("14_07_17-15_35", "19_07_17-15_40", "21_07_17-15_5")
+
+#checking these three files in my larger dataframes
+#selecting files surrounding the missing file
+missing.snaps1<- sn35.17[which(sn35.17$File == "1677987850.170714145002.wav" ), ]
+missing.snaps2<- sn35.17[which(sn35.17$File == "1677987850.170714150002.wav" ), ]
+missing.snaps3<- sn35.17[which(sn35.17$File == "1677987850.170714151002.wav" ), ]
+
+#binding site 35 sites together
+ms35 <- rbind(missing.snaps1, missing.snaps2, missing.snaps3)
+ms35$Site <- 35
+
+#selecting files surrounding the missing file
+missing.snaps4<- sn40.17[which(sn40.17$File == "1678278673.170719145002.wav" ), ]
+missing.snaps5<- sn40.17[which(sn40.17$File == "1678278673.170719151002.wav" ), ]
+
+#binding site 40 files together
+ms40 <- rbind(missing.snaps4, missing.snaps5)
+ms40$Site <- 40
+
+#selecting files surrounding the missing file
+missing.snaps5<- sn5.17[which(sn5.17$File == "1677987881.170721145002.wav" ), ]
+missing.snaps6<- sn5.17[which(sn5.17$File == "1677987881.170721151002.wav" ), ]
+
+#binding site 5 files together
+ms5 <- rbind(missing.snaps5, missing.snaps6)
+ms5$Site <- 5
+
+#binding all missing files together
+missing.snaps <- rbind(ms35, ms40, ms5)
+
+write.csv(missing.snaps, "Raw_Data/MissingFiles.csv")
