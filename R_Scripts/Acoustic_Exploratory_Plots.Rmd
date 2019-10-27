@@ -142,6 +142,10 @@ load("../Raw_Data/ki_fishaverage17.Rdata")
 load("../Raw_Data/ki_fishaverage18.Rdata")
 
 
+##loading in the full dataframe with all data
+load("../Raw_Data/AC.DF.Rdata")
+load("../Raw_Data/AC.DF1.Rdata")
+
 #creating small legend function
 #addSmallLegend <- function(myPlot, pointSize = 0.7, textSize = 5, spaceLegend = 0.2) {
 #    myPlot +
@@ -188,6 +192,9 @@ splbb.v <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), nrow = 2,
 
 splbb.v
 p.splbb
+
+#Combining both into one graph
+#p.splbb.both <- ggplot(data =SPL_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + geom_line(data = SPL_BB.hr.long, aes())
 
 
 ```
@@ -480,3 +487,104 @@ boats <- ggplot(BV.sum, aes(x = Site, y = Visitations)) + geom_bar(stat = "ident
 boats
 ```
 
+
+#Combined Model
+**Combined Model** All variables are matched to the files that were used for Fish call counts (3:00, 9:00, 15:00, 21:00)
+
+##Box Plots
+
+```{r combined model, echo = FALSE}
+colnames(AC.DF1)
+
+#reordering hour so that it is in chronological order
+AC.DF1$Hour <- factor(AC.DF1$Hour, levels = c("3", "9", "15", "21"))
+
+#Bar graphs with Hour as the X variable
+SPL_BBp <- ggplot(data = AC.DF1, aes(y = SPL_BB, x = Hour, fill = Year)) + geom_boxplot() + ylab("BB_SPL") + xlab("Hour")
+
+SPL_HFp <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Hour, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Hour")
+
+SPL_MFp <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Hour, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Hour")
+
+Tot_Kp <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Hour, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Hour")
+
+LCp <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Hour, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Hour")
+
+Herbp <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Hour, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Hour")
+
+Snapp <- ggplot(data = AC.DF1, aes(y = Snaps, x = Hour, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Hour")
+
+hour_bp <- plot_grid(SPL_BBp, SPL_HFp, SPL_MFp, Tot_Kp, LCp, Herbp, Snapp, nrow = 2, ncol = 4)
+hour_bp
+
+#Bar graphs with Site as the x variable
+
+# making site a factor
+AC.DF1$Site <- as.character(AC.DF1$Site)
+
+SPL_BBp1 <- ggplot(data = AC.DF1, aes(y = SPL_BB, x = Site, fill = Year)) + geom_boxplot() + ylab("BB_SPL") + xlab("Site")
+
+SPL_HFp1 <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Site, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Site")
+
+SPL_MFp1 <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Site, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Site")
+
+Tot_Kp1 <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Site, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Site")
+
+LCp1 <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Site, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Site")
+
+Herbp1 <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Site, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Site")
+
+Snapp1 <- ggplot(data = AC.DF1, aes(y = Snaps, x = Site, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Site")
+
+site_bp <- plot_grid(SPL_BBp1, SPL_HFp1, SPL_MFp1, Tot_Kp1, LCp1, Herbp1,Snapp1, nrow = 2, ncol = 4)
+site_bp
+
+```
+
+##Distributions
+
+```{r histogram, echo = FALSE}
+#plotting count histogram
+
+Count.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Tot_Knocks)) + geom_histogram()
+Herb.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_Herbivory)) + geom_histogram()
+LC.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_L_calls)) + geom_histogram()
+
+
+hist.p <- plot_grid(Count.hist, Herb.hist, LC.hist, nrow = 1, ncol = 3)
+hist.p
+
+#plotting distributions of SPL response variables
+MF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_Midrange)) + geom_histogram()
+BB.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_BB)) + geom_histogram()
+HF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_HF)) + geom_histogram()
+
+hist1.p <- plot_grid(MF.hist, BB.hist, HF.hist, nrow = 1, ncol = 3)
+hist1.p
+
+#plotting distributions of ACI response variables
+MF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_Midrange)) + geom_histogram()
+BB.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_BB)) + geom_histogram()
+HF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_HF)) + geom_histogram()
+
+hist2.p <- plot_grid(MF.hist1, BB.hist1, HF.hist1, nrow = 1, ncol = 3)
+hist2.p
+
+```
+
+##Plotting regressions
+
+```{r regression, echo = FALSE}
+#plotting total knocks against midrange SPL
+GLM1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + geom_smooth(method = "glm")
+
+GLM2 <- ggplot(AC.DF1, aes(Snaps, SPL_HF)) + geom_point() + geom_smooth(method = "glm")
+
+
+GLM3 <- ggplot(AC.DF1, aes(Snaps, SPL_BB)) + geom_point() + geom_smooth(method = "glm")
+
+GLM4 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point() + geom_smooth(method = "glm")
+
+glm.p <- plot_grid(GLM1, GLM2, GLM3, GLM4, nrow = 1, ncol = 4)
+glm.p
+```

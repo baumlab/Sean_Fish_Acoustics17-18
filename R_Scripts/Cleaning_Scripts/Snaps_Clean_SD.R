@@ -14,11 +14,11 @@ sn35.18 <- read.csv("Raw_Data/35_Snaps_2018.csv")
 sn40.18 <- read.csv("Raw_Data/40_Snaps_2018.csv")
 
 #2017
-sn5.17 <- read.csv("Raw_Data/Site5_Snaps_2017.csv")
+sn5.17 <- read.csv("Raw_Data/Site5_Snaps_2017rev.csv")
 sn8.17 <- read.csv("Raw_Data/Site8_Snaps_2017.csv")
 sn32.17 <- read.csv("Raw_Data/Site32_Snaps_2017.csv")
-sn35.17 <- read.csv("Raw_Data/Site35_Snaps_2017.csv")
-sn40.17 <- read.csv("Raw_Data/Site40_Snaps_2017.csv")
+sn35.17 <- read.csv("Raw_Data/Site35_Snaps_2017rev.csv")
+sn40.17 <- read.csv("Raw_Data/Site40_Snaps_2017rev.csv")
 
 #Total Dataframe
 load("Raw_Data/AC.DF.Rdata")
@@ -68,8 +68,10 @@ sn32.17$Site <- 32
 sn35.17$Site <- 35
 sn40.17$Site <- 40
 
-#renaming the first column in site 40 so that I can stack the columns
+#renaming the first column in sites 40,35, and 5 so that I can stack the columns
 names(sn40.17) <- c("File", "Snaps", "Site")
+names(sn35.17) <- c("File", "Snaps", "Site")
+names(sn5.17) <- c("File", "Snaps", "Site")
 
 #stacking all of the dataframes into 1 so that it is easier to handle
 snap.17 <- rbind(sn5.17, sn8.17, sn32.17, sn35.17, sn40.17)
@@ -139,44 +141,48 @@ snaps <- rbind(snap.17, snap.18)
 ##### Merge snaps and AC.DF ####
 AC.DF1 <- merge(AC.DF, snaps, by = "st.id")
 
+#save AC.DF1 as a datafile
+save(AC.DF1, file="Raw_Data/AC.DF1.Rdata")
+
 
 # I am losing rows here - 113 of them, so I gotta figure out why this is
 ## its happening in 2017 snap files - I only have 2000 compared to almost 20,000 in 2018 - fixed this with above step - needed to fix Month format in 2018
 
-#figuring out which 3 files are missing from 2017
-difs <- setdiff(AC.DF$st.id, snap.17$st.id)
-difs
-
-#making a list of the three files
-dm <- c("14_07_17-15_35", "19_07_17-15_40", "21_07_17-15_5")
-
-#checking these three files in my larger dataframes
-#selecting files surrounding the missing file
-missing.snaps1<- sn35.17[which(sn35.17$File == "1677987850.170714145002.wav" ), ]
-missing.snaps2<- sn35.17[which(sn35.17$File == "1677987850.170714150002.wav" ), ]
-missing.snaps3<- sn35.17[which(sn35.17$File == "1677987850.170714151002.wav" ), ]
-
-#binding site 35 sites together
-ms35 <- rbind(missing.snaps1, missing.snaps2, missing.snaps3)
-ms35$Site <- 35
-
-#selecting files surrounding the missing file
-missing.snaps4<- sn40.17[which(sn40.17$File == "1678278673.170719145002.wav" ), ]
-missing.snaps5<- sn40.17[which(sn40.17$File == "1678278673.170719151002.wav" ), ]
-
-#binding site 40 files together
-ms40 <- rbind(missing.snaps4, missing.snaps5)
-ms40$Site <- 40
-
-#selecting files surrounding the missing file
-missing.snaps5<- sn5.17[which(sn5.17$File == "1677987881.170721145002.wav" ), ]
-missing.snaps6<- sn5.17[which(sn5.17$File == "1677987881.170721151002.wav" ), ]
-
-#binding site 5 files together
-ms5 <- rbind(missing.snaps5, missing.snaps6)
-ms5$Site <- 5
-
-#binding all missing files together
-missing.snaps <- rbind(ms35, ms40, ms5)
-
-write.csv(missing.snaps, "Raw_Data/MissingFiles.csv")
+##figuring out which 3 files are missing from 2017
+#difs <- setdiff(AC.DF$st.id, snap.17$st.id)
+#difs
+#
+##making a list of the three files
+#dm <- c("14_07_17-15_35", "19_07_17-15_40", "21_07_17-15_5")
+#
+##checking these three files in my larger dataframes
+##selecting files surrounding the missing file
+#missing.snaps1<- sn35.17[which(sn35.17$File == "1677987850.170714145002.wav" ), ]
+#missing.snaps2<- sn35.17[which(sn35.17$File == "1677987850.170714150002.wav" ), ]
+#missing.snaps3<- sn35.17[which(sn35.17$File == "1677987850.170714151002.wav" ), ]
+#
+##binding site 35 sites together
+#ms35 <- rbind(missing.snaps1, missing.snaps2, missing.snaps3)
+#ms35$Site <- 35
+#
+##selecting files surrounding the missing file
+#missing.snaps4<- sn40.17[which(sn40.17$File == "1678278673.170719145002.wav" ), ]
+#missing.snaps5<- sn40.17[which(sn40.17$File == "1678278673.170719151002.wav" ), ]
+#
+##binding site 40 files together
+#ms40 <- rbind(missing.snaps4, missing.snaps5)
+#ms40$Site <- 40
+#
+##selecting files surrounding the missing file
+#missing.snaps5<- sn5.17[which(sn5.17$File == "1677987881.170721145002.wav" ), ]
+#missing.snaps6<- sn5.17[which(sn5.17$File == "1677987881.170721151002.wav" ), ]
+#
+##binding site 5 files together
+#ms5 <- rbind(missing.snaps5, missing.snaps6)
+#ms5$Site <- 5
+#
+##binding all missing files together
+#missing.snaps <- rbind(ms35, ms40, ms5)
+#
+#write.csv(missing.snaps, "Raw_Data/MissingFiles.csv")
+#
