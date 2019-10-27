@@ -22,60 +22,60 @@ library(usdm)
 ##loading in the ACI/SPL data - wide form
 
 #hourdata
-#load("../Raw_Data/ACI_BB17hr.Rdata")
-#load("../Raw_Data/ACI_BB18hr.Rdata")
-#load("../Raw_Data/ACI_HF17hr.Rdata")
-#load("../Raw_Data/ACI_HF18hr.Rdata")
-#load("../Raw_Data/ACI_MF17hr.Rdata")
-#load("../Raw_Data/ACI_MF18hr.Rdata")
-#
-#load("../Raw_Data/SPL_BB17hr.Rdata")
-#load("../Raw_Data/SPL_BB18hr.Rdata")
-#load("../Raw_Data/SPL_HF17hr.Rdata")
-#load("../Raw_Data/SPL_HF18hr.Rdata")
-#load("../Raw_Data/SPL_MF17hr.Rdata")
-#load("../Raw_Data/SPL_MF18hr.Rdata")
+load("../Raw_Data/ACI_BB17hr.Rdata")
+load("../Raw_Data/ACI_BB18hr.Rdata")
+load("../Raw_Data/ACI_HF17hr.Rdata")
+load("../Raw_Data/ACI_HF18hr.Rdata")
+load("../Raw_Data/ACI_MF17hr.Rdata")
+load("../Raw_Data/ACI_MF18hr.Rdata")
+
+load("../Raw_Data/SPL_BB17hr.Rdata")
+load("../Raw_Data/SPL_BB18hr.Rdata")
+load("../Raw_Data/SPL_HF17hr.Rdata")
+load("../Raw_Data/SPL_HF18hr.Rdata")
+load("../Raw_Data/SPL_MF17hr.Rdata")
+load("../Raw_Data/SPL_MF18hr.Rdata")
 
 #All time data
 load("../Raw_Data/SPL_BB17.Rdata")
 load("../Raw_Data/SPL_BB18.Rdata")
 
 #daydata
-#load("../Raw_Data/ACI_BB17day.Rdata")
-#load("../Raw_Data/ACI_BB18day.Rdata")
-#load("../Raw_Data/ACI_HF17day.Rdata")
-#load("../Raw_Data/ACI_HF18day.Rdata")
-#load("../Raw_Data/ACI_MF17day.Rdata")
-#load("../Raw_Data/ACI_MF18day.Rdata")
-#
-#load("../Raw_Data/SPL_BB17day.Rdata")
-#load("../Raw_Data/SPL_BB18day.Rdata")
-#load("../Raw_Data/SPL_HF17day.Rdata")
-#load("../Raw_Data/SPL_HF18day.Rdata")
-#load("../Raw_Data/SPL_MF17day.Rdata")
-#load("../Raw_Data/SPL_MF18day.Rdata")
+load("../Raw_Data/ACI_BB17day.Rdata")
+load("../Raw_Data/ACI_BB18day.Rdata")
+load("../Raw_Data/ACI_HF17day.Rdata")
+load("../Raw_Data/ACI_HF18day.Rdata")
+load("../Raw_Data/ACI_MF17day.Rdata")
+load("../Raw_Data/ACI_MF18day.Rdata")
+
+load("../Raw_Data/SPL_BB17day.Rdata")
+load("../Raw_Data/SPL_BB18day.Rdata")
+load("../Raw_Data/SPL_HF17day.Rdata")
+load("../Raw_Data/SPL_HF18day.Rdata")
+load("../Raw_Data/SPL_MF17day.Rdata")
+load("../Raw_Data/SPL_MF18day.Rdata")
 
 #loading ACI/SPL long data for boxplots
 #ACI
-#load("../Raw_Data/ACI_BB17hrlong.Rdata")
-#load("../Raw_Data/ACI_HF17hrlong.Rdata")
-#load("../Raw_Data/ACI_MF17hrlong.Rdata")
-#load("../Raw_Data/ACI_BB18hrlong.Rdata")
-#load("../Raw_Data/ACI_HF18hrlong.Rdata")
-#load("../Raw_Data/ACI_MF18hrlong.Rdata")
-#
-#load("../Raw_Data/ACI_MFhrlong.Rdata")
-#load("../Raw_Data/ACI_HFhrlong.Rdata")
-#load("../Raw_Data/ACI_BBhrlong.Rdata")
-#
-#load("../Raw_Data/ACI_BBhr_av.Rdata")
-#load("../Raw_Data/ACI_HFhr_av.Rdata")
-#load("../Raw_Data/ACI_MFhr_av.Rdata")
+load("../Raw_Data/ACI_BB17hrlong.Rdata")
+load("../Raw_Data/ACI_HF17hrlong.Rdata")
+load("../Raw_Data/ACI_MF17hrlong.Rdata")
+load("../Raw_Data/ACI_BB18hrlong.Rdata")
+load("../Raw_Data/ACI_HF18hrlong.Rdata")
+load("../Raw_Data/ACI_MF18hrlong.Rdata")
+
+load("../Raw_Data/ACI_MFhrlong.Rdata")
+load("../Raw_Data/ACI_HFhrlong.Rdata")
+load("../Raw_Data/ACI_BBhrlong.Rdata")
+
+load("../Raw_Data/ACI_BBhr_av.Rdata")
+load("../Raw_Data/ACI_HFhr_av.Rdata")
+load("../Raw_Data/ACI_MFhr_av.Rdata")
 
 ##making year a character
-#ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
-#ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
-#ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
+ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
+ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
+ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
 
 #SPL
 load("../Raw_Data/SPL_BB17hrlong.Rdata")
@@ -94,16 +94,16 @@ load("../Raw_Data/SPL_HFhr_av.Rdata")
 load("../Raw_Data/SPL_MFhr_av.Rdata")
 
 #making year a character
-#SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
-#SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
-#SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
+SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
+SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
+SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
 
 ##loading in fish call count data
-#load("../Raw_Data/FC.05hr.Rdata")
-#load("../Raw_Data/FC.08hr.Rdata")
-#load("../Raw_Data/FC.32hr.Rdata")
-#load("../Raw_Data/FC.35hr.Rdata")
-#load("../Raw_Data/FC.40hr.Rdata")
+load("../Raw_Data/FC.05hr.Rdata")
+load("../Raw_Data/FC.08hr.Rdata")
+load("../Raw_Data/FC.32hr.Rdata")
+load("../Raw_Data/FC.35hr.Rdata")
+load("../Raw_Data/FC.40hr.Rdata")
 
 load("../Raw_Data/FC.CallperDayALL.Rdata")
 load("../Raw_Data/FC.CallperDay17.Rdata")
@@ -200,7 +200,7 @@ p.splbb
 ```
 
 ### Broadband by site
-```{r spl broadband, echo=FALSE}
+```{r spl bb by site, echo=FALSE}
 
 #Dataframe needs to be shifted to wide format
 
@@ -500,45 +500,74 @@ colnames(AC.DF1)
 AC.DF1$Hour <- factor(AC.DF1$Hour, levels = c("3", "9", "15", "21"))
 
 #Bar graphs with Hour as the X variable
-SPL_BBp <- ggplot(data = AC.DF1, aes(y = SPL_BB, x = Hour, fill = Year)) + geom_boxplot() + ylab("BB_SPL") + xlab("Hour")
+SPL_BBp <- ggplot(data = AC.DF1, aes(y = SPL_BB, x = Hour, fill = Year)) + geom_boxplot() + ylab("BB_SPL") + xlab("Hour") + theme(legend.position = "none")
 
-SPL_HFp <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Hour, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Hour")
+SPL_HFp <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Hour, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Hour") + theme(legend.position = "none")
 
 SPL_MFp <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Hour, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Hour")
 
-Tot_Kp <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Hour, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Hour")
+Tot_Kp <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Hour, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Hour") + theme(legend.position = "none")
 
-LCp <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Hour, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Hour")
+LCp <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Hour, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Hour") + theme(legend.position = "none")
 
-Herbp <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Hour, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Hour")
+Herbp <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Hour, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Hour") + theme(legend.position = "none")
 
 Snapp <- ggplot(data = AC.DF1, aes(y = Snaps, x = Hour, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Hour")
 
-hour_bp <- plot_grid(SPL_BBp, SPL_HFp, SPL_MFp, Tot_Kp, LCp, Herbp, Snapp, nrow = 2, ncol = 4)
+hour.f_bp <- plot_grid(SPL_BBp, SPL_HFp, SPL_MFp, nrow = 2, ncol = 2)
+
+#pdf(file="../Figures/Hour_Metrics.pdf", width = 11, height = 7)
+hour.f_bp
+#dev.off()
+
+hour_bp <- plot_grid(Tot_Kp, LCp, Herbp, Snapp, nrow = 2, ncol = 2)
+
+#pdf(file="../Figures/Hour_Counts.pdf", width = 11, height = 7)
 hour_bp
+#dev.off()
+
+hour.comp <- plot_grid(SPL_MFp, Tot_Kp, SPL_HFp, Snapp, nrow = 2, ncol =2)
+
+#pdf(file="../Figures/Hour_Compare.pdf", width = 11, height = 7)
+hour.comp
+#dev.off()
 
 #Bar graphs with Site as the x variable
 
 # making site a factor
 AC.DF1$Site <- as.character(AC.DF1$Site)
 
-SPL_BBp1 <- ggplot(data = AC.DF1, aes(y = SPL_BB, x = Site, fill = Year)) + geom_boxplot() + ylab("BB_SPL") + xlab("Site")
+SPL_BBp1 <- ggplot(data = AC.DF1, aes(y = SPL_BB, x = Site, fill = Year)) + geom_boxplot() + ylab("BB_SPL") + xlab("Site") + theme(legend.position = "none")
 
-SPL_HFp1 <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Site, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Site")
+SPL_HFp1 <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Site, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Site") + theme(legend.position = "none")
 
 SPL_MFp1 <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Site, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Site")
 
-Tot_Kp1 <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Site, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Site")
+Tot_Kp1 <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Site, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Site") + theme(legend.position = "none")
 
-LCp1 <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Site, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Site")
+LCp1 <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Site, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Site") + theme(legend.position = "none")
 
-Herbp1 <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Site, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Site")
+Herbp1 <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Site, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Site") + theme(legend.position = "none")
 
 Snapp1 <- ggplot(data = AC.DF1, aes(y = Snaps, x = Site, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Site")
 
-site_bp <- plot_grid(SPL_BBp1, SPL_HFp1, SPL_MFp1, Tot_Kp1, LCp1, Herbp1,Snapp1, nrow = 2, ncol = 4)
-site_bp
+site.f_bp <- plot_grid(SPL_BBp1, SPL_HFp1, SPL_MFp1, nrow = 2, ncol = 2)
 
+#pdf(file="../Figures/Site_Metrics.pdf", width = 11, height = 7)
+site.f_bp
+#dev.off()
+
+site_bp <- plot_grid(Tot_Kp1, LCp1, Herbp1,Snapp1, nrow = 2, ncol = 2)
+
+#pdf(file="../Figures/Site_Counts.pdf", width = 11, height = 7)
+site_bp
+#dev.off()
+
+site.comp <- plot_grid(SPL_MFp1, Tot_Kp1, SPL_HFp1, Snapp1, nrow = 2, ncol = 2)
+
+#pdf(file="../Figures/Site_Compare.pdf", width = 11, height = 7)
+site.comp
+#dev.off()
 ```
 
 ##Distributions
