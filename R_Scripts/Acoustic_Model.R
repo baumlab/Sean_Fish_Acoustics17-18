@@ -39,6 +39,12 @@ summary(gfit1)
 par(mfrow = c(2,2))
 plot(gfit1)
 
+
+results_fit1 <- summary.glm(gfit1)$coefficients
+
+write.csv(results_fit1, "Figures/Fit1Results.csv")
+#### Testing for collinearity ####
+
 #subsetting only explanatory variables
 AC.DF.x <- subset(AC.DF, select = c(Tot_Knocks, Num_L_calls, Site, Hour))
 
