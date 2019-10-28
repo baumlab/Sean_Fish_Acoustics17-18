@@ -504,7 +504,7 @@ SPL_BBp <- ggplot(data = AC.DF1, aes(y = SPL_BB, x = Hour, fill = Year)) + geom_
 
 SPL_HFp <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Hour, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Hour") + theme(legend.position = "none")
 
-SPL_MFp <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Hour, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Hour")
+SPL_MFp <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Hour, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Hour") + theme(legend.position = "none")
 
 Tot_Kp <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Hour, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Hour") + theme(legend.position = "none")
 
@@ -512,7 +512,7 @@ LCp <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Hour, fill = Year)) + geom
 
 Herbp <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Hour, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Hour") + theme(legend.position = "none")
 
-Snapp <- ggplot(data = AC.DF1, aes(y = Snaps, x = Hour, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Hour")
+Snapp <- ggplot(data = AC.DF1, aes(y = Snaps, x = Hour, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Hour") + theme(legend.position = "none")
 
 hour.f_bp <- plot_grid(SPL_BBp, SPL_HFp, SPL_MFp, nrow = 2, ncol = 2)
 
@@ -541,7 +541,7 @@ SPL_BBp1 <- ggplot(data = AC.DF1, aes(y = SPL_BB, x = Site, fill = Year)) + geom
 
 SPL_HFp1 <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Site, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Site") + theme(legend.position = "none")
 
-SPL_MFp1 <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Site, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Site")
+SPL_MFp1 <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Site, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Site") + theme(legend.position = "none")
 
 Tot_Kp1 <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Site, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Site") + theme(legend.position = "none")
 
@@ -549,7 +549,7 @@ LCp1 <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Site, fill = Year)) + geo
 
 Herbp1 <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Site, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Site") + theme(legend.position = "none")
 
-Snapp1 <- ggplot(data = AC.DF1, aes(y = Snaps, x = Site, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Site")
+Snapp1 <- ggplot(data = AC.DF1, aes(y = Snaps, x = Site, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Site") + theme(legend.position = "none")
 
 site.f_bp <- plot_grid(SPL_BBp1, SPL_HFp1, SPL_MFp1, nrow = 2, ncol = 2)
 
@@ -563,10 +563,38 @@ site_bp <- plot_grid(Tot_Kp1, LCp1, Herbp1,Snapp1, nrow = 2, ncol = 2)
 site_bp
 #dev.off()
 
+
 site.comp <- plot_grid(SPL_MFp1, Tot_Kp1, SPL_HFp1, Snapp1, nrow = 2, ncol = 2)
 
 #pdf(file="../Figures/Site_Compare.pdf", width = 11, height = 7)
 site.comp
+#dev.off()
+
+site.spl_bp <- plot_grid(Tot_Kp1, SPL_MFp1, LCp1, SPL_HFp1, Snapp1, SPL_BBp1 , nrow = 3, ncol = 2)
+
+#pdf(file="../Figures/Site_Compare.SPL.pdf", width = 11, height = 7)
+site.spl_bp
+#dev.off()
+
+
+### ACI Plot ###
+
+Tot_Kp2 <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Site, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Site") + theme(legend.position = "none")
+
+LCp2 <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Site, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Site") + theme(legend.position = "none")
+
+Snapp2 <- ggplot(data = AC.DF1, aes(y = Snaps, x = Site, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Site") + theme(legend.position = "none")
+
+ACI_MFp <- ggplot(data = AC.DF1, aes(y = ACI_Midrange, x = Site, fill = Year)) + geom_boxplot() + ylab("MF_ACI") + xlab("Site") + theme(legend.position = "none")
+
+ACI_HFp <- ggplot(data = AC.DF1, aes(y = ACI_HF, x = Site, fill = Year)) + geom_boxplot() + ylab("HF_ACI") + xlab("Site") + theme(legend.position = "none")
+
+ACI_BBp <- ggplot(data = AC.DF1, aes(y = ACI_BB, x = Site, fill = Year)) + geom_boxplot() + ylab("BB_ACI") + xlab("Site") + theme(legend.position = "none")
+
+site.aci_bp <- plot_grid(Tot_Kp2, ACI_MFp, LCp2, ACI_HFp, Snapp2, ACI_BBp , nrow = 3, ncol = 2)
+
+#pdf(file="../Figures/Site_Compare.ACI.pdf", width = 11, height = 7)
+site.aci_bp
 #dev.off()
 ```
 

@@ -33,7 +33,7 @@ load("Raw_Data/AC.DF1.Rdata")
 #summary(fit1.4)
 
 ## GLM because I have a gamma distribution ##
-gfit1 <- glm(SPL_Midrange ~ Tot_Knocks+ Num_L_calls + Num_Herbivory, data = AC.DF1, family = Gamma)
+gfit1 <- glm(SPL_Midrange ~ Tot_Knocks+ Num_L_calls, data = AC.DF1, family = Gamma)
 summary(gfit1)
 
 par(mfrow = c(2,2))
