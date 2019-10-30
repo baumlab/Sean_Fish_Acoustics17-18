@@ -276,6 +276,21 @@ p.spl.bp
 ```
 
 
+
+## SPL (No Averages)
+
+### Broadband
+```{r spl hf no av, echo = FALSE}
+#renaming columns
+names(SPL_BB17) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
+#Making date a character
+SPL_BB17$Date <- as.character(SPL_BB17$Date)
+
+ggplot(data =SPL_BB17, aes(x=Time, y=s32)) + geom_line()
+ggplot(data = SPL_BB17, aes(x = Time, y = s35)) + geom_line()
+ggplot(data = SPL_BB17, aes(x = Time, y = s5)) + geom_line()
+
+```
 ##ACI (Hourly Averages)
 
 
@@ -591,7 +606,7 @@ ACI_HFp <- ggplot(data = AC.DF1, aes(y = ACI_HF, x = Site, fill = Year)) + geom_
 
 ACI_BBp <- ggplot(data = AC.DF1, aes(y = ACI_BB, x = Site, fill = Year)) + geom_boxplot() + ylab("BB_ACI") + xlab("Site") + theme(legend.position = "none")
 
-site.aci_bp <- plot_grid(Tot_Kp2, ACI_MFp, LCp2, ACI_HFp, Snapp2, ACI_BBp , nrow = 3, ncol = 2)
+site.aci_bp <- plot_grid(Tot_Kp2, ACI_MFp, LCp2, ACI_HFp, Snapp2, ACI_BBp , nrow = 2, ncol = 3)
 
 #pdf(file="../Figures/Site_Compare.ACI.pdf", width = 11, height = 7)
 site.aci_bp
@@ -637,11 +652,12 @@ GLM1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + geom_smoo
 
 GLM2 <- ggplot(AC.DF1, aes(Snaps, SPL_HF)) + geom_point() + geom_smooth(method = "glm")
 
-
 GLM3 <- ggplot(AC.DF1, aes(Snaps, SPL_BB)) + geom_point() + geom_smooth(method = "glm")
 
 GLM4 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point() + geom_smooth(method = "glm")
 
-glm.p <- plot_grid(GLM1, GLM2, GLM3, GLM4, nrow = 1, ncol = 4)
-glm.p
+GLM1
+GLM2
+GLM3
+GLM4
 ```
