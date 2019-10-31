@@ -59,6 +59,39 @@ detach(snap.18)
 
 #2018 is now ready to match with the AC.DF dataframe
 
+
+## Prepping 2018 Snap to match with SPLHF long dataframe
+snap.181 <- snap.18
+
+#dropping useless columns
+colnames(snap.181)
+drop <- c("st.id", "yr")
+snap.181 = snap.181[,!names(snap.181) %in% drop]
+colnames(snap.181)
+
+#renaming columns
+names(snap.181) <- c("Year", "Month", "Day", "Hour", "Minute", "Date", "Time", "Snaps", "Site")
+
+#setting up date column for POSIX format
+snap.181$Date1 <- paste(snap.181$Day, snap.181$Month, sep = "-")
+
+snap.181$Date1 <- paste(snap.181$Date1, snap.181$Year, sep = "-")
+
+#setting up time column for POSIX format
+
+#adding leading zeroes to minutes and hours with one digit to match format of AC.DF dataframe
+snap.181$Minute <- sprintf("%02d", snap.181$Minute)
+
+snap.181$Hour <- sprintf("%02d", snap.181$Hour)
+
+
+snap.181$Time1 <- paste(snap.181$Hour, snap.181$Minute, sep = ":")
+
+
+snap.181$datetime <- as.POSIXct(paste(snap.181$Date1, snap.181$Time1), format = "%d-%m-%Y %H:%M")
+
+save(snap.181, file="Raw_Data/snap18long.Rdata")
+
 ##### 2017 Data ####
 
 #adding site to each datafile
@@ -103,6 +136,8 @@ snap.17 <- snap.17 %>% separate(Time, into = c("Hour", "Time"), sep = 2)
 #Separating time column into hour and the rest of the time
 snap.17 <- snap.17 %>% separate(Time, into = c("Minute", "Seconds"), sep = 2)
 
+#copying dataframe for later use
+snap.171 <- snap.17
 #removing all but the recordings on the hour
 attach(snap.17)
 snap.17 <- snap.17[which(Minute=="00"),]
@@ -129,6 +164,25 @@ snap.17$st.id <- paste(snap.17$st.id, snap.17$Hour, sep= "-")
 snap.17$st.id <- paste(snap.17$st.id, snap.17$Site, sep= "_")
 
 
+
+
+## Prepping 2017 Snap to match with SPLHF long dataframe
+#adding new column with the correct year format
+snap.171$Year1 <- 2017
+
+#setting up date column for POSIX format
+snap.171$Date1 <- paste(snap.171$Day, snap.171$Month, sep = "-")
+
+snap.171$Date1 <- paste(snap.171$Date1, snap.171$Year1, sep = "-")
+
+#setting up time column for POSIX format
+
+snap.171$Time <- paste(snap.171$Hour, snap.171$Minute, sep = ":")
+
+
+snap.171$datetime <- as.POSIXct(paste(snap.171$Date1, snap.171$Time), format = "%d-%m-%Y %H:%M")
+
+save(snap.171, file="Raw_Data/snap17long.Rdata")
 
 
 ##### Combining 2017 and 2018 Data ####
@@ -186,3 +240,25 @@ save(AC.DF1, file="Raw_Data/AC.DF1.Rdata")
 #
 #write.csv(missing.snaps, "Raw_Data/MissingFiles.csv")
 #
+#### Merge snaps long and High Frequency SPL ####
+load("Raw_Data/SPLHF17long.Rdata")
+load("Raw_Data/SPLHF18long.Rdata")
+
+#creating new column in each dataframe that includes date/time and site together to match with
+snap.171$ds.id <- paste(snap.171$datetime, snap.171$Site, sep = "_")
+SPLHF17.long$ds.id <- paste(SPLHF17.long$datetime, SPLHF17.long$Site, sep = "_")
+
+
+snap.181$ds.id <- paste(snap.181$datetime, snap.181$Site, sep = "_")
+SPLHF18.long$ds.id <- paste(SPLHF18.long$datetime, SPLHF18.long$Site, sep = "_")
+
+Snap.HF17 <- merge(snap.171, SPLHF17.long, by = "ds.id")
+Snap.HF18 <- merge(snap.181, SPLHF18.long, by = "ds.id")
+
+#removing useless columns
+
+
+#saving my new dataframes
+
+save(Snap.HF17, file="Raw_Data/Snap.HF17.Rdata")
+save(Snap.HF18, file="Raw_Data/Snap.HF18.Rdata")

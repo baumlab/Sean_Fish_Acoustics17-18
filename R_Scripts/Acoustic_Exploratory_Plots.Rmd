@@ -18,42 +18,55 @@ library(RColorBrewer)
 library(GGally)
 library(mctest)
 library(usdm)
+library(hms)
 
 ##loading in the ACI/SPL data - wide form
 
 #hourdata
-load("../Raw_Data/ACI_BB17hr.Rdata")
-load("../Raw_Data/ACI_BB18hr.Rdata")
-load("../Raw_Data/ACI_HF17hr.Rdata")
-load("../Raw_Data/ACI_HF18hr.Rdata")
-load("../Raw_Data/ACI_MF17hr.Rdata")
-load("../Raw_Data/ACI_MF18hr.Rdata")
-
-load("../Raw_Data/SPL_BB17hr.Rdata")
-load("../Raw_Data/SPL_BB18hr.Rdata")
-load("../Raw_Data/SPL_HF17hr.Rdata")
-load("../Raw_Data/SPL_HF18hr.Rdata")
-load("../Raw_Data/SPL_MF17hr.Rdata")
-load("../Raw_Data/SPL_MF18hr.Rdata")
+#load("../Raw_Data/ACI_BB17hr.Rdata")
+#load("../Raw_Data/ACI_BB18hr.Rdata")
+#load("../Raw_Data/ACI_HF17hr.Rdata")
+#load("../Raw_Data/ACI_HF18hr.Rdata")
+#load("../Raw_Data/ACI_MF17hr.Rdata")
+#load("../Raw_Data/ACI_MF18hr.Rdata")
+#
+#load("../Raw_Data/SPL_BB17hr.Rdata")
+#load("../Raw_Data/SPL_BB18hr.Rdata")
+#load("../Raw_Data/SPL_HF17hr.Rdata")
+#load("../Raw_Data/SPL_HF18hr.Rdata")
+#load("../Raw_Data/SPL_MF17hr.Rdata")
+#load("../Raw_Data/SPL_MF18hr.Rdata")
 
 #All time data
 load("../Raw_Data/SPL_BB17.Rdata")
 load("../Raw_Data/SPL_BB18.Rdata")
+load("../Raw_Data/SPLBB17long.Rdata")
+load("../Raw_Data/SPLBB18long.Rdata")
+load("../Raw_Data/SPLHF17long.Rdata")
+load("../Raw_Data/SPLHF18long.Rdata")
+load("../Raw_Data/SPLMF17long.Rdata")
+load("../Raw_Data/SPLMF18long.Rdata")
+
+#combined SPL and HF dataframes
+load("../Raw_Data/Snap.HF17.Rdata")
+load("../Raw_Data/Snap.HF18.Rdata")
+
+
 
 #daydata
-load("../Raw_Data/ACI_BB17day.Rdata")
-load("../Raw_Data/ACI_BB18day.Rdata")
-load("../Raw_Data/ACI_HF17day.Rdata")
-load("../Raw_Data/ACI_HF18day.Rdata")
-load("../Raw_Data/ACI_MF17day.Rdata")
-load("../Raw_Data/ACI_MF18day.Rdata")
-
-load("../Raw_Data/SPL_BB17day.Rdata")
-load("../Raw_Data/SPL_BB18day.Rdata")
-load("../Raw_Data/SPL_HF17day.Rdata")
-load("../Raw_Data/SPL_HF18day.Rdata")
-load("../Raw_Data/SPL_MF17day.Rdata")
-load("../Raw_Data/SPL_MF18day.Rdata")
+#load("../Raw_Data/ACI_BB17day.Rdata")
+#load("../Raw_Data/ACI_BB18day.Rdata")
+#load("../Raw_Data/ACI_HF17day.Rdata")
+#load("../Raw_Data/ACI_HF18day.Rdata")
+#load("../Raw_Data/ACI_MF17day.Rdata")
+#load("../Raw_Data/ACI_MF18day.Rdata")
+#
+#load("../Raw_Data/SPL_BB17day.Rdata")
+#load("../Raw_Data/SPL_BB18day.Rdata")
+#load("../Raw_Data/SPL_HF17day.Rdata")
+#load("../Raw_Data/SPL_HF18day.Rdata")
+#load("../Raw_Data/SPL_MF17day.Rdata")
+#load("../Raw_Data/SPL_MF18day.Rdata")
 
 #loading ACI/SPL long data for boxplots
 #ACI
@@ -72,12 +85,12 @@ load("../Raw_Data/ACI_BBhr_av.Rdata")
 load("../Raw_Data/ACI_HFhr_av.Rdata")
 load("../Raw_Data/ACI_MFhr_av.Rdata")
 
-##making year a character
+###making year a character
 ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
 ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
 ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
 
-#SPL
+##SPL
 load("../Raw_Data/SPL_BB17hrlong.Rdata")
 load("../Raw_Data/SPL_HF17hrlong.Rdata")
 load("../Raw_Data/SPL_MF17hrlong.Rdata")
@@ -93,7 +106,7 @@ load("../Raw_Data/SPL_BBhr_av.Rdata")
 load("../Raw_Data/SPL_HFhr_av.Rdata")
 load("../Raw_Data/SPL_MFhr_av.Rdata")
 
-#making year a character
+##making year a character
 SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
 SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
 SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
@@ -167,34 +180,34 @@ load("../Raw_Data/AC.DF1.Rdata")
 
 *Note* 2017 had a 10 minute duty cycle with 5 minutes recording while 2018 had a 15 minute duty cycle with 5 minutes recording, so the number of files averages differs between years
 
-##SPL (Hourly Averages)
+##SPL (WRONG)
 
 ### Broadband
 Broadband SPL averaged by hour across all days
 ```{r spl broadband, echo=FALSE}
 
-p.splbb17<- ggplot(data =SPL_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
-
-#making legend smaller
-#p.splbb17 <- addSmallLegend(p.splbb17)
-
-p.splbb18<- ggplot(data =SPL_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "none")
-
-#Horizontal graph
-#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
-#splbb.h
-
-p.splbb <- ggplot(data =SPL_BB.hr.av, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged BB SPL") +
-  theme(legend.position = "none")
-
-splbb.v <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
-
-splbb.v
-p.splbb
-
-#Combining both into one graph
-#p.splbb.both <- ggplot(data =SPL_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + geom_line(data = SPL_BB.hr.long, aes())
+#p.splbb17<- ggplot(data =SPL_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + #theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+#
+##making legend smaller
+##p.splbb17 <- addSmallLegend(p.splbb17)
+#
+#p.splbb18<- ggplot(data =SPL_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + #scale_color_brewer(palette = "Set1") +
+#  theme(legend.position = "none")
+#
+##Horizontal graph
+##splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+##splbb.h
+#
+#p.splbb <- ggplot(data =SPL_BB.hr.av, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + #scale_color_brewer(palette = "Set1") + ggtitle("Averaged BB SPL") +
+#  theme(legend.position = "none")
+#
+#splbb.v <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
+#
+#splbb.v
+#p.splbb
+#
+##Combining both into one graph
+##p.splbb.both <- ggplot(data =SPL_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_SPL") + #geom_line(data = SPL_BB.hr.long, aes())
 
 
 ```
@@ -215,64 +228,64 @@ p.splbb
 High Frequency SPL averaged by hour across all days
 ```{r spl hf, echo=FALSE}
 
-p.splhf17<- ggplot(data =SPL_HF17.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
-
-#making legend smaller
-#p.splbb17 <- addSmallLegend(p.splbb17)
-
-p.splhf18<- ggplot(data =SPL_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "none")
-
-p.splhf <- ggplot(data =SPL_HF.hr.av, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged HF SPL")
-
-
-#Horizontal graph
-#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
-#splbb.h
-
-splhf.v <- plot_grid(p.splhf17, p.splhf18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
-
-splhf.v
-p.splhf
+#p.splhf17<- ggplot(data =SPL_HF17.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + #theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+#
+##making legend smaller
+##p.splbb17 <- addSmallLegend(p.splbb17)
+#
+#p.splhf18<- ggplot(data =SPL_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + #scale_color_brewer(palette = "Set1") +
+#  theme(legend.position = "none")
+#
+#p.splhf <- ggplot(data =SPL_HF.hr.av, aes(x=as.numeric(Hour), y=HF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_SPL") + #scale_color_brewer(palette = "Set1") + ggtitle("Averaged HF SPL")
+#
+#
+##Horizontal graph
+##splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+##splbb.h
+#
+#splhf.v <- plot_grid(p.splhf17, p.splhf18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
+#
+#splhf.v
+#p.splhf
 ```
 
 ### Mid Frequency
 Mid Frequency SPL averaged by hour across all days
 ```{r spl mf, echo=FALSE}
 
-p.splmf17<- ggplot(data =SPL_MF17.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
-
-#making legend smaller
-#p.splbb17 <- addSmallLegend(p.splbb17)
-
-p.splmf18<- ggplot(data =SPL_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "none")
-
-p.splmf <- ggplot(data =SPL_MF.hr.av, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged MF SPL")
-
-#Horizontal graph
-#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
-#splbb.h
-
-splmf.v <- plot_grid(p.splmf17, p.splmf18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
-
-splmf.v
-p.splmf
+#p.splmf17<- ggplot(data =SPL_MF17.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + #theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+#
+##making legend smaller
+##p.splbb17 <- addSmallLegend(p.splbb17)
+#
+#p.splmf18<- ggplot(data =SPL_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + #scale_color_brewer(palette = "Set1") +
+#  theme(legend.position = "none")
+#
+#p.splmf <- ggplot(data =SPL_MF.hr.av, aes(x=as.numeric(Hour), y=MF_SPL)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_SPL") + #scale_color_brewer(palette = "Set1") + ggtitle("Averaged MF SPL")
+#
+##Horizontal graph
+##splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+##splbb.h
+#
+#splmf.v <- plot_grid(p.splmf17, p.splmf18, labels = c("2017", "2018"), nrow = 2, align = "v", label_x = .5)
+#
+#splmf.v
+#p.splmf
 ```
 
 
 ### Boxplots
 Distribution of SPL at all frequencies and sites - averaged by hour
 ```{r spl bp, echo=FALSE}
-#Boxplot
-
-p.splbb.bp <- ggplot(data = SPL_BB.hr.long, aes(y = Broadband_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
-p.splhf.bp <- ggplot(data = SPL_HF.hr.long, aes(y = HF_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
-p.splmf.bp <- ggplot(data = SPL_MF.hr.long, aes(y = MF_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
-
-p.spl.bp <- plot_grid(p.splbb.bp, p.splhf.bp, p.splmf.bp, labels = c("Broadband", "High Frequency", "Mid Frequency"), nrow = 3, align = "v", label_x = .4)
-
-p.spl.bp
+##Boxplot
+#
+#p.splbb.bp <- ggplot(data = SPL_BB.hr.long, aes(y = Broadband_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
+#p.splhf.bp <- ggplot(data = SPL_HF.hr.long, aes(y = HF_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
+#p.splmf.bp <- ggplot(data = SPL_MF.hr.long, aes(y = MF_SPL, x = Site, fill = Year)) + geom_boxplot() + ylab("SPL")
+#
+#p.spl.bp <- plot_grid(p.splbb.bp, p.splhf.bp, p.splmf.bp, labels = c("Broadband", "High Frequency", "Mid Frequency"), nrow = 3, align = "v", label_x = .4)
+#
+#p.spl.bp
 ```
 
 
@@ -280,15 +293,156 @@ p.spl.bp
 ## SPL (No Averages)
 
 ### Broadband
-```{r spl hf no av, echo = FALSE}
-#renaming columns
-names(SPL_BB17) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
-#Making date a character
+```{r spl bb no av, echo = FALSE}
+#2017
+
+#converting site to character
+SPLBB17.long$Site <- as.character(SPLBB17.long$Site)
+
+#plots that worked but weren't helpful
+
+#ggplot(data =SPLBB17.long, aes(x=datetime, y = SPL_BB)) + geom_line(aes(color = "Site"))
+#  theme(axis.text.x = element_text(angle = 90))
+
+#ggplot(data =SPL_BB17, aes(x=datetime)) + 
+#  geom_point(aes(y = s32), color = "darkred") +
+#  geom_point(aes(y = s35), color = "blue") +
+#  geom_point(aes(y = s40), color = "steelblue") +
+#  geom_point(aes(y = s5), color = "green") +
+#  geom_point(aes(y = s8), color = "orange") +
+#scale_x_datetime(date_breaks = "1 day") + 
+#  theme(axis.text.x = element_text(angle = 90))
+  
+#comparing between sites for entire deployment
+full.SPLBB17 <- ggplot(data =SPLBB17.long, aes(x=datetime, y = SPL_BB)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
 SPL_BB17$Date <- as.character(SPL_BB17$Date)
 
-ggplot(data =SPL_BB17, aes(x=Time, y=s32)) + geom_line()
-ggplot(data = SPL_BB17, aes(x = Time, y = s35)) + geom_line()
-ggplot(data = SPL_BB17, aes(x = Time, y = s5)) + geom_line()
+#converting site to character
+SPLBB17.long$Site <- as.character(SPLBB17.long$Site)
+
+#comparing between sites for 1 day
+day.SPLBB17 <- ggplot(data = SPLBB17.long, aes(x= Time, y = SPL_BB)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+#need to break the x axis down using scale_x_time - but running into problem
+
+
+
+
+
+#2018
+
+#converting site to character
+SPLBB18.long$Site <- as.character(SPLBB18.long$Site)
+
+#comparing between sites for entire deployment
+ggplot(data =SPLBB18.long, aes(x=datetime, y = SPL_BB)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPL_BB18$Date <- as.character(SPL_BB18$Date)
+
+#converting site to character
+SPLBB18.long$Site <- as.character(SPLBB18.long$Site)
+
+#comparing between sites for 1 day
+day.SPLBB18 <- ggplot(data = SPLBB18.long, aes(x= Time, y = SPL_BB)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
+
+                                                                                                                                                             
+```
+
+### High Frequency
+```{r hf spl no av, echo = FALSE}
+#2017
+
+#converting site to character
+SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLHF17 <- ggplot(data =SPLHF17.long, aes(x=datetime, y = SPL_HF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPL_HF17$Date <- as.character(SPL_HF17$Date)
+
+#converting site to character
+SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
+
+#comparing between sites for 1 day
+day.SPLHF17 <- ggplot(data = SPLHF17.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
+#2018
+#converting site to character
+SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLHF18 <- ggplot(data =SPLHF18.long, aes(x=datetime, y = SPL_HF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPL_HF18$Date <- as.character(SPL_HF18$Date)
+
+#converting site to character
+SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
+
+#comparing between sites for 1 day
+day.SPLHF18 <- ggplot(data = SPLHF18.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
+
+```
+
+
+### Mid Frequency
+```{r mf spl no av, echo = FALSE}
+#2017
+
+#converting site to character
+SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLMF17 <- ggplot(data =SPLMF17.long, aes(x=datetime, y = SPL_MF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPL_MF17$Date <- as.character(SPL_MF17$Date)
+
+#converting site to character
+SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
+
+#comparing between sites for 1 day
+day.SPLMF17 <- ggplot(data = SPLMF17.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
+#2018
+#converting site to character
+SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLMF18 <- ggplot(data =SPLMF18.long, aes(x=datetime, y = SPL_MF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPL_MF18$Date <- as.character(SPL_MF18$Date)
+
+#converting site to character
+SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
+
+#comparing between sites for 1 day
+day.SPLMF18 <- ggplot(data = SPLMF18.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
 
 ```
 ##ACI (Hourly Averages)
@@ -297,87 +451,87 @@ ggplot(data = SPL_BB17, aes(x = Time, y = s5)) + geom_line()
 ### Broadband
 Broadband ACI averaged by hour across all days
 ```{r aci broadband, echo=FALSE}
-
-p.acibb17<- ggplot(data =ACI_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
-
-#making legend smaller
-#p.acibb17 <- addSmallLegend(p.acibb17)
-
-p.acibb18<- ggplot(data =ACI_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "none")
-
-
-p.acibb <- ggplot(data =ACI_BB.hr.av, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged BB ACI")
-
-#Horizontal graph
-#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
-#splbb.h
-
-acibb.v <- plot_grid(p.acibb17, p.acibb18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
-
-acibb.v
-p.acibb
+#
+#p.acibb17<- ggplot(data =ACI_BB17.hr.long, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + #theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+#
+##making legend smaller
+##p.acibb17 <- addSmallLegend(p.acibb17)
+#
+#p.acibb18<- ggplot(data =ACI_BB18.hr.long, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + #scale_color_brewer(palette = "Set1") +
+#  theme(legend.position = "none")
+#
+#
+#p.acibb <- ggplot(data =ACI_BB.hr.av, aes(x=as.numeric(Hour), y=Broadband_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("BB_ACI") + #scale_color_brewer(palette = "Set1") + ggtitle("Averaged BB ACI")
+#
+##Horizontal graph
+##splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+##splbb.h
+#
+#acibb.v <- plot_grid(p.acibb17, p.acibb18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
+#
+#acibb.v
+#p.acibb
 ```
 
 ### High Frequency
 High Frequency ACI averaged by hour across all days
 ```{r aci hf, echo=FALSE}
 
-p.acihf17<- ggplot(data =ACI_HF17.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
-
-#making legend smaller
-#p.splbb17 <- addSmallLegend(p.splbb17)
-
-p.acihf18<- ggplot(data =ACI_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "none")
-
-p.acihf <- ggplot(data =ACI_HF.hr.av, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged HF ACI")
-#Horizontal graph
-#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
-#splbb.h
-
-acihf.v <- plot_grid(p.acihf17, p.acihf18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
-
-acihf.v
-p.acihf
+#p.acihf17<- ggplot(data =ACI_HF17.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + #theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+#
+##making legend smaller
+##p.splbb17 <- addSmallLegend(p.splbb17)
+#
+#p.acihf18<- ggplot(data =ACI_HF18.hr.long, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + #scale_color_brewer(palette = "Set1") +
+#  theme(legend.position = "none")
+#
+#p.acihf <- ggplot(data =ACI_HF.hr.av, aes(x=as.numeric(Hour), y=HF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("HF_ACI") + #scale_color_brewer(palette = "Set1") + ggtitle("Averaged HF ACI")
+##Horizontal graph
+##splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+##splbb.h
+#
+#acihf.v <- plot_grid(p.acihf17, p.acihf18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
+#
+#acihf.v
+#p.acihf
 ```
 
 ### Mid Frequency
 Mid Frequency ACI averaged by hour across all days
 ```{r aci mf, echo=FALSE}
 
-p.acimf17<- ggplot(data =ACI_MF17.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
-
-#making legend smaller
-#p.splbb17 <- addSmallLegend(p.splbb17)
-
-p.acimf18<- ggplot(data =ACI_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "none")
-
-p.acimf <- ggplot(data =ACI_MF.hr.av, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + scale_color_brewer(palette = "Set1") + ggtitle("Averaged MF ACI")
-
-#Horizontal graph
-#splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
-#splbb.h
-
-acimf.v <- plot_grid(p.acimf17, p.acimf18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
-
-acimf.v
-p.acimf
+#p.acimf17<- ggplot(data =ACI_MF17.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + #theme(legend.position = "bottom", legend.title = element_blank(), axis.title.x = element_blank(), axis.text.x = element_blank()) + scale_color_brewer(palette = "Set1")
+#
+##making legend smaller
+##p.splbb17 <- addSmallLegend(p.splbb17)
+#
+#p.acimf18<- ggplot(data =ACI_MF18.hr.long, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + #scale_color_brewer(palette = "Set1") +
+#  theme(legend.position = "none")
+#
+#p.acimf <- ggplot(data =ACI_MF.hr.av, aes(x=as.numeric(Hour), y=MF_ACI)) + geom_line(aes(color=as.character(Site))) + xlab("Hour") + ylab ("MF_ACI") + #scale_color_brewer(palette = "Set1") + ggtitle("Averaged MF ACI")
+#
+##Horizontal graph
+##splbb.h <- plot_grid(p.splbb17, p.splbb18, labels = c("2017", "2018"), align = "h")
+##splbb.h
+#
+#acimf.v <- plot_grid(p.acimf17, p.acimf18, labels = c("2017", "2018"), label_x = .5, nrow = 2 )
+#
+#acimf.v
+#p.acimf
 ```
 
 ### Boxplots
 Distribution of ACI at all frequencies and sites - averaged by hour
 ```{r aci bp, echo=FALSE}
 #Boxplot
-
-p.acibb.bp <- ggplot(data = ACI_BB.hr.long, aes(y = Broadband_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
-p.acihf.bp <- ggplot(data = ACI_HF.hr.long, aes(y = HF_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
-p.acimf.bp <- ggplot(data = ACI_MF.hr.long, aes(y = MF_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
-
-p.aci.bp <- plot_grid(p.acibb.bp, p.acihf.bp, p.acimf.bp, labels = c("Broadband", "High Frequency", "Mid Frequency"), nrow = 3, align = "v", label_x = .4)
-
-p.aci.bp
+#
+#p.acibb.bp <- ggplot(data = ACI_BB.hr.long, aes(y = Broadband_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
+#p.acihf.bp <- ggplot(data = ACI_HF.hr.long, aes(y = HF_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
+#p.acimf.bp <- ggplot(data = ACI_MF.hr.long, aes(y = MF_ACI, x = Site, fill = Year)) + geom_boxplot() + ylab("ACI")
+#
+#p.aci.bp <- plot_grid(p.acibb.bp, p.acihf.bp, p.acimf.bp, labels = c("Broadband", "High Frequency", "Mid Frequency"), nrow = 3, align = "v", label_x = .4)
+#
+#p.aci.bp
 ```
 
 ##Fish Sounds
@@ -613,6 +767,31 @@ site.aci_bp
 #dev.off()
 ```
 
+##Confidence Intervals
+```{r histogram, echo = FALSE}
+#taking average and calculating confidence intervals for sites
+
+
+#Knocks by site
+ggplot(data =AC.DF1, aes(x= Hour, y = Tot_Knocks)) + geom_point(aes(color = Site))
+#one way ANOVA will compare because my only factor is site
+
+
+
+#Knocks by year
+
+#Knocks by hour
+
+#Snaps by site
+
+
+#Snaps by year
+
+#Knocks by hour
+
+
+
+```
 ##Distributions
 
 ```{r histogram, echo = FALSE}
@@ -644,20 +823,22 @@ hist2.p
 
 ```
 
-##Plotting regressions
+##Plotting scatterplots
 
 ```{r regression, echo = FALSE}
 #plotting total knocks against midrange SPL
-GLM1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + geom_smooth(method = "glm")
+SP1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point()
 
-GLM2 <- ggplot(AC.DF1, aes(Snaps, SPL_HF)) + geom_point() + geom_smooth(method = "glm")
+SP2 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point()
 
-GLM3 <- ggplot(AC.DF1, aes(Snaps, SPL_BB)) + geom_point() + geom_smooth(method = "glm")
+SP3 <- ggplot(AC.DF1, aes(Snaps, SPL_BB)) + geom_point()
 
-GLM4 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point() + geom_smooth(method = "glm")
+SP4 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point()
 
-GLM1
-GLM2
-GLM3
-GLM4
+
+
+SP1
+SP2
+SP3
+SP4
 ```

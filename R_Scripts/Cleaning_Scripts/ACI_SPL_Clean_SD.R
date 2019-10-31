@@ -301,7 +301,49 @@ SPL_BB <- merge(SPL_BB, SPL_BB_5, by = c('Date', 'Time'))
 #renaming columns
 names(SPL_BB) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
+
 SPL_BB17 <- SPL_BB
+
+#renaming columns
+names(SPL_BB17) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
+
+#splitting the wide dataframe into several dataframes so that I can make a long form dataframe
+SPL_BB32 <- select(SPL_BB17, Date, Time, s32)
+SPL_BB35 <- select(SPL_BB17, Date, Time, s35)
+SPL_BB40 <- select(SPL_BB17, Date, Time, s40)
+SPL_BB5 <- select(SPL_BB17, Date, Time, s5)
+SPL_BB8 <- select(SPL_BB17, Date, Time, s8)
+
+#adding site column to each dataframe
+SPL_BB32$Site <- 32
+SPL_BB35$Site <- 35
+SPL_BB40$Site <- 40
+SPL_BB5$Site <- 5
+SPL_BB8$Site <- 8
+
+#matching column names for all
+names(SPL_BB32) <- c("Date", "Time", "SPL_BB", "Site")
+names(SPL_BB35) <- c("Date", "Time", "SPL_BB", "Site")
+names(SPL_BB40) <- c("Date", "Time", "SPL_BB", "Site")
+names(SPL_BB5) <- c("Date", "Time", "SPL_BB", "Site")
+names(SPL_BB8) <- c("Date", "Time", "SPL_BB", "Site")
+
+#rbinding everything
+SPLBB17.long <- rbind(SPL_BB32, SPL_BB35, SPL_BB40, SPL_BB5, SPL_BB8)
+
+#re-adding year
+SPLBB17.long$Date <- paste0(SPLBB17.long$Date, "-2017")
+
+#Creating datetime object
+SPLBB17.long$datetime <- as.POSIXct(paste(SPLBB17.long$Date, SPLBB17.long$Time), format = "%d-%m-%Y %H:%M")
+
+#re-adding year
+SPL_BB17$Date <- paste0(SPL_BB17$Date, "-2017")
+
+#Creating datetime object
+SPL_BB17$datetime <- as.POSIXct(paste(SPL_BB17$Date, SPL_BB17$Time), format = "%d-%m-%Y %H:%M")
+
+
 
 #2018
 #pulling columns before merge
@@ -322,8 +364,55 @@ names(SPL_BB) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
 SPL_BB18 <- SPL_BB
 
+
+#renaming columns
+names(SPL_BB18) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
+
+#splitting the wide dataframe into several dataframes so that I can make a long form dataframe
+SPL_BB32 <- select(SPL_BB18, Date, Time, s32)
+SPL_BB35 <- select(SPL_BB18, Date, Time, s35)
+SPL_BB40 <- select(SPL_BB18, Date, Time, s40)
+SPL_BB5 <- select(SPL_BB18, Date, Time, s5)
+SPL_BB8 <- select(SPL_BB18, Date, Time, s8)
+
+#adding site column to each dataframe
+SPL_BB32$Site <- 32
+SPL_BB35$Site <- 35
+SPL_BB40$Site <- 40
+SPL_BB5$Site <- 5
+SPL_BB8$Site <- 8
+
+#matching column names for all
+names(SPL_BB32) <- c("Date", "Time", "SPL_BB", "Site")
+names(SPL_BB35) <- c("Date", "Time", "SPL_BB", "Site")
+names(SPL_BB40) <- c("Date", "Time", "SPL_BB", "Site")
+names(SPL_BB5) <- c("Date", "Time", "SPL_BB", "Site")
+names(SPL_BB8) <- c("Date", "Time", "SPL_BB", "Site")
+
+#rbinding everything
+SPLBB18.long <- rbind(SPL_BB32, SPL_BB35, SPL_BB40, SPL_BB5, SPL_BB8)
+
+#re-adding year
+SPLBB18.long$Date <- paste0(SPLBB18.long$Date, "-2018")
+
+#Creating datetime object
+SPLBB18.long$datetime <- as.POSIXct(paste(SPLBB18.long$Date, SPLBB18.long$Time), format = "%d-%m-%Y %H:%M")
+
+#re-adding year and creating datetime column in SPL_BB18
+
+#re-adding year
+SPL_BB18$Date <- paste0(SPL_BB18$Date, "-2018")
+
+#Creating datetime object
+SPL_BB18$datetime <- as.POSIXct(paste(SPL_BB18$Date, SPL_BB18$Time), format = "%d-%m-%Y %H:%M")
+
+
+
 save(SPL_BB17, file = "Raw_Data/SPL_BB17.Rdata")
 save(SPL_BB18, file = "Raw_Data/SPL_BB18.Rdata")
+
+save(SPLBB17.long, file = "Raw_Data/SPLBB17long.Rdata")
+save(SPLBB18.long, file = "Raw_Data/SPLBB18long.Rdata")
 
 ## HF SPL ####
 #pulling columns before merge
@@ -344,6 +433,47 @@ names(SPL_HF) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
 SPL_HF17 <- SPL_HF
 
+#renaming columns
+names(SPL_HF17) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
+
+#splitting the wide dataframe into several dataframes so that I can make a long form dataframe
+SPL_HF32 <- select(SPL_HF17, Date, Time, s32)
+SPL_HF35 <- select(SPL_HF17, Date, Time, s35)
+SPL_HF40 <- select(SPL_HF17, Date, Time, s40)
+SPL_HF5 <- select(SPL_HF17, Date, Time, s5)
+SPL_HF8 <- select(SPL_HF17, Date, Time, s8)
+
+#adding site column to each dataframe
+SPL_HF32$Site <- 32
+SPL_HF35$Site <- 35
+SPL_HF40$Site <- 40
+SPL_HF5$Site <- 5
+SPL_HF8$Site <- 8
+
+#matching column names for all
+names(SPL_HF32) <- c("Date", "Time", "SPL_HF", "Site")
+names(SPL_HF35) <- c("Date", "Time", "SPL_HF", "Site")
+names(SPL_HF40) <- c("Date", "Time", "SPL_HF", "Site")
+names(SPL_HF5) <- c("Date", "Time", "SPL_HF", "Site")
+names(SPL_HF8) <- c("Date", "Time", "SPL_HF", "Site")
+
+#rbinding everything
+SPLHF17.long <- rbind(SPL_HF32, SPL_HF35, SPL_HF40, SPL_HF5, SPL_HF8)
+
+#re-adding year
+SPLHF17.long$Date <- paste0(SPLHF17.long$Date, "-2017")
+
+#Creating datetime object
+SPLHF17.long$datetime <- as.POSIXct(paste(SPLHF17.long$Date, SPLHF17.long$Time), format = "%d-%m-%Y %H:%M")
+
+#re-adding year
+SPL_HF17$Date <- paste0(SPL_HF17$Date, "-2017")
+
+#Creating datetime object
+SPL_HF17$datetime <- as.POSIXct(paste(SPL_HF17$Date, SPL_HF17$Time), format = "%d-%m-%Y %H:%M")
+
+
+
 #2018
 #pulling columns before merge
 SPL_HF_32 <- s32.18 %>% select(SPL_HF, Date, Time)
@@ -363,6 +493,48 @@ names(SPL_HF) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
 SPL_HF18 <- SPL_HF
 
+#renaming columns
+names(SPL_HF18) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
+
+#splitting the wide dataframe into several dataframes so that I can make a long form dataframe
+SPL_HF32 <- select(SPL_HF18, Date, Time, s32)
+SPL_HF35 <- select(SPL_HF18, Date, Time, s35)
+SPL_HF40 <- select(SPL_HF18, Date, Time, s40)
+SPL_HF5 <- select(SPL_HF18, Date, Time, s5)
+SPL_HF8 <- select(SPL_HF18, Date, Time, s8)
+
+#adding site column to each dataframe
+SPL_HF32$Site <- 32
+SPL_HF35$Site <- 35
+SPL_HF40$Site <- 40
+SPL_HF5$Site <- 5
+SPL_HF8$Site <- 8
+
+#matching column names for all
+names(SPL_HF32) <- c("Date", "Time", "SPL_HF", "Site")
+names(SPL_HF35) <- c("Date", "Time", "SPL_HF", "Site")
+names(SPL_HF40) <- c("Date", "Time", "SPL_HF", "Site")
+names(SPL_HF5) <- c("Date", "Time", "SPL_HF", "Site")
+names(SPL_HF8) <- c("Date", "Time", "SPL_HF", "Site")
+
+#rbinding everything
+SPLHF18.long <- rbind(SPL_HF32, SPL_HF35, SPL_HF40, SPL_HF5, SPL_HF8)
+
+#re-adding year
+SPLHF18.long$Date <- paste0(SPLHF18.long$Date, "-2018")
+
+#Creating datetime object
+SPLHF18.long$datetime <- as.POSIXct(paste(SPLHF18.long$Date, SPLHF18.long$Time), format = "%d-%m-%Y %H:%M")
+
+#re-adding year
+SPL_HF18$Date <- paste0(SPL_HF18$Date, "-2018")
+
+#Creating datetime object
+SPL_HF18$datetime <- as.POSIXct(paste(SPL_HF18$Date, SPL_HF18$Time), format = "%d-%m-%Y %H:%M")
+
+#saving dataframes
+save(SPLHF17.long, file = "Raw_Data/SPLHF17long.Rdata")
+save(SPLHF18.long, file = "Raw_Data/SPLHF18long.Rdata")
 
 
 ## MF SPL ####
@@ -384,6 +556,47 @@ names(SPL_MF) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
 SPL_MF17 <- SPL_MF
 
+#renaming columns
+names(SPL_MF17) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
+
+#splitting the wide dataframe into several dataframes so that I can make a long form dataframe
+SPL_MF32 <- select(SPL_MF17, Date, Time, s32)
+SPL_MF35 <- select(SPL_MF17, Date, Time, s35)
+SPL_MF40 <- select(SPL_MF17, Date, Time, s40)
+SPL_MF5 <- select(SPL_MF17, Date, Time, s5)
+SPL_MF8 <- select(SPL_MF17, Date, Time, s8)
+
+#adding site column to each dataframe
+SPL_MF32$Site <- 32
+SPL_MF35$Site <- 35
+SPL_MF40$Site <- 40
+SPL_MF5$Site <- 5
+SPL_MF8$Site <- 8
+
+#matching column names for all
+names(SPL_MF32) <- c("Date", "Time", "SPL_MF", "Site")
+names(SPL_MF35) <- c("Date", "Time", "SPL_MF", "Site")
+names(SPL_MF40) <- c("Date", "Time", "SPL_MF", "Site")
+names(SPL_MF5) <- c("Date", "Time", "SPL_MF", "Site")
+names(SPL_MF8) <- c("Date", "Time", "SPL_MF", "Site")
+
+#rbinding everything
+SPLMF17.long <- rbind(SPL_MF32, SPL_MF35, SPL_MF40, SPL_MF5, SPL_MF8)
+
+#re-adding year
+SPLMF17.long$Date <- paste0(SPLMF17.long$Date, "-2017")
+
+#Creating datetime object
+SPLMF17.long$datetime <- as.POSIXct(paste(SPLMF17.long$Date, SPLMF17.long$Time), format = "%d-%m-%Y %H:%M")
+
+#re-adding year
+SPL_MF17$Date <- paste0(SPL_MF17$Date, "-2017")
+
+#Creating datetime object
+SPL_MF17$datetime <- as.POSIXct(paste(SPL_MF17$Date, SPL_MF17$Time), format = "%d-%m-%Y %H:%M")
+
+
+
 #2018
 #pulling columns before merge
 SPL_MF_32 <- s32.18 %>% select(SPL_Midrange, Date, Time)
@@ -402,6 +615,49 @@ SPL_MF <- merge(SPL_MF, SPL_MF_5, by = c('Date', 'Time'))
 names(SPL_MF) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
 SPL_MF18 <- SPL_MF
+
+#renaming columns
+names(SPL_MF18) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
+
+#splitting the wide dataframe into several dataframes so that I can make a long form dataframe
+SPL_MF32 <- select(SPL_MF18, Date, Time, s32)
+SPL_MF35 <- select(SPL_MF18, Date, Time, s35)
+SPL_MF40 <- select(SPL_MF18, Date, Time, s40)
+SPL_MF5 <- select(SPL_MF18, Date, Time, s5)
+SPL_MF8 <- select(SPL_MF18, Date, Time, s8)
+
+#adding site column to each dataframe
+SPL_MF32$Site <- 32
+SPL_MF35$Site <- 35
+SPL_MF40$Site <- 40
+SPL_MF5$Site <- 5
+SPL_MF8$Site <- 8
+
+#matching column names for all
+names(SPL_MF32) <- c("Date", "Time", "SPL_MF", "Site")
+names(SPL_MF35) <- c("Date", "Time", "SPL_MF", "Site")
+names(SPL_MF40) <- c("Date", "Time", "SPL_MF", "Site")
+names(SPL_MF5) <- c("Date", "Time", "SPL_MF", "Site")
+names(SPL_MF8) <- c("Date", "Time", "SPL_MF", "Site")
+
+#rbinding everything
+SPLMF18.long <- rbind(SPL_MF32, SPL_MF35, SPL_MF40, SPL_MF5, SPL_MF8)
+
+#re-adding year
+SPLMF18.long$Date <- paste0(SPLMF18.long$Date, "-2018")
+
+#Creating datetime object
+SPLMF18.long$datetime <- as.POSIXct(paste(SPLMF18.long$Date, SPLMF18.long$Time), format = "%d-%m-%Y %H:%M")
+
+#re-adding year
+SPL_MF18$Date <- paste0(SPL_MF18$Date, "-2018")
+
+#Creating datetime object
+SPL_MF18$datetime <- as.POSIXct(paste(SPL_MF18$Date, SPL_MF18$Time), format = "%d-%m-%Y %H:%M")
+
+#saving dataframes
+save(SPLMF17.long, file = "Raw_Data/SPLMF17long.Rdata")
+save(SPLMF18.long, file = "Raw_Data/SPLMF18long.Rdata")
 
 
 #### Adding one column for year to each of my new dataframes ####

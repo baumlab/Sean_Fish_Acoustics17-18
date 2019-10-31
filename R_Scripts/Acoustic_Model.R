@@ -43,6 +43,9 @@ plot(gfit1)
 results_fit1 <- summary.glm(gfit1)$coefficients
 
 write.csv(results_fit1, "Figures/Fit1Results.csv")
+
+
+
 #### Testing for collinearity ####
 
 #subsetting only explanatory variables
