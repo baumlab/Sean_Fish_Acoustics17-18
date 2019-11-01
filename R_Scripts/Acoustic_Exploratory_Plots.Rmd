@@ -40,12 +40,20 @@ library(hms)
 #All time data
 load("../Raw_Data/SPL_BB17.Rdata")
 load("../Raw_Data/SPL_BB18.Rdata")
+
 load("../Raw_Data/SPLBB17long.Rdata")
 load("../Raw_Data/SPLBB18long.Rdata")
+
 load("../Raw_Data/SPLHF17long.Rdata")
 load("../Raw_Data/SPLHF18long.Rdata")
+
 load("../Raw_Data/SPLMF17long.Rdata")
 load("../Raw_Data/SPLMF18long.Rdata")
+
+load("../Raw_Data/SPLHFlong.Rdata")
+load("../Raw_Data/SPLMFlong.Rdata")
+
+
 
 #combined SPL and HF dataframes
 load("../Raw_Data/Snap.HF17.Rdata")
@@ -296,6 +304,7 @@ Distribution of SPL at all frequencies and sites - averaged by hour
 ```{r spl bb no av, echo = FALSE}
 #2017
 
+
 #converting site to character
 SPLBB17.long$Site <- as.character(SPLBB17.long$Site)
 
@@ -353,7 +362,6 @@ SPLBB18.long$Site <- as.character(SPLBB18.long$Site)
 day.SPLBB18 <- ggplot(data = SPLBB18.long, aes(x= Time, y = SPL_BB)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
 
 
-
                                                                                                                                                              
 ```
 
@@ -370,7 +378,7 @@ full.SPLHF17 <- ggplot(data =SPLHF17.long, aes(x=datetime, y = SPL_HF)) +
   theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
 
 #converting date to character
-SPL_HF17$Date <- as.character(SPL_HF17$Date)
+SPLHF17.long$Date <- as.character(SPLHF17.long$Date)
 
 #converting site to character
 SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
@@ -389,7 +397,7 @@ full.SPLHF18 <- ggplot(data =SPLHF18.long, aes(x=datetime, y = SPL_HF)) +
   theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
 
 #converting date to character
-SPL_HF18$Date <- as.character(SPL_HF18$Date)
+SPLHF18.long$Date <- as.character(SPLHF18.long$Date)
 
 #converting site to character
 SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
@@ -397,8 +405,19 @@ SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
 #comparing between sites for 1 day
 day.SPLHF18 <- ggplot(data = SPLHF18.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
 
+full.SPLHF17
+full.SPLHF18
+day.SPLHF17
+day.SPLHF18
 
+#combined
 
+#converting site to character
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+day.SPLHF <- ggplot(data = SPLHF.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+day.SPLHF
 ```
 
 
@@ -415,7 +434,7 @@ full.SPLMF17 <- ggplot(data =SPLMF17.long, aes(x=datetime, y = SPL_MF)) +
   theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
 
 #converting date to character
-SPL_MF17$Date <- as.character(SPL_MF17$Date)
+SPLMF17.long$Date <- as.character(SPLMF17.long$Date)
 
 #converting site to character
 SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
@@ -434,7 +453,7 @@ full.SPLMF18 <- ggplot(data =SPLMF18.long, aes(x=datetime, y = SPL_MF)) +
   theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
 
 #converting date to character
-SPL_MF18$Date <- as.character(SPL_MF18$Date)
+SPLMF18.long$Date <- as.character(SPLMF18.long$Date)
 
 #converting site to character
 SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
@@ -443,8 +462,45 @@ SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
 day.SPLMF18 <- ggplot(data = SPLMF18.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
 
 
+full.SPLMF17
+full.SPLMF18
+day.SPLMF17
+day.SPLMF18
+
+#combined model
+#comparing between sites for 1 day
+#making site a character
+SPLMF.long$Site <- as.character(SPLMF.long$Site)
+
+day.SPLMF <- ggplot(data = SPLMF.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90))
+
+day.SPLMF
+
+#plotting HF and MF on same plot each year
 
 ```
+
+### Combo Plots
+```{r mf spl no av, echo = FALSE}
+#creating combined dataframe
+SPL.both <- cbind(SPLMF17.long, SPLHF17.long$SPL_HF)
+
+#renaming columns
+names(SPL.both) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF")
+
+#comparing between sites for entire deployment
+full.SPL <- ggplot(data =SPL.both, aes(x=datetime)) + 
+  geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+full.SPL
+
+#comparing between sites for 1 day
+day.SPL <- ggplot(data = SPL.both, aes(x= Time)) + geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) + theme(axis.text.x = element_text(angle = 90)) + ylab("SPL")
+day.SPL
+
+```
+
+
 ##ACI (Hourly Averages)
 
 

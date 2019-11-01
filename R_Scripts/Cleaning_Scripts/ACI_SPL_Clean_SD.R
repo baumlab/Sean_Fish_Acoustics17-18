@@ -532,11 +532,16 @@ SPL_HF18$Date <- paste0(SPL_HF18$Date, "-2018")
 #Creating datetime object
 SPL_HF18$datetime <- as.POSIXct(paste(SPL_HF18$Date, SPL_HF18$Time), format = "%d-%m-%Y %H:%M")
 
+
+#combining dataframes into one long dataframe
+SPLHF.long <- rbind(SPLHF17.long, SPLHF18.long)
+
+
 #saving dataframes
 save(SPLHF17.long, file = "Raw_Data/SPLHF17long.Rdata")
 save(SPLHF18.long, file = "Raw_Data/SPLHF18long.Rdata")
 
-
+save(SPLHF.long, file = "Raw_Data/SPLHFlong.Rdata")
 ## MF SPL ####
 #pulling columns before merge
 SPL_MF_32 <- s32.17 %>% select(SPL_Midrange, Date, Time)
@@ -655,10 +660,15 @@ SPL_MF18$Date <- paste0(SPL_MF18$Date, "-2018")
 #Creating datetime object
 SPL_MF18$datetime <- as.POSIXct(paste(SPL_MF18$Date, SPL_MF18$Time), format = "%d-%m-%Y %H:%M")
 
+#combining dataframes into one long dataframe
+SPLMF.long <- rbind(SPLMF17.long, SPLMF18.long)
+
+
 #saving dataframes
 save(SPLMF17.long, file = "Raw_Data/SPLMF17long.Rdata")
 save(SPLMF18.long, file = "Raw_Data/SPLMF18long.Rdata")
 
+save(SPLMF.long, file = "Raw_Data/SPLMFlong.Rdata")
 
 #### Adding one column for year to each of my new dataframes ####
 ACI_BB17$Year <- "2017"

@@ -1,0 +1,674 @@
+---
+title: "Acoustic_2019_Explore2"
+author: "Sean Dimoff"
+date: "October 9, 2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(cowplot)
+library(rmarkdown)
+library(knitr)
+library(RColorBrewer)
+library(GGally)
+library(mctest)
+library(usdm)
+library(hms)
+
+##loading in the ACI/SPL data - wide form
+
+#hourdata
+#load("../Raw_Data/ACI_BB17hr.Rdata")
+#load("../Raw_Data/ACI_BB18hr.Rdata")
+#load("../Raw_Data/ACI_HF17hr.Rdata")
+#load("../Raw_Data/ACI_HF18hr.Rdata")
+#load("../Raw_Data/ACI_MF17hr.Rdata")
+#load("../Raw_Data/ACI_MF18hr.Rdata")
+#
+#load("../Raw_Data/SPL_BB17hr.Rdata")
+#load("../Raw_Data/SPL_BB18hr.Rdata")
+#load("../Raw_Data/SPL_HF17hr.Rdata")
+#load("../Raw_Data/SPL_HF18hr.Rdata")
+#load("../Raw_Data/SPL_MF17hr.Rdata")
+#load("../Raw_Data/SPL_MF18hr.Rdata")
+
+#All time data
+load("../Raw_Data/SPL_BB17.Rdata")
+load("../Raw_Data/SPL_BB18.Rdata")
+
+load("../Raw_Data/SPLBB17long.Rdata")
+load("../Raw_Data/SPLBB18long.Rdata")
+
+load("../Raw_Data/SPLHF17long.Rdata")
+load("../Raw_Data/SPLHF18long.Rdata")
+
+load("../Raw_Data/SPLMF17long.Rdata")
+load("../Raw_Data/SPLMF18long.Rdata")
+
+load("../Raw_Data/SPLHFlong.Rdata")
+load("../Raw_Data/SPLMFlong.Rdata")
+
+
+
+#combined SPL and HF dataframes
+load("../Raw_Data/Snap.HF17.Rdata")
+load("../Raw_Data/Snap.HF18.Rdata")
+
+
+
+#daydata
+#load("../Raw_Data/ACI_BB17day.Rdata")
+#load("../Raw_Data/ACI_BB18day.Rdata")
+#load("../Raw_Data/ACI_HF17day.Rdata")
+#load("../Raw_Data/ACI_HF18day.Rdata")
+#load("../Raw_Data/ACI_MF17day.Rdata")
+#load("../Raw_Data/ACI_MF18day.Rdata")
+#
+#load("../Raw_Data/SPL_BB17day.Rdata")
+#load("../Raw_Data/SPL_BB18day.Rdata")
+#load("../Raw_Data/SPL_HF17day.Rdata")
+#load("../Raw_Data/SPL_HF18day.Rdata")
+#load("../Raw_Data/SPL_MF17day.Rdata")
+#load("../Raw_Data/SPL_MF18day.Rdata")
+
+#loading ACI/SPL long data for boxplots
+#ACI
+#load("../Raw_Data/ACI_BB17hrlong.Rdata")
+#load("../Raw_Data/ACI_HF17hrlong.Rdata")
+#load("../Raw_Data/ACI_MF17hrlong.Rdata")
+#load("../Raw_Data/ACI_BB18hrlong.Rdata")
+#load("../Raw_Data/ACI_HF18hrlong.Rdata")
+#load("../Raw_Data/ACI_MF18hrlong.Rdata")
+#
+#load("../Raw_Data/ACI_MFhrlong.Rdata")
+#load("../Raw_Data/ACI_HFhrlong.Rdata")
+#load("../Raw_Data/ACI_BBhrlong.Rdata")
+#
+#load("../Raw_Data/ACI_BBhr_av.Rdata")
+#load("../Raw_Data/ACI_HFhr_av.Rdata")
+#load("../Raw_Data/ACI_MFhr_av.Rdata")
+#
+####making year a character
+#ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
+#ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
+#ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
+#
+###SPL
+#load("../Raw_Data/SPL_BB17hrlong.Rdata")
+#load("../Raw_Data/SPL_HF17hrlong.Rdata")
+#load("../Raw_Data/SPL_MF17hrlong.Rdata")
+#load("../Raw_Data/SPL_BB18hrlong.Rdata")
+#load("../Raw_Data/SPL_HF18hrlong.Rdata")
+#load("../Raw_Data/SPL_MF18hrlong.Rdata")
+#
+#load("../Raw_Data/SPL_MFhrlong.Rdata")
+#load("../Raw_Data/SPL_HFhrlong.Rdata")
+#load("../Raw_Data/SPL_BBhrlong.Rdata")
+#
+#load("../Raw_Data/SPL_BBhr_av.Rdata")
+#load("../Raw_Data/SPL_HFhr_av.Rdata")
+#load("../Raw_Data/SPL_MFhr_av.Rdata")
+#
+###making year a character
+#SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
+#SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
+#SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
+#
+##loading in fish call count data
+#load("../Raw_Data/FC.05hr.Rdata")
+#load("../Raw_Data/FC.08hr.Rdata")
+#load("../Raw_Data/FC.32hr.Rdata")
+#load("../Raw_Data/FC.35hr.Rdata")
+#load("../Raw_Data/FC.40hr.Rdata")
+#
+#load("../Raw_Data/FC.CallperDayALL.Rdata")
+#load("../Raw_Data/FC.CallperDay17.Rdata")
+#load("../Raw_Data/FC.CallperDay18.Rdata")
+#
+#load("../Raw_Data/FC.CallperHourALL.Rdata")
+#load("../Raw_Data/FC.CallperHour17.Rdata")
+#load("../Raw_Data/FC.CallperHour18.Rdata")
+
+#loading in total dataframe
+#load("../Raw_Data/AC.DF.Rdata")
+
+
+
+
+##loading in Boat visitation data
+load("../Raw_Data/BV.all.Rdata")
+load("../Raw_Data/BV.sum.Rdata")
+
+
+
+
+
+##loading in lunar phase data
+#load("../Raw_Data/LunarPhase2017.Rdata")
+#load("../Raw_Data/LunarPhase2018.Rdata")
+
+
+##loading in fish data
+#load("../Raw_Data/ki_fishabundance.Rdata")
+#load("../Raw_Data/ki_fishabundance17.Rdata")
+#load("../Raw_Data/ki_fishabundance18.Rdata")
+#
+#load("../Raw_Data/ki_fishaverage.Rdata")
+#load("../Raw_Data/ki_fishaverage17.Rdata")
+#load("../Raw_Data/ki_fishaverage18.Rdata")
+
+
+##loading in the full dataframe with all data
+load("../Raw_Data/AC.DF.Rdata")
+load("../Raw_Data/AC.DF1.Rdata")
+
+#creating small legend function
+#addSmallLegend <- function(myPlot, pointSize = 0.7, textSize = 5, spaceLegend = 0.2) {
+#    myPlot +
+#        guides(shape = guide_legend(override.aes = list(size = pointSize)),
+#               color = guide_legend(override.aes = list(size = pointSize))) +
+#        theme(legend.title = element_text(size = textSize), 
+#              legend.text  = element_text(size = textSize),
+#              legend.key.size = unit(spaceLegend, "lines"))
+#}
+
+
+```
+**Exploratory Plots for 2017-2018 Acoustic/Fish Data**
+
+**Purpose** To explore the Acoustic data gathered in 2017 and 2018 to expose important trends between sites, diurnal patterns, fish abundance, lunar phase, and coral reef acoustics.
+
+#Acoustics
+**Acoustics Breakdown** All acoustic metrics (SPL and ACI) are broken down into 3 frequency bands: Broadband (All frequencies), High Frequency (Frequencies between 1 kHz - 22 kHz), and Mid Frequency (Frequencies between 160 Hz and 1 kHz)
+
+*Note* 2017 had a 10 minute duty cycle with 5 minutes recording while 2018 had a 15 minute duty cycle with 5 minutes recording, so the number of files averages differs between years
+
+## SPL (No Averages)
+
+### Broadband
+```{r spl bb no av, echo = FALSE}
+#2017
+
+
+#converting site to character
+SPLBB17.long$Site <- as.character(SPLBB17.long$Site)
+
+#plots that worked but weren't helpful
+
+#ggplot(data =SPLBB17.long, aes(x=datetime, y = SPL_BB)) + geom_line(aes(color = "Site"))
+#  theme(axis.text.x = element_text(angle = 90))
+
+#ggplot(data =SPL_BB17, aes(x=datetime)) + 
+#  geom_point(aes(y = s32), color = "darkred") +
+#  geom_point(aes(y = s35), color = "blue") +
+#  geom_point(aes(y = s40), color = "steelblue") +
+#  geom_point(aes(y = s5), color = "green") +
+#  geom_point(aes(y = s8), color = "orange") +
+#scale_x_datetime(date_breaks = "1 day") + 
+#  theme(axis.text.x = element_text(angle = 90))
+  
+#comparing between sites for entire deployment
+full.SPLBB17 <- ggplot(data =SPLBB17.long, aes(x=datetime, y = SPL_BB)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPL_BB17$Date <- as.character(SPL_BB17$Date)
+
+#converting site to character
+SPLBB17.long$Site <- as.character(SPLBB17.long$Site)
+
+#comparing between sites for 1 day
+day.SPLBB17 <- ggplot(data = SPLBB17.long, aes(x= Time, y = SPL_BB)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+#need to break the x axis down using scale_x_time - but running into problem
+
+
+
+
+
+#2018
+
+#converting site to character
+SPLBB18.long$Site <- as.character(SPLBB18.long$Site)
+
+#comparing between sites for entire deployment
+ggplot(data =SPLBB18.long, aes(x=datetime, y = SPL_BB)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPL_BB18$Date <- as.character(SPL_BB18$Date)
+
+#converting site to character
+SPLBB18.long$Site <- as.character(SPLBB18.long$Site)
+
+#comparing between sites for 1 day
+day.SPLBB18 <- ggplot(data = SPLBB18.long, aes(x= Time, y = SPL_BB)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
+                                                                                                                                                             
+```
+
+### High Frequency
+```{r hf spl no av, echo = FALSE}
+#2017
+
+#converting site to character
+SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLHF17 <- ggplot(data =SPLHF17.long, aes(x=datetime, y = SPL_HF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPLHF17.long$Date <- as.character(SPLHF17.long$Date)
+
+#converting site to character
+SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
+
+#comparing between sites for 1 day
+day.SPLHF17 <- ggplot(data = SPLHF17.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
+#2018
+#converting site to character
+SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLHF18 <- ggplot(data =SPLHF18.long, aes(x=datetime, y = SPL_HF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPLHF18.long$Date <- as.character(SPLHF18.long$Date)
+
+#converting site to character
+SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
+
+#comparing between sites for 1 day
+day.SPLHF18 <- ggplot(data = SPLHF18.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+full.SPLHF17
+full.SPLHF18
+day.SPLHF17
+day.SPLHF18
+
+#combined
+
+#converting site to character
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+day.SPLHF <- ggplot(data = SPLHF.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+day.SPLHF
+```
+
+
+### Mid Frequency
+```{r mf spl no av, echo = FALSE}
+#2017
+
+#converting site to character
+SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLMF17 <- ggplot(data =SPLMF17.long, aes(x=datetime, y = SPL_MF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPLMF17.long$Date <- as.character(SPLMF17.long$Date)
+
+#converting site to character
+SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
+
+#comparing between sites for 1 day
+day.SPLMF17 <- ggplot(data = SPLMF17.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
+#2018
+#converting site to character
+SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLMF18 <- ggplot(data =SPLMF18.long, aes(x=datetime, y = SPL_MF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+
+#converting date to character
+SPLMF18.long$Date <- as.character(SPLMF18.long$Date)
+
+#converting site to character
+SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
+
+#comparing between sites for 1 day
+day.SPLMF18 <- ggplot(data = SPLMF18.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess")
+
+
+full.SPLMF17
+full.SPLMF18
+day.SPLMF17
+day.SPLMF18
+
+#combined model
+#comparing between sites for 1 day
+#making site a character
+SPLMF.long$Site <- as.character(SPLMF.long$Site)
+
+day.SPLMF <- ggplot(data = SPLMF.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90))
+
+day.SPLMF
+
+#plotting HF and MF on same plot each year
+
+```
+
+### Combo Plots
+```{r combo hf mf, echo = FALSE}
+#creating combined dataframe
+SPL.both <- cbind(SPLMF17.long, SPLHF17.long$SPL_HF)
+
+#renaming columns
+names(SPL.both) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF")
+
+#comparing between sites for entire deployment
+full.SPL <- ggplot(data =SPL.both, aes(x=datetime)) + 
+  geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+full.SPL
+
+#comparing between sites for 1 day
+day.SPL <- ggplot(data = SPL.both, aes(x= Time)) + geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) + theme(axis.text.x = element_text(angle = 90)) + ylab("SPL")
+day.SPL
+
+```
+
+
+
+#Validations
+**Combined Model** All variables are matched to the files that were used for Fish call counts (3:00, 9:00, 15:00, 21:00)
+
+##Box Plots
+
+```{r combined model, echo = FALSE}
+colnames(AC.DF1)
+
+#reordering hour so that it is in chronological order
+AC.DF1$Hour <- factor(AC.DF1$Hour, levels = c("3", "9", "15", "21"))
+
+#Box graphs with Hour as the X variable
+
+SPL_HFp <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Hour, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Hour") + theme(legend.position = "none")
+
+SPL_MFp <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Hour, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Hour") + theme(legend.position = "none")
+
+Tot_Kp <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Hour, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Hour") + theme(legend.position = "none")
+
+LCp <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Hour, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Hour") + theme(legend.position = "none")
+
+Herbp <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Hour, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Hour") + theme(legend.position = "none")
+
+Snapp <- ggplot(data = AC.DF1, aes(y = Snaps, x = Hour, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Hour") + theme(legend.position = "none")
+
+hour.f_bp <- plot_grid( SPL_HFp, SPL_MFp, nrow = 1, ncol = 2)
+
+#pdf(file="../Figures/Hour_Metrics.pdf", width = 11, height = 7)
+hour.f_bp
+#dev.off()
+
+hour_bp <- plot_grid(Tot_Kp, LCp, Herbp, Snapp, nrow = 2, ncol = 2)
+
+#pdf(file="../Figures/Hour_Counts.pdf", width = 11, height = 7)
+hour_bp
+#dev.off()
+
+hour.comp <- plot_grid(SPL_MFp, Tot_Kp, SPL_HFp, Snapp, nrow = 2, ncol =2)
+
+#pdf(file="../Figures/Hour_Compare.pdf", width = 11, height = 7)
+hour.comp
+#dev.off()
+
+#Box graphs with Site as the x variable
+
+# making site a factor
+AC.DF1$Site <- as.character(AC.DF1$Site)
+
+SPL_HFp1 <- ggplot(data = AC.DF1, aes(y = SPL_HF, x = Site, fill = Year)) + geom_boxplot() + ylab("HF_SPL") + xlab("Site") + theme(legend.position = "none")
+
+SPL_MFp1 <- ggplot(data = AC.DF1, aes(y = SPL_Midrange, x = Site, fill = Year)) + geom_boxplot() + ylab("MF_SPL") + xlab("Site") + theme(legend.position = "none")
+
+Tot_Kp1 <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Site, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Site") + theme(legend.position = "none")
+
+LCp1 <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Site, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Site") + theme(legend.position = "none")
+
+Herbp1 <- ggplot(data = AC.DF1, aes(y = Num_Herbivory, x = Site, fill = Year)) + geom_boxplot() + ylab("Herbivory") + xlab("Site") + theme(legend.position = "none")
+
+Snapp1 <- ggplot(data = AC.DF1, aes(y = Snaps, x = Site, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Site") + theme(legend.position = "none")
+
+site.f_bp <- plot_grid(SPL_HFp1, SPL_MFp1, nrow = 1, ncol = 2)
+
+#pdf(file="../Figures/Site_Metrics.pdf", width = 11, height = 7)
+site.f_bp
+#dev.off()
+
+site_bp <- plot_grid(Tot_Kp1, LCp1, Herbp1,Snapp1, nrow = 2, ncol = 2)
+
+#pdf(file="../Figures/Site_Counts.pdf", width = 11, height = 7)
+site_bp
+#dev.off()
+
+
+site.comp <- plot_grid(SPL_MFp1, Tot_Kp1, SPL_HFp1, Snapp1, nrow = 2, ncol = 2)
+
+#pdf(file="../Figures/Site_Compare.pdf", width = 11, height = 7)
+site.comp
+#dev.off()
+
+site.spl_bp <- plot_grid(Tot_Kp1, SPL_MFp1, LCp1, SPL_HFp1, Snapp1 , nrow = 3, ncol = 2)
+
+#pdf(file="../Figures/Site_Compare.SPL.pdf", width = 11, height = 7)
+site.spl_bp
+#dev.off()
+
+
+### ACI Plot ###
+
+Tot_Kp2 <- ggplot(data = AC.DF1, aes(y = Tot_Knocks, x = Site, fill = Year)) + geom_boxplot() + ylab("Knocks") + xlab("Site") + theme(legend.position = "none")
+
+LCp2 <- ggplot(data = AC.DF1, aes(y = Num_L_calls, x = Site, fill = Year)) + geom_boxplot() + ylab("Long Calls") + xlab("Site") + theme(legend.position = "none")
+
+Snapp2 <- ggplot(data = AC.DF1, aes(y = Snaps, x = Site, fill = Year)) + geom_boxplot() + ylab("Snaps") + xlab("Site") + theme(legend.position = "none")
+
+ACI_MFp <- ggplot(data = AC.DF1, aes(y = ACI_Midrange, x = Site, fill = Year)) + geom_boxplot() + ylab("MF_ACI") + xlab("Site") + theme(legend.position = "none")
+
+ACI_HFp <- ggplot(data = AC.DF1, aes(y = ACI_HF, x = Site, fill = Year)) + geom_boxplot() + ylab("HF_ACI") + xlab("Site") + theme(legend.position = "none")
+
+ACI_BBp <- ggplot(data = AC.DF1, aes(y = ACI_BB, x = Site, fill = Year)) + geom_boxplot() + ylab("BB_ACI") + xlab("Site") + theme(legend.position = "none")
+
+site.aci_bp <- plot_grid(Tot_Kp2, ACI_MFp, LCp2, ACI_HFp, Snapp2, ACI_BBp , nrow = 2, ncol = 3)
+
+#pdf(file="../Figures/Site_Compare.ACI.pdf", width = 11, height = 7)
+site.aci_bp
+#dev.off()
+```
+
+##Confidence Intervals
+```{r CI, echo = FALSE}
+
+##Knocks
+
+#taking average and calculating confidence intervals for sites
+knock.av <- aggregate(Tot_Knocks ~ Site, AC.DF1, mean)
+knock.se <- aggregate(Tot_Knocks ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+knock.av$SE <- knock.se$Tot_Knocks
+knock.av$U.SE <- knock.av$Tot_Knocks + knock.av$SE
+knock.av$L.SE <- knock.av$Tot_Knocks - knock.av$SE
+
+#making site a character
+knock.av$Site <- as.character(knock.av$Site)
+
+knock.CI <- ggplot(knock.av, aes(Site, Tot_Knocks)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Tot_Knocks", title = "Total Knocks")
+knock.CI
+
+
+
+##Snaps
+
+#snaps by site
+snap.av <- aggregate(Snaps ~ Site, AC.DF1, mean)
+snap.se <- aggregate(Snaps ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+snap.av$SE <- snap.se$Snaps
+snap.av$U.SE <- snap.av$Snaps + snap.av$SE
+snap.av$L.SE <- snap.av$Snaps - snap.av$SE
+
+#making site a character
+snap.av$Site <- as.character(snap.av$Site)
+
+snap.CI <- ggplot(snap.av, aes(Site, Snaps)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Snaps", title = "Snaps per site")
+snap.CI
+
+
+##Long Calls
+
+#LC by site
+LC.av <- aggregate(Num_L_calls ~ Site, AC.DF1, mean)
+LC.se <- aggregate(Num_L_calls ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+LC.av$SE <- LC.se$Num_L_calls
+LC.av$U.SE <- LC.av$Num_L_calls + LC.av$SE
+LC.av$L.SE <- LC.av$Num_L_calls - LC.av$SE
+
+#making site a character
+LC.av$Site <- as.character(LC.av$Site)
+
+LC.CI <- ggplot(LC.av, aes(Site, Num_L_calls)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Long Calls", title = "Long Calls per site")
+LC.CI
+
+##Herbivory
+
+#LC by site
+H.av <- aggregate(Num_Herbivory ~ Site, AC.DF1, mean)
+H.se <- aggregate(Num_Herbivory ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+H.av$SE <- H.se$Num_Herbivory
+H.av$U.SE <- H.av$Num_Herbivory + H.av$SE
+H.av$L.SE <- H.av$Num_Herbivory - H.av$SE
+
+#making site a character
+H.av$Site <- as.character(H.av$Site)
+
+H.CI <- ggplot(H.av, aes(Site, Num_Herbivory)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Herbivory", title = "Herbivory per site")
+H.CI
+
+
+
+
+```
+##Distributions
+
+```{r histogram, echo = FALSE}
+#plotting count histogram
+
+Count.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Tot_Knocks)) + geom_histogram()
+Herb.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_Herbivory)) + geom_histogram()
+LC.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_L_calls)) + geom_histogram()
+Snap.hist <- ggplot(data = Snap.HF17, aes(Snap.HF17$Snaps)) + geom_histogram()
+
+hist.p <- plot_grid(Count.hist, Herb.hist, LC.hist,Snap.hist, nrow = 2, ncol = 2)
+hist.p
+
+#plotting distributions of SPL response variables
+MF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_Midrange)) + geom_histogram()
+BB.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_BB)) + geom_histogram()
+HF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_HF)) + geom_histogram()
+
+hist1.p <- plot_grid(MF.hist, BB.hist, HF.hist, nrow = 1, ncol = 3)
+hist1.p
+
+#plotting distributions of ACI response variables
+MF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_Midrange)) + geom_histogram()
+BB.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_BB)) + geom_histogram()
+HF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_HF)) + geom_histogram()
+
+hist2.p <- plot_grid(MF.hist1, BB.hist1, HF.hist1, nrow = 1, ncol = 3)
+hist2.p
+
+```
+
+##Scatterplots
+
+```{r scatterplots, echo = FALSE}
+#plotting total knocks against midrange SPL
+SP.mf1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point()
+
+SP.mf2 <- ggplot(AC.DF1, aes(Num_L_calls, SPL_Midrange)) + geom_point()
+
+SP.mf3 <- ggplot(AC.DF1, aes(Num_Herbivory, SPL_Midrange)) + geom_point()
+
+#checking for colinearity
+SP.mfc1 <- ggplot(AC.DF1, aes(Tot_Knocks, Num_L_calls)) + geom_point()
+
+SP.mfc2 <- ggplot(AC.DF1, aes(Tot_Knocks, Num_Herbivory)) + geom_point()
+
+SP.mfc3 <- ggplot(AC.DF1, aes(Num_L_calls, Num_Herbivory)) + geom_point()
+
+
+
+SP.hf1 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point()
+
+
+SP4 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point()
+
+#summing long calls and knocks
+AC.DF1$Fish_Sounds <- AC.DF1$Tot_Knocks + AC.DF1$Num_L_calls
+
+SP.mf4 <- ggplot(AC.DF1, aes(Fish_Sounds, SPL_Midrange)) + geom_point()
+
+SP.mf1
+SP.mf2
+SP.mf3
+SP.mf4
+
+SP.mfc1
+SP.mfc2
+SP.mfc3
+
+
+SP.hf1
+
+
+#plotting ACI against explanatory factors
+SP.acimf1 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point()
+SP.acimf2 <- ggplot(AC.DF1, aes(Num_L_calls, ACI_Midrange)) + geom_point()
+SP.acimf3 <- ggplot(AC.DF1, aes(Num_Herbivory, ACI_Midrange)) + geom_point()
+
+SP.acihf1 <- ggplot(AC.DF1, aes(Snaps, ACI_HF)) + geom_point()
+
+
+
+
+
+SP.acimf1
+SP.acimf2
+SP.acimf3
+
+SP.acihf1
+
+```
