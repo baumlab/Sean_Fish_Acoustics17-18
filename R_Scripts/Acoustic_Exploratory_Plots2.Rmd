@@ -19,6 +19,7 @@ library(GGally)
 library(mctest)
 library(usdm)
 library(hms)
+library(dplyr)
 
 ##loading in the ACI/SPL data - wide form
 
@@ -167,15 +168,6 @@ load("../Raw_Data/BV.sum.Rdata")
 load("../Raw_Data/AC.DF.Rdata")
 load("../Raw_Data/AC.DF1.Rdata")
 
-#creating small legend function
-#addSmallLegend <- function(myPlot, pointSize = 0.7, textSize = 5, spaceLegend = 0.2) {
-#    myPlot +
-#        guides(shape = guide_legend(override.aes = list(size = pointSize)),
-#               color = guide_legend(override.aes = list(size = pointSize))) +
-#        theme(legend.title = element_text(size = textSize), 
-#              legend.text  = element_text(size = textSize),
-#              legend.key.size = unit(spaceLegend, "lines"))
-#}
 
 
 ```
@@ -615,10 +607,18 @@ hist2.p
 ##Scatterplots
 
 ```{r scatterplots, echo = FALSE}
+#making site a character
+AC.DF1$Site <- as.character(AC.DF1$Site)
+
 #plotting total knocks against midrange SPL
 SP.mf1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point()
+SP.mf1.1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site))
+SP.mf1.2 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour))
+
 
 SP.mf2 <- ggplot(AC.DF1, aes(Num_L_calls, SPL_Midrange)) + geom_point()
+SP.mf2.1 <- ggplot(AC.DF1, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site))
+SP.mf2.2 <- ggplot(AC.DF1, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Hour))
 
 SP.mf3 <- ggplot(AC.DF1, aes(Num_Herbivory, SPL_Midrange)) + geom_point()
 
@@ -630,8 +630,11 @@ SP.mfc2 <- ggplot(AC.DF1, aes(Tot_Knocks, Num_Herbivory)) + geom_point()
 SP.mfc3 <- ggplot(AC.DF1, aes(Num_L_calls, Num_Herbivory)) + geom_point()
 
 
+#making site a character
+Snap.HF17$Site.x<- as.character(Snap.HF17$Site.x)
 
 SP.hf1 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point()
+SP.hf2 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x))
 
 
 SP4 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point()
@@ -642,7 +645,13 @@ AC.DF1$Fish_Sounds <- AC.DF1$Tot_Knocks + AC.DF1$Num_L_calls
 SP.mf4 <- ggplot(AC.DF1, aes(Fish_Sounds, SPL_Midrange)) + geom_point()
 
 SP.mf1
+SP.mf1.1
+SP.mf1.2
+
 SP.mf2
+SP.mf2.1
+SP.mf2.2
+
 SP.mf3
 SP.mf4
 
@@ -652,7 +661,7 @@ SP.mfc3
 
 
 SP.hf1
-
+SP.hf2
 
 #plotting ACI against explanatory factors
 SP.acimf1 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point()
@@ -670,5 +679,109 @@ SP.acimf2
 SP.acimf3
 
 SP.acihf1
+
+```
+
+
+##Patterns in MF and Tot_Knocks at Site and Hour Level
+```{r MF & Knocks Breakdown, echo = FALSE}
+#splitting dataframe by site
+s5 <- filter(AC.DF1, Site == "5")
+s32 <- filter(AC.DF1, Site == "32")
+s35 <- filter(AC.DF1, Site == "35")
+s40 <- filter(AC.DF1, Site == "40")
+s8 <- filter(AC.DF1, Site == "8")
+
+#splitting dataframe by hour
+h3 <- filter(AC.DF1, Hour == "3")
+h9 <- filter(AC.DF1, Hour == "9")
+h15 <- filter(AC.DF1, Hour == "15")
+h21 <- filter(AC.DF1, Hour == "21")
+
+#plotting scatterplots by site
+SPmf.5 <- ggplot(s5, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Green") +ggtitle("Site 5")
+
+SPmf.32 <- ggplot(s32, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 32")
+
+SPmf.35 <- ggplot(s35, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Yellow") + ggtitle("Site 35")
+
+SPmf.40 <- ggplot(s40, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SPmf.8 <- ggplot(s8, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Yellow") + ggtitle("Site 8")
+
+
+SPmf.5
+SPmf.35
+SPmf.8
+SPmf.40
+SPmf.32
+#plotting scatterplots by hour
+SPmf.h3 <- ggplot(h3, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggtitle("3 AM")
+SPmf.h3
+
+SPmf.h9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggitle("9 AM")
+SPmf.h9
+
+SPmf.h15 <- ggplot(h15, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggtitle("3 PM")
+SPmf.h15
+
+SPmf.h21 <- ggplot(h21, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggtitle("9 PM")
+SPmf.h21
+
+```
+
+##Patterns in HF and Snaps at Site Level
+```{r patternsHF&Snaps, echo = FALSE}
+SP.t1 <- ggplot(Snap.HF17, aes(Time.x, Snaps)) + geom_point(aes(color = Site.x))
+SP.t1
+#splitting snaps by site
+#splitting dataframe by site
+s5 <- filter(Snap.HF17, Site.x == "5")
+s32 <- filter(Snap.HF17, Site.x == "32")
+s35 <- filter(Snap.HF17, Site.x == "35")
+s40 <- filter(Snap.HF17, Site.x == "40")
+s8 <- filter(Snap.HF17, Site.x == "8")
+
+#plotting by site
+SP.t5 <- ggplot(s5, aes(Time.x, Snaps)) + geom_point(color = "Green") + ggtitle("Site 5")
+
+SP.t32 <- ggplot(s32, aes(Time.x, Snaps)) + geom_point(color = "Red" ) + ggtitle("Site 32")
+
+SP.t35 <- ggplot(s35, aes(Time.x, Snaps)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SP.t40 <- ggplot(s40, aes(Time.x, Snaps)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SP.t8 <- ggplot(s8, aes(Time.x, Snaps)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SP.t5
+SP.t8
+SP.t35
+SP.t40
+SP.t32
+
+
+##regressions by site
+SPhf.5 <- ggplot(s5, aes(Snaps, SPL_HF)) + geom_point(color = "Green") + ggtitle("Site 5")
+
+SPhf.32 <- ggplot(s32, aes(Snaps, SPL_HF)) + geom_point(color = "Red") + ggtitle("Site 32")
+
+SPhf.35 <- ggplot(s35, aes(Snaps, SPL_HF)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SPhf.40 <- ggplot(s40, aes(Snaps, SPL_HF)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SPhf.8 <- ggplot(s8, aes(Snaps, SPL_HF)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SPhf.5
+SPhf.8
+SPhf.35
+SPhf.40
+SPhf.32
+
+
+```
+##Basic Regressions
+```{r regressions, echo = FALSE}
+#running basic regressions linking exp. to resp. at site and hour level
+
 
 ```

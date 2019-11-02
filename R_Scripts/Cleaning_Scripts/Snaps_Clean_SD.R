@@ -262,3 +262,8 @@ Snap.HF18 <- merge(snap.181, SPLHF18.long, by = "ds.id")
 
 save(Snap.HF17, file="Raw_Data/Snap.HF17.Rdata")
 save(Snap.HF18, file="Raw_Data/Snap.HF18.Rdata")
+
+#stacking these so that I get one total dataframe
+
+#removing unnecessary columns
+
