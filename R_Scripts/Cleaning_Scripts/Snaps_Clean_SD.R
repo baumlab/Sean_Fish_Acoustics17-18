@@ -266,4 +266,22 @@ save(Snap.HF18, file="Raw_Data/Snap.HF18.Rdata")
 #stacking these so that I get one total dataframe
 
 #removing unnecessary columns
+drop <- c("Date.y", "Time.y", "Site.y", "datetime.y", "Year", "Month", "Day", "Hour", "Minute", "Seconds","Date1")
+Snap.HF17 <- Snap.HF17[,!names(Snap.HF17)%in%drop]
 
+drop1 <- c("Date.y", "Time.y", "Site.y", "datetime.y", "Month", "Day", "Hour", "Minute","Date1","Time1")
+Snap.HF18 <- Snap.HF18[,!names(Snap.HF18)%in%drop1]
+
+#reordering columns so they match between dataframes
+Snap.HF17 <- Snap.HF17[,c("datetime.x", "Site.x", "Date", "Time.x", "Year1", "ds.id", "Snaps", "SPL_HF")]
+Snap.HF18 <- Snap.HF18[,c("datetime.x", "Site.x", "Date.x", "Time.x", "Year", "ds.id", "Snaps", "SPL_HF")]
+
+#renaming columns the same thing
+names(Snap.HF17) <- c("datetime", "Site", "Date", "Time", "Year", "ds.id", "Snaps", "SPL_HF")
+names(Snap.HF18) <- c("datetime", "Site", "Date", "Time", "Year", "ds.id", "Snaps", "SPL_HF")
+
+#rbinding these together
+Snap.HF <- rbind(Snap.HF17, Snap.HF18)
+
+#Saving the combined dataframe
+save(Snap.HF, file= "Raw_Data/Snap.HF.Rdata")
