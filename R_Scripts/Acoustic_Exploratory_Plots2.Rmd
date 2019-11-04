@@ -54,7 +54,7 @@ load("../Raw_Data/SPLMF18long.Rdata")
 load("../Raw_Data/SPLHFlong.Rdata")
 load("../Raw_Data/SPLMFlong.Rdata")
 
-
+load("../Raw_Data/SPLMF.long.wind.Rdata")
 
 #combined SPL and HF dataframes
 load("../Raw_Data/Snap.HF17.Rdata")
@@ -834,7 +834,7 @@ SPmf.aci.h21
 
 
 ##Regressions
-###Regressions - SPL
+###Biotic Regressions - SPL
 Running basic regressions linking the explanatory to the response at their lowest levels and combined to see how different sites/ hours change the regression - SPL
 ```{r regressions, echo = FALSE}
 #equation for r^2 value
@@ -894,7 +894,22 @@ summary(h21mf.lm)$r.squared
 
 ```
 
-###Regressions - ACI
+###Abiotic Regressions (Wind) -SPL
+Running basic regressions linking the wind to SPL at both HF and MF to see if wind speed is significantly affecting the sound
+```{r abiotic regressions, echo = FALSE}
+#equation for r^2 value
+
+WP.1 <- ggplot(Snap.HF, aes(Wind.Speed, SPL_HF)) + geom_point(aes(color = Site)) + ggtitle("Effect of Wind on HF SPL") + stat_smooth(method = "glm")
+WP.1
+
+#making site a character
+SPLMF.long.wind$Site <- as.character(SPLMF.long.wind$Site)
+WP.2 <- ggplot(SPLMF.long.wind, aes(Wind.Speed, SPL_MF)) + geom_point(aes(color = Site)) + ggtitle("Effect of wind on MF SPL") + stat_smooth(method = "glm")
+WP.2
+
+
+```
+###Biotic Regressions - ACI
 Running basic regressions linking the explanatory to the response at their lowest levels and combined to see how different sites/ hours change the regression - ACI
 ```{r regressions ACI, echo = FALSE}
 SPmf.aci.5 + geom_smooth(method = "glm") + ggtitle("Site 5, MF ACI")
@@ -933,3 +948,77 @@ SPmf.aci.h21 + geom_smooth(method = "glm") + ggtitle("9 PM, MF ACI")
 h21amf.lm = lm(ACI_Midrange ~ Tot_Knocks, data = h21)
 summary(h21amf.lm)$r.squared
 ```
+#Models
+**Preliminary Models** Looking into the relationships between biogenic sounds (Knocks/Calls and Snaps) and their frequency spectra (MF SPL/HF SPL) respectively.
+
+##Model 1
+Looking at Total Knocks only
+SPL MF ~ Tot_Knocks
+``` {r model 1, echo = TRUE}
+
+#model 1 looking at Total Knocks only
+gfit1 <- glm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1, family = Gamma)
+
+summary(gfit1)
+
+par(mfrow = c(2,2))
+plot(gfit1)
+
+summary.glm(gfit1)$coefficients
+
+
+
+```
+
+##Model 2
+Looking at Total Knocks and Number of Long Calls
+SPL MF ~ Tot_Knocks + Num_L_Calls
+``` {r model 2, echo = TRUE}
+
+#model 1 looking at Total Knocks only
+gfit2 <- glm(SPL_Midrange ~ Tot_Knocks + Num_L_calls, data = AC.DF1, family = Gamma)
+
+summary(gfit2)
+
+par(mfrow = c(2,2))
+plot(gfit2)
+
+
+summary.glm(gfit2)$coefficients
+
+
+
+```
+
+##Model 3 
+Looking at Total Knocks/Number of long calls/Herbivory
+SPL MF ~ Tot_Knocks + Num_L_Calls + Num_Herbivory
+``` {r model 3, echo = TRUE}
+
+#model 1 looking at Total Knocks only
+gfit3 <- glm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory, data = AC.DF1, family = Gamma)
+
+summary(gfit3)
+
+par(mfrow = c(2,2))
+plot(gfit3)
+
+
+summary.glm(gfit3)$coefficients
+
+```
+
+##Model 4 - HF SPL and Snaps
+Looking at Snaps and their effect on the HF SPL
+SPL HF ~ Snaps
+Distributions look normal so this is a linear model
+``` {r model 4, echo = TRUE}
+fit4 <- lm(SPL_HF ~ Snaps, data = AC.DF1)
+summary(fit4)
+
+par(mfrow = c(2,2))
+plot(fit4)
+
+summary(fit4)$coefficients
+
+````

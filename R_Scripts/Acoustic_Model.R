@@ -49,7 +49,7 @@ write.csv(results_fit1, "Figures/Fit1Results.csv")
 #### Testing for collinearity ####
 
 #subsetting only explanatory variables
-AC.DF.x <- subset(AC.DF, select = c(Tot_Knocks, Num_L_calls, Site, Hour))
+AC.DF.x <- subset(AC.DF1, select = c(Tot_Knocks, Num_L_calls, Site, Hour))
 
 #testing for collinearity between explanatory variables
 ggpairs(AC.DF.x)

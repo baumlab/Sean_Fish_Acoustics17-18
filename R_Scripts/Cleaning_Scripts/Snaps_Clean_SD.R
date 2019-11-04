@@ -283,5 +283,50 @@ names(Snap.HF18) <- c("datetime", "Site", "Date", "Time", "Year", "ds.id", "Snap
 #rbinding these together
 Snap.HF <- rbind(Snap.HF17, Snap.HF18)
 
+
+
+###################################
+#
+#
+#
+#### Adding Wind to my SPL HF and MF dataframes ####
+#
+#
+#
+###################################
+
+
+#adding in wind to Snap.HF
+load("Raw_Data/Windspeed.Rdata")
+
+Snap.HF <- merge(Snap.HF, wind.sp, by = "datetime")
+
+#removing columns that aren't helpful
+col.drop <- c("Identification", "Latitude", "Longitude", "Date.y", "Hour", "Minute", "Time.y")
+
+Snap.HF = Snap.HF[,!names(Snap.HF) %in% col.drop]
+colnames(Snap.HF)
+
+#renaming columns
+names(Snap.HF) <- c("datetime", "Site", "Date", "Time", "Year", "ds.id", "Snaps", "SPL_HF", "Wind.Direction", "Wind.Speed")
+colnames(Snap.HF)
+
 #Saving the combined dataframe
 save(Snap.HF, file= "Raw_Data/Snap.HF.Rdata")
+
+#merging with the MF SPL Data
+load("Raw_Data/SPLMFlong.Rdata")
+
+SPLMF.long.wind <- merge(SPLMF.long, wind.sp, by = "datetime")
+
+#removing columns that aren't helpful
+col.drop <- c("Identification", "Latitude", "Longitude", "Date.y", "Hour", "Minute", "Time.y")
+SPLMF.long.wind = SPLMF.long.wind[,!names(SPLMF.long.wind) %in% col.drop]
+colnames(SPLMF.long.wind)
+
+#renaming columns
+names(SPLMF.long.wind) <- c("datetime", "Date", "Time", "SPL_MF", "Site", "Wind.Direction", "Wind.Speed")
+colnames(SPLMF.long.wind)
+
+#saving new dataframe
+save(SPLMF.long.wind, file = "Raw_Data/SPLMF.long.wind.Rdata")
