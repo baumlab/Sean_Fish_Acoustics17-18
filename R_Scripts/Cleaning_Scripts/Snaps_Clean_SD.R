@@ -283,6 +283,10 @@ names(Snap.HF18) <- c("datetime", "Site", "Date", "Time", "Year", "ds.id", "Snap
 #rbinding these together
 Snap.HF <- rbind(Snap.HF17, Snap.HF18)
 
+#making site a character
+Snap.HF$Site <- as.character(Snap.HF$Site)
+
+save(Snap.HF, file="Raw_Data/Snap.HF.Rdata")
 
 
 ###################################

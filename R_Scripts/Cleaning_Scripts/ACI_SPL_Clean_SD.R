@@ -536,6 +536,10 @@ SPL_HF18$datetime <- as.POSIXct(paste(SPL_HF18$Date, SPL_HF18$Time), format = "%
 #combining dataframes into one long dataframe
 SPLHF.long <- rbind(SPLHF17.long, SPLHF18.long)
 
+#changing site to character
+SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
+SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
 
 #saving dataframes
 save(SPLHF17.long, file = "Raw_Data/SPLHF17long.Rdata")
@@ -663,6 +667,10 @@ SPL_MF18$datetime <- as.POSIXct(paste(SPL_MF18$Date, SPL_MF18$Time), format = "%
 #combining dataframes into one long dataframe
 SPLMF.long <- rbind(SPLMF17.long, SPLMF18.long)
 
+#making site a character
+SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
+SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
+SPLMF.long$Site <- as.character(SPLMF.long$Site)
 
 #saving dataframes
 save(SPLMF17.long, file = "Raw_Data/SPLMF17long.Rdata")

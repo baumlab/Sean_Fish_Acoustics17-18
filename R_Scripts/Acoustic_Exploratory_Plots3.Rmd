@@ -1,0 +1,896 @@
+---
+title: "Acoustic_2019_Explore3"
+author: "Sean Dimoff"
+date: "October 9, 2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(cowplot)
+library(rmarkdown)
+library(knitr)
+library(RColorBrewer)
+library(GGally)
+library(mctest)
+library(usdm)
+library(hms)
+library(dplyr)
+
+##loading in the ACI/SPL data - wide form
+
+#hourdata
+#load("../Raw_Data/ACI_BB17hr.Rdata")
+#load("../Raw_Data/ACI_BB18hr.Rdata")
+#load("../Raw_Data/ACI_HF17hr.Rdata")
+#load("../Raw_Data/ACI_HF18hr.Rdata")
+#load("../Raw_Data/ACI_MF17hr.Rdata")
+#load("../Raw_Data/ACI_MF18hr.Rdata")
+#
+#load("../Raw_Data/SPL_BB17hr.Rdata")
+#load("../Raw_Data/SPL_BB18hr.Rdata")
+#load("../Raw_Data/SPL_HF17hr.Rdata")
+#load("../Raw_Data/SPL_HF18hr.Rdata")
+#load("../Raw_Data/SPL_MF17hr.Rdata")
+#load("../Raw_Data/SPL_MF18hr.Rdata")
+
+#All time data
+#load("../Raw_Data/SPL_BB17.Rdata")
+#load("../Raw_Data/SPL_BB18.Rdata")
+
+#load("../Raw_Data/SPLBB17long.Rdata")
+#load("../Raw_Data/SPLBB18long.Rdata")
+
+load("../Raw_Data/SPLHF17long.Rdata")
+load("../Raw_Data/SPLHF18long.Rdata")
+
+
+load("../Raw_Data/SPLMF17long.Rdata")
+load("../Raw_Data/SPLMF18long.Rdata")
+
+
+load("../Raw_Data/SPLHFlong.Rdata")
+load("../Raw_Data/SPLMFlong.Rdata")
+
+load("../Raw_Data/SPLMF.long.wind.Rdata")
+
+#combined SPL and HF dataframes
+load("../Raw_Data/Snap.HF17.Rdata")
+load("../Raw_Data/Snap.HF18.Rdata")
+#changing site to a character
+Snap.HF17$Site.x <- as.character(Snap.HF17$Site.x)
+Snap.HF18$Site.x <- as.character(Snap.HF18$Site.x)
+
+load("../Raw_Data/Snap.HF.Rdata")
+
+
+
+#daydata
+#load("../Raw_Data/ACI_BB17day.Rdata")
+#load("../Raw_Data/ACI_BB18day.Rdata")
+#load("../Raw_Data/ACI_HF17day.Rdata")
+#load("../Raw_Data/ACI_HF18day.Rdata")
+#load("../Raw_Data/ACI_MF17day.Rdata")
+#load("../Raw_Data/ACI_MF18day.Rdata")
+#
+#load("../Raw_Data/SPL_BB17day.Rdata")
+#load("../Raw_Data/SPL_BB18day.Rdata")
+#load("../Raw_Data/SPL_HF17day.Rdata")
+#load("../Raw_Data/SPL_HF18day.Rdata")
+#load("../Raw_Data/SPL_MF17day.Rdata")
+#load("../Raw_Data/SPL_MF18day.Rdata")
+
+#loading ACI/SPL long data for boxplots
+#ACI
+#load("../Raw_Data/ACI_BB17hrlong.Rdata")
+#load("../Raw_Data/ACI_HF17hrlong.Rdata")
+#load("../Raw_Data/ACI_MF17hrlong.Rdata")
+#load("../Raw_Data/ACI_BB18hrlong.Rdata")
+#load("../Raw_Data/ACI_HF18hrlong.Rdata")
+#load("../Raw_Data/ACI_MF18hrlong.Rdata")
+#
+#load("../Raw_Data/ACI_MFhrlong.Rdata")
+#load("../Raw_Data/ACI_HFhrlong.Rdata")
+#load("../Raw_Data/ACI_BBhrlong.Rdata")
+#
+#load("../Raw_Data/ACI_BBhr_av.Rdata")
+#load("../Raw_Data/ACI_HFhr_av.Rdata")
+#load("../Raw_Data/ACI_MFhr_av.Rdata")
+#
+####making year a character
+#ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
+#ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
+#ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
+#
+###SPL
+#load("../Raw_Data/SPL_BB17hrlong.Rdata")
+#load("../Raw_Data/SPL_HF17hrlong.Rdata")
+#load("../Raw_Data/SPL_MF17hrlong.Rdata")
+#load("../Raw_Data/SPL_BB18hrlong.Rdata")
+#load("../Raw_Data/SPL_HF18hrlong.Rdata")
+#load("../Raw_Data/SPL_MF18hrlong.Rdata")
+#
+#load("../Raw_Data/SPL_MFhrlong.Rdata")
+#load("../Raw_Data/SPL_HFhrlong.Rdata")
+#load("../Raw_Data/SPL_BBhrlong.Rdata")
+#
+#load("../Raw_Data/SPL_BBhr_av.Rdata")
+#load("../Raw_Data/SPL_HFhr_av.Rdata")
+#load("../Raw_Data/SPL_MFhr_av.Rdata")
+#
+###making year a character
+#SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
+#SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
+#SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
+#
+##loading in fish call count data
+#load("../Raw_Data/FC.05hr.Rdata")
+#load("../Raw_Data/FC.08hr.Rdata")
+#load("../Raw_Data/FC.32hr.Rdata")
+#load("../Raw_Data/FC.35hr.Rdata")
+#load("../Raw_Data/FC.40hr.Rdata")
+#
+#load("../Raw_Data/FC.CallperDayALL.Rdata")
+#load("../Raw_Data/FC.CallperDay17.Rdata")
+#load("../Raw_Data/FC.CallperDay18.Rdata")
+#
+#load("../Raw_Data/FC.CallperHourALL.Rdata")
+#load("../Raw_Data/FC.CallperHour17.Rdata")
+#load("../Raw_Data/FC.CallperHour18.Rdata")
+
+#loading in total dataframe
+#load("../Raw_Data/AC.DF.Rdata")
+
+
+
+
+##loading in Boat visitation data
+#load("../Raw_Data/BV.all.Rdata")
+#load("../Raw_Data/BV.sum.Rdata")
+
+
+
+
+
+##loading in lunar phase data
+#load("../Raw_Data/LunarPhase2017.Rdata")
+#load("../Raw_Data/LunarPhase2018.Rdata")
+
+
+##loading in fish data
+#load("../Raw_Data/ki_fishabundance.Rdata")
+#load("../Raw_Data/ki_fishabundance17.Rdata")
+#load("../Raw_Data/ki_fishabundance18.Rdata")
+#
+#load("../Raw_Data/ki_fishaverage.Rdata")
+#load("../Raw_Data/ki_fishaverage17.Rdata")
+#load("../Raw_Data/ki_fishaverage18.Rdata")
+
+
+##loading in the full dataframe with all data
+#load("../Raw_Data/AC.DF.Rdata")
+load("../Raw_Data/AC.DF1.Rdata")
+
+#making site a character
+AC.DF1$Site <- as.character(AC.DF1$Site)
+
+```
+**Exploratory Plots for 2017-2018 Acoustic/Fish Data**
+
+**Purpose** To explore the Acoustic data gathered in 2017 and 2018 to expose important trends between sites, diurnal patterns, fish abundance, lunar phase, and coral reef acoustics.
+
+#Validations
+
+**Combined Model** All variables are matched to the files that were used for Fish call counts (3:00, 9:00, 15:00, 21:00)
+
+##Confidence Intervals
+```{r CI, echo = FALSE}
+
+##Knocks
+
+#taking average and calculating confidence intervals for sites
+knock.av <- aggregate(Tot_Knocks ~ Site, AC.DF1, mean)
+knock.se <- aggregate(Tot_Knocks ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+knock.av$SE <- knock.se$Tot_Knocks
+knock.av$U.SE <- knock.av$Tot_Knocks + knock.av$SE
+knock.av$L.SE <- knock.av$Tot_Knocks - knock.av$SE
+
+#making site a character
+knock.av$Site <- as.character(knock.av$Site)
+
+knock.CI <- ggplot(knock.av, aes(Site, Tot_Knocks)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Tot_Knocks", title = "Total Knocks")
+knock.CI
+
+
+
+##Snaps
+
+#snaps by site
+snap.av <- aggregate(Snaps ~ Site, AC.DF1, mean)
+snap.se <- aggregate(Snaps ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+snap.av$SE <- snap.se$Snaps
+snap.av$U.SE <- snap.av$Snaps + snap.av$SE
+snap.av$L.SE <- snap.av$Snaps - snap.av$SE
+
+#making site a character
+snap.av$Site <- as.character(snap.av$Site)
+
+snap.CI <- ggplot(snap.av, aes(Site, Snaps)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Snaps", title = "Snaps per site")
+snap.CI
+
+
+##Long Calls
+
+#LC by site
+LC.av <- aggregate(Num_L_calls ~ Site, AC.DF1, mean)
+LC.se <- aggregate(Num_L_calls ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+LC.av$SE <- LC.se$Num_L_calls
+LC.av$U.SE <- LC.av$Num_L_calls + LC.av$SE
+LC.av$L.SE <- LC.av$Num_L_calls - LC.av$SE
+
+#making site a character
+LC.av$Site <- as.character(LC.av$Site)
+
+LC.CI <- ggplot(LC.av, aes(Site, Num_L_calls)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Long Calls", title = "Long Calls per site")
+LC.CI
+
+##Herbivory
+
+#LC by site
+H.av <- aggregate(Num_Herbivory ~ Site, AC.DF1, mean)
+H.se <- aggregate(Num_Herbivory ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+H.av$SE <- H.se$Num_Herbivory
+H.av$U.SE <- H.av$Num_Herbivory + H.av$SE
+H.av$L.SE <- H.av$Num_Herbivory - H.av$SE
+
+#making site a character
+H.av$Site <- as.character(H.av$Site)
+
+H.CI <- ggplot(H.av, aes(Site, Num_Herbivory)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Herbivory", title = "Herbivory per site")
+H.CI
+
+
+
+
+```
+
+##Distributions
+
+```{r histogram, echo = FALSE}
+#plotting count histogram
+
+Count.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Tot_Knocks)) + geom_histogram()
+Herb.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_Herbivory)) + geom_histogram()
+LC.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_L_calls)) + geom_histogram()
+Snap.hist <- ggplot(data = Snap.HF17, aes(Snap.HF17$Snaps)) + geom_histogram()
+
+hist.p <- plot_grid(Count.hist, Herb.hist, LC.hist,Snap.hist, nrow = 2, ncol = 2)
+hist.p
+
+#plotting distributions of SPL response variables
+MF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_Midrange)) + geom_histogram() + ggtitle("MF SPL distribution")
+#BB.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_BB)) + geom_histogram() + ggtitle("BB distribution")
+HF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_HF)) + geom_histogram() + ggtitle("HF SPL distribution")
+
+hist1.p <- plot_grid(MF.hist, HF.hist, nrow = 1, ncol = 2)
+hist1.p
+
+#plotting distributions of ACI response variables
+MF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_Midrange)) + geom_histogram() + ggtitle("MF ACI distribution")
+#BB.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_BB)) + geom_histogram()
+HF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_HF)) + geom_histogram() + ggtitle("HF ACI distribution")
+
+hist2.p <- plot_grid(MF.hist1, HF.hist1, nrow = 1, ncol = 2)
+hist2.p
+
+
+```
+
+
+##Scatterplots
+###Scatterplots SPL
+Plotting explanatory (Knocks, Calls, Herbivory, Snaps) against response variables (MF and HF) SPL
+```{r scatterplots SPL, echo = FALSE}
+
+#plotting total knocks against midrange SPL
+SP.mf1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggtitle("Effects of knocks on SPL MF")
+SP.mf1.1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, split by site")
+SP.mf1.2 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + ggtitle("Effect of knocks on SPL MF, split by hour")
+
+
+SP.mf2 <- ggplot(AC.DF1, aes(Num_L_calls, SPL_Midrange)) + geom_point() + ggtitle("Effect of knocks on SPL MF")
+SP.mf2.1 <- ggplot(AC.DF1, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, split by site")
+SP.mf2.2 <- ggplot(AC.DF1, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Hour)) + ggtitle("Effect of knocks on SPL MF, split by hour")
+
+SP.mf3 <- ggplot(AC.DF1, aes(Num_Herbivory, SPL_Midrange)) + geom_point() + ggtitle("Effect of herbivory on SPL MF")
+
+#checking for colinearity
+SP.mfc1 <- ggplot(AC.DF1, aes(Tot_Knocks, Num_L_calls)) + geom_point() + ggtitle("Collinearity between Knocks and Long Calls")
+
+SP.mfc2 <- ggplot(AC.DF1, aes(Tot_Knocks, Num_Herbivory)) + geom_point() + ggtitle("Collinearity between Knocks and Herbivory")
+
+SP.mfc3 <- ggplot(AC.DF1, aes(Num_L_calls, Num_Herbivory)) + geom_point() + ggtitle("Collinearity between Herbivory and Long Calls")
+
+
+
+
+SP.hf1 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on SPL HF, 2017")
+SP.hf2 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2017, split by site")
+
+SP.hf3 <- ggplot(Snap.HF18, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on SPL HF, 2018")
+SP.hf4 <- ggplot(Snap.HF18, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2018, split by site")
+
+#extreme outliers in 2018 - snap counts in the hundreds rather than thousands, going to find and remove them and run again
+## Check that 2 divers were at all sites
+low.snap <- Snap.HF18[Snap.HF18$Snaps <1000, ]
+# Remove anything with fewer than 2 observers 
+
+Snap.HF18E <- Snap.HF18[!(Snap.HF18$ds.id %in% low.snap$ds.id),]
+#now rerunning without the 3 outliers
+
+SP.hf3E <- ggplot(Snap.HF18E, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on SPL HF, 2018, outliers removed")
+SP.hf4E <- ggplot(Snap.HF18E, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2018, split by site, outliers removed")
+
+
+
+#summing long calls and knocks
+#AC.DF1$Fish_Sounds <- AC.DF1$Tot_Knocks + AC.DF1$Num_L_calls
+
+#because doing this requires combining two factors on different scales, there isn't a legitimate way to combine these
+#SP.mf4 <- ggplot(AC.DF1, aes(Fish_Sounds, SPL_Midrange)) + geom_point() + ggtitle("Combined Knocks and Calls vs. SPL MF")
+
+
+SP.mf1
+SP.mf1.1
+SP.mf1.2
+
+SP.mf2
+SP.mf2.1
+SP.mf2.2
+
+SP.mf3
+#SP.mf4
+
+SP.mfc1
+SP.mfc2
+SP.mfc3
+
+
+SP.hf1
+SP.hf2
+SP.hf3
+SP.hf4
+
+SP.hf3E
+SP.hf4E
+```
+
+##Patterns Breakdown SPL
+
+
+###Snaps - Breakdown by Site
+
+```{r patterns Snaps, echo = FALSE}
+
+#splitting snaps by site
+#splitting dataframe by site
+s5 <- filter(Snap.HF, Site == "5")
+s32 <- filter(Snap.HF, Site == "32")
+s35 <- filter(Snap.HF, Site == "35")
+s40 <- filter(Snap.HF, Site == "40")
+s8 <- filter(Snap.HF, Site == "8")
+
+
+##regressions by site
+SPhf.5 <- ggplot(s5, aes(Snaps, SPL_HF)) + geom_point(color = "Green") + ggtitle("Site 5")
+
+SPhf.32 <- ggplot(s32, aes(Snaps, SPL_HF)) + geom_point(color = "Red") + ggtitle("Site 32")
+
+SPhf.35 <- ggplot(s35, aes(Snaps, SPL_HF)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SPhf.40 <- ggplot(s40, aes(Snaps, SPL_HF)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SPhf.8 <- ggplot(s8, aes(Snaps, SPL_HF)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SPhf.5
+SPhf.8
+SPhf.35
+SPhf.40
+SPhf.32
+
+
+```
+
+###Patterns in Tot_Knocks and Hour at Site and Hour Level - SPL
+Breaking down the relationship between total knocks and MF to the site and hour level
+```{r MF & Knocks Breakdown, echo = FALSE}
+#splitting dataframe by site
+s5 <- filter(AC.DF1, Site == "5")
+s32 <- filter(AC.DF1, Site == "32")
+s35 <- filter(AC.DF1, Site == "35")
+s40 <- filter(AC.DF1, Site == "40")
+s8 <- filter(AC.DF1, Site == "8")
+
+#splitting dataframe by hour
+h3 <- filter(AC.DF1, Hour == "3")
+h9 <- filter(AC.DF1, Hour == "9")
+h15 <- filter(AC.DF1, Hour == "15")
+h21 <- filter(AC.DF1, Hour == "21")
+
+#plotting scatterplots by site
+SPmf.5 <- ggplot(s5, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Green") + ggtitle("Site 5")
+
+SPmf.32 <- ggplot(s32, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 32")
+
+SPmf.35 <- ggplot(s35, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SPmf.40 <- ggplot(s40, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SPmf.8 <- ggplot(s8, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+
+SPmf.5
+SPmf.35
+SPmf.8
+SPmf.40
+SPmf.32
+#plotting scatterplots by hour
+SPmf.h3 <- ggplot(h3, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggtitle("3 AM")
+SPmf.h3
+
+SPmf.h9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggtitle("9 AM")
+SPmf.h9
+
+SPmf.h15 <- ggplot(h15, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggtitle("3 PM")
+SPmf.h15
+
+SPmf.h21 <- ggplot(h21, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + ggtitle("9 PM")
+SPmf.h21
+
+```
+
+##Regressions
+###Biotic Regressions - SPL
+Running basic regressions linking the explanatory to the response at their lowest levels and combined to see how different sites/ hours change the regression - SPL
+
+**Linear Model outputs below each**
+
+```{r regressions3, echo = FALSE}
+SP.hf2 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
+shf.lm17 = lm(SPL_HF ~ Snaps, data = Snap.HF17)
+summary(shf.lm17)
+```
+2017 Snap data, snaps significant.
+
+```{r regressions4, echo = FALSE}
+SP.hf4E + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2018")
+shf.lm18 = lm(SPL_HF ~ Snaps, data = Snap.HF18)
+summary(shf.lm18)
+```
+2018 Snap data with outliers removed. Snaps significant.
+
+```{r regressions, echo = FALSE}
+#equation for r^2 value
+
+SP.mf1.1 + ggtitle("Total Knocks effect on SPL MF, split by site") + stat_smooth(method = "lm") 
+SP.mf1.2 + ggtitle("Total Knocks effect on SPL MF, split by hour") + geom_smooth(method = "lm")
+kmf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1)
+summary(kmf.lm)
+```
+2017-2018 data w/200 samples.  1st plot splits by site and second by hour to show any patterns before I break them down individually.
+
+
+**Breakdown by Site**
+
+```{r regressions5, echo = FALSE}
+SPmf.5 + geom_smooth(method = "lm") + ggtitle("Site 5, MF SPL")
+s5mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s5)
+summary(s5mf.lm)
+```
+Site 5, knocks not significant.
+
+
+```{r regressions6, echo = FALSE}
+SPmf.35 + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL")
+s35mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s35)
+summary(s35mf.lm)
+```
+Site 35, knocks significant.
+
+```{r regressions7, echo = FALSE}
+SPmf.8 + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL")
+s8mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s8)
+summary(s8mf.lm)
+```
+Site 8, knocks not significant. Negative relationship... thats interesting.
+
+```{r regressions8, echo = FALSE}
+SPmf.40 + geom_smooth(method = "lm") + ggtitle("Site 40, MF SPL")
+s40mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s40)
+summary(s40mf.lm)
+```
+Site 40, knocks not significant.
+
+```{r regressions9, echo = FALSE}
+SPmf.32 + geom_smooth(method = "lm") + ggtitle("Site 32, MF SPL")
+s32mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s32)
+summary(s32mf.lm)
+```
+Site 32, knocks significant.
+
+
+**Breakdown by Hour**
+
+```{r regressions10, echo = FALSE}
+SPmf.h3 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+h3mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h3)
+summary(h3mf.lm)
+```
+3AM, knocks not significant
+
+```{r regressions11, echo = FALSE}
+SPmf.h9 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+h9mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h9)
+summary(h9mf.lm)
+```
+9AM, knocks significant
+
+```{r regressions12, echo = FALSE}
+SPmf.h15 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+h15mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h15)
+summary(h15mf.lm)
+```
+3PM, knocks not significant
+
+```{r regressions13, echo = FALSE}
+SPmf.h21 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+h21mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h21)
+summary(h21mf.lm)
+```
+9PM, knocks not significant.
+
+
+**Summary**
+Knocks significantly explained SPLMF at sites 35 and 32 and at 9AM.
+
+###Abiotic Regressions (Wind) -SPL
+Running basic regressions linking the wind to SPL at both HF and MF to see if wind speed is significantly affecting the sound
+```{r abiotic regressions, echo = FALSE}
+#equation for r^2 value
+
+WP.1 <- ggplot(Snap.HF, aes(Wind.Speed, SPL_HF)) + geom_point(aes(color = Site)) + ggtitle("Effect of Wind on HF SPL") + stat_smooth(method = "glm")
+WP.1
+
+#making site a character
+SPLMF.long.wind$Site <- as.character(SPLMF.long.wind$Site)
+WP.2 <- ggplot(SPLMF.long.wind, aes(Wind.Speed, SPL_MF)) + geom_point(aes(color = Site)) + ggtitle("Effect of wind on MF SPL") + stat_smooth(method = "glm")
+WP.2
+
+
+```
+Wind doesn't seem to impact SPL HF or MF in any particular direction. Although the wind range seems really small.
+
+
+#Time-Series Acoustics
+**Acoustics Breakdown** All acoustic metrics (SPL and ACI) are broken down into 3 frequency bands: Broadband (All frequencies), High Frequency (Frequencies between 1 kHz - 22 kHz), and Mid Frequency (Frequencies between 160 Hz and 1 kHz)
+
+*Note* 2017 had a 10 minute duty cycle with 5 minutes recording while 2018 had a 15 minute duty cycle with 5 minutes recording, so the number of files averages differs between years
+
+##Frequency-Band Breakdowns
+
+### High Frequency
+Plots of high frequency patterns, notice diurnal patterns with highest SPL at night and lowest during the day (this is shown in the literature), also notice the clear splits by site.
+
+```{r hf spl no av, echo = FALSE}
+#splitting dataframe by site - 2017
+s5h17 <- filter(SnapHF17.long, Site == "5")
+s32h17 <- filter(SnapHF17.long, Site == "32")
+s35h17 <- filter(SnapHF17.long, Site == "35")
+s40h17 <- filter(SnapHF17.long, Site == "40")
+s8h17 <- filter(SnapHF17.long, Site == "8")
+
+
+#splitting dataframe by site - 2018
+s5h18 <- filter(SnapHF18.long, Site == "5")
+s32h18 <- filter(SnapHF18.long, Site == "32")
+s35h18 <- filter(SnapHF18.long, Site == "35")
+s40h18 <- filter(SnapHF18.long, Site == "40")
+s8h18 <- filter(SnapHF18.long, Site == "8")
+
+#splitting dataframe by site - combined
+s5h <- filter(Snap.HF, Site == "5")
+s32h <- filter(Snap.HF, Site == "32")
+s35h <- filter(Snap.HF, Site == "35")
+s40h <- filter(Snap.HF, Site == "40")
+s8h <- filter(Snap.HF, Site == "8")
+
+
+#2017
+
+#converting site to character
+SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLHF17 <- ggplot(data =SPLHF17.long, aes(x=datetime, y = SPL_HF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90)) + ggtitle("HF SPL total deployment, 2017")
+
+#converting date to character
+SPLHF17.long$Date <- as.character(SPLHF17.long$Date)
+
+#converting site to character
+SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
+
+#comparing between sites for 1 day
+day.SPLHF17 <- ggplot(data = SPLHF17.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess") + ggtitle("HF SPL diurnal patterns, 2017")
+
+
+#2018
+#converting site to character
+SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLHF18 <- ggplot(data =SPLHF18.long, aes(x=datetime, y = SPL_HF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90)) + ggtitle("HF SPL total deployment, 2018")
+
+#converting date to character
+SPLHF18.long$Date <- as.character(SPLHF18.long$Date)
+
+#converting site to character
+SPLHF18.long$Site <- as.character(SPLHF18.long$Site)
+
+#comparing between sites for 1 day
+day.SPLHF18 <- ggplot(data = SPLHF18.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess") + ggtitle("HF SPL diurnal patterns, 2018")
+
+full.SPLHF17
+full.SPLHF18
+day.SPLHF17
+day.SPLHF18
+
+#combined
+
+#converting site to character
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+day.SPLHF <- ggplot(data = SPLHF.long, aes(x= Time, y = SPL_HF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess") + ggtitle("HF SPL diurnal patterns, combined years")
+
+day.SPLHF
+```
+
+Notice, site 35 seems to have switched position between 2017 and 2018 but all of the other sites seem to be staying more or less in the same spot
+
+- I wonder if this has to do with macroalgal cover changes between 2017 and 2018
+
+
+
+###Snap-Breakdowns
+
+Running this to see if snaps follow the same trends as SPL HF at all sites
+
+```{r snapsovertime, echo = FALSE}
+
+
+SP.t1 <- ggplot(Snap.HF, aes(Time, Snaps)) + geom_point(aes(color = Site))
+SP.t1
+
+#plotting by site
+SP.t5 <- ggplot(s5h, aes(Time, Snaps)) + geom_point(color = "Green") + ggtitle("Site 5")
+
+SP.t32 <- ggplot(s32h, aes(Time, Snaps)) + geom_point(color = "Red" ) + ggtitle("Site 32")
+
+SP.t35 <- ggplot(s35h, aes(Time, Snaps)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SP.t40 <- ggplot(s40h, aes(Time, Snaps)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SP.t8 <- ggplot(s8h, aes(Time, Snaps)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SP.t5
+SP.t8
+SP.t35
+SP.t40
+SP.t32
+
+```
+
+
+### Mid Frequency
+Plots of mid frequency patterns, notice opposite diurnal patterns with highest SPL during the day and lowest at night, also notice the clear splits by site.
+
+```{r mf spl no av, echo = FALSE}
+#2017
+
+#converting site to character
+SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLMF17 <- ggplot(data =SPLMF17.long, aes(x=datetime, y = SPL_MF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90)) + ggtitle("MF SPL total deployment, 2017")
+
+#converting date to character
+SPLMF17.long$Date <- as.character(SPLMF17.long$Date)
+
+#converting site to character
+SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
+
+#comparing between sites for 1 day
+day.SPLMF17 <- ggplot(data = SPLMF17.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess") + ggtitle("MF SPL diurnal patterns, 2017")
+
+
+
+#2018
+#converting site to character
+SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
+
+#comparing between sites for entire deployment
+full.SPLMF18 <- ggplot(data =SPLMF18.long, aes(x=datetime, y = SPL_MF)) + 
+  geom_point(aes(color = Site)) + geom_smooth(aes(color = Site), method = "loess") +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90)) + ggtitle("MF SPL total deployment, 2018")
+
+
+#converting date to character
+SPLMF18.long$Date <- as.character(SPLMF18.long$Date)
+
+#converting site to character
+SPLMF18.long$Site <- as.character(SPLMF18.long$Site)
+
+#comparing between sites for 1 day
+day.SPLMF18 <- ggplot(data = SPLMF18.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90)) + geom_smooth(aes(color = Site), method = "loess") + ggtitle("MF SPL diurnal patterns, 2018")
+
+
+full.SPLMF17
+full.SPLMF18
+day.SPLMF17
+day.SPLMF18
+
+#combined model
+#comparing between sites for 1 day
+#making site a character
+SPLMF.long$Site <- as.character(SPLMF.long$Site)
+
+day.SPLMF <- ggplot(data = SPLMF.long, aes(x= Time, y = SPL_MF)) + geom_point(aes(color = Site)) + theme(axis.text.x = element_text(angle = 90))
+
+day.SPLMF + ggtitle("MF SPL diurnal patterns, combined years")
+
+#plotting HF and MF on same plot each year
+
+```
+
+Also, notice that 35 does a similar switch in Mid-frequency, going from the bottom in 2017 to the top in 2018
+
+
+
+## Combo Plots
+```{r combo hf mf, echo = FALSE}
+#creating combined dataframe
+SPL.both <- cbind(SPLMF17.long, SPLHF17.long$SPL_HF)
+
+SPL.both18 <- cbind(SPLMF18.long, SPLHF18.long$SPL_HF)
+
+SPL.both.b <- cbind(SPLMF.long, SPLHF.long$SPL_HF)
+
+#renaming columns
+names(SPL.both) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF")
+names(SPL.both18) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF")
+names(SPL.both.b) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF")
+#comparing between sites for entire deployment
+full.SPL <- ggplot(data =SPL.both, aes(x=datetime)) + 
+  geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90)) + ggtitle("MF and HF SPL total deployment, 2017")
+full.SPL
+
+#comparing between sites for 1 day
+day.SPL <- ggplot(data = SPL.both, aes(x= Time)) + geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) + theme(axis.text.x = element_text(angle = 90)) + ylab("SPL")+ ggtitle("MF and HF SPL diurnal pattern, 2017")
+day.SPL
+
+#comparing between sites for entire deployment
+full.SPL18 <- ggplot(data =SPL.both18, aes(x=datetime)) + 
+  geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) +
+  theme(axis.text.x = element_text(angle = 90)) + scale_x_datetime(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90)) + ggtitle("MF and HF SPL total deployment, 2018")
+full.SPL18
+
+#comparing between sites for 1 day
+day.SPL18 <- ggplot(data = SPL.both18, aes(x= Time)) + geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) + theme(axis.text.x = element_text(angle = 90)) + ylab("SPL")+ ggtitle("MF and HF SPL diurnal pattern, 2018")
+day.SPL18
+
+#comparing between sites for 1 day
+day.SPL.both <- ggplot(data = SPL.both.b, aes(x= Time)) + geom_point(aes(y = SPL_MF, color = Site)) + geom_point(aes(y = SPL_HF, color = Site)) + theme(axis.text.x = element_text(angle = 90)) + ylab("SPL")+ ggtitle("MF and HF SPL diurnal pattern, combined years")
+day.SPL.both
+
+```
+
+
+
+
+
+#Models
+**Preliminary Models** Looking into the relationships between biogenic sounds (Knocks/Calls and Snaps) and their frequency spectra (MF SPL/HF SPL) respectively.
+
+##Model 1
+Looking at Total Knocks only
+SPL MF ~ Tot_Knocks
+``` {r model 1, echo = TRUE}
+
+#model 1 looking at Total Knocks only
+gfit1 <- glm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1, family = Gamma)
+
+summary(gfit1)
+
+par(mfrow = c(2,2))
+plot(gfit1)
+
+summary.glm(gfit1)$coefficients
+
+
+
+```
+
+##Model 2
+Looking at Total Knocks and Number of Long Calls
+SPL MF ~ Tot_Knocks + Num_L_Calls
+``` {r model 2, echo = TRUE}
+
+#model 1 looking at Total Knocks only
+gfit2 <- glm(SPL_Midrange ~ Tot_Knocks + Num_L_calls, data = AC.DF1, family = Gamma)
+
+summary(gfit2)
+
+par(mfrow = c(2,2))
+plot(gfit2)
+
+
+summary.glm(gfit2)$coefficients
+
+
+
+```
+
+##Model 3 
+Looking at Total Knocks/Number of long calls/Herbivory
+SPL MF ~ Tot_Knocks + Num_L_Calls + Num_Herbivory
+``` {r model 3, echo = TRUE}
+
+#model 1 looking at Total Knocks only
+gfit3 <- glm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory, data = AC.DF1, family = Gamma)
+
+summary(gfit3)
+
+par(mfrow = c(2,2))
+plot(gfit3)
+
+
+summary.glm(gfit3)$coefficients
+
+```
+
+##Model 4 - HF SPL and Snaps
+Looking at Snaps and their effect on the HF SPL
+SPL HF ~ Snaps
+Distributions look normal so this is a linear model
+``` {r model 4, echo = TRUE}
+fit4 <- lm(SPL_HF ~ Snaps, data = AC.DF1)
+summary(fit4)
+
+par(mfrow = c(2,2))
+plot(fit4)
+
+summary(fit4)$coefficients
+
+````
