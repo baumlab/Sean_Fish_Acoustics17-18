@@ -367,9 +367,17 @@ h21 <- filter(AC.DF1, Hour == "21")
 
 SP.hf2 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on HF SPL, 2017, split by site")
 
+#pdf(file="../Figures/Snap_SPL_Regression2017.pdf", width = 11, height = 7)
 SP.hf2 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
+#dev.off()
+
 shf.lm17 = lm(SPL_HF ~ Snaps, data = Snap.HF17)
 summary(shf.lm17)
+
+#pdf(file="../Figures/Snap_SPL_Regression.pdf", width = 11, height = 7)
+#SP.hf3 <- ggplot(Snap.HF, aes(Snaps, SPL_HF)) + geom_point() + geom_smooth(method = "lm")
+#SP.hf3
+#dev.off()
 ```
 
 2017 Snap data, snaps significant.
@@ -497,6 +505,7 @@ summary(sp32lm18)
 
 ```{r regressions, echo = FALSE}
 #equation for r^2 value
+#SP.mf1.3 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point()
 SP.mf1.1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, split by site")
 SP.mf1.2 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + ggtitle("Effect of knocks on SPL MF, split by hour")
 
@@ -504,6 +513,10 @@ SP.mf1.1 + ggtitle("Total Knocks effect on SPL MF, split by site") + stat_smooth
 SP.mf1.2 + ggtitle("Total Knocks effect on SPL MF, split by hour") + geom_smooth(method = "lm")
 kmf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1)
 summary(kmf.lm)
+
+#pdf(file="../Figures/Knocks_MF_Regression.pdf", width = 11, height = 7)
+#SP.mf1.3 + stat_smooth(method = "lm")
+#dev.off()
 ```
 
 
@@ -534,6 +547,24 @@ summary(s35mf.lm)
 
 Site 35, knocks significant.
 
+Removing 2 outliers > 150
+
+```{r regressions6E, echo = FALSE}
+
+h.knock35 <- s35[s35$Tot_Knocks >150, ]
+# Remove anything with fewer than 2 observers 
+
+s35E <- s35[!(s35$st.id %in% h.knock35$st.id),]
+#now rerunning without the 2 outliers
+
+SPmf.35E <- ggplot(s35E, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SPmf.35E + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL - outliers removed")
+s35mf.lmE = lm(SPL_Midrange ~ Tot_Knocks, data = s35E)
+summary(s35mf.lmE)
+
+```
+
 ```{r regressions7, echo = FALSE}
 SPmf.8 <- ggplot(s8, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
 
@@ -543,6 +574,25 @@ summary(s8mf.lm)
 ```
 
 Site 8, knocks not significant. Negative relationship... thats interesting.
+
+Removing Outlier
+
+```{r regressions7E, echo = FALSE}
+
+h.knock8 <- s8[s8$Tot_Knocks >200, ]
+# Remove anything with fewer than 2 observers 
+
+s8E <- s8[!(s8$st.id %in% h.knock8$st.id),]
+#now rerunning without the 2 outliers
+
+SPmf.8E <- ggplot(s8E, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SPmf.8E + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL - outlier removed")
+s8mf.lmE = lm(SPL_Midrange ~ Tot_Knocks, data = s8E)
+summary(s8mf.lmE)
+
+```
+
 
 ```{r regressions8, echo = FALSE}
 SPmf.40 <- ggplot(s40, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 40")
@@ -1327,6 +1377,114 @@ day.SPL18.32 <- ggplot(data = cp18.32, aes(x= Time)) + geom_point(aes(y = SPL_MF
 cp.dSPLMF18 <- plot_grid(day.SPL18.5, day.SPL18.8, day.SPL18.35, day.SPL18.40, day.SPL18.32, nrow = 5, ncol = 1, align = "v")
 cp.dSPLMF18
 
+```
+
+**Diurnal Pattern, Only using 4 time point subset - 2017**
+
+While I know these averages aren't accurate - SPL is log scaled, I just wanted to see the breakdown
+
+```{r combo 4 time subset 2017, echo = FALSE}
+
+#subsetting 4 times
+SPL.both17.3 <- filter(SPL.both17, Time == "03:00")
+SPL.both17.9 <- filter(SPL.both17, Time == "09:00")
+SPL.both17.15 <- filter(SPL.both17, Time == "15:00")
+SPL.both17.21 <- filter(SPL.both17, Time == "21:00")
+
+#binding above dataframes together
+SPL.both17.TS <- rbind(SPL.both17.3, SPL.both17.9, SPL.both17.15, SPL.both17.21)
+
+#renaming columns
+names(SPL.both17.TS) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF")
+
+#making plot
+day.SPL17.TS <- ggplot(data = SPL.both17.TS, aes(x= Time)) + geom_point(aes(y = SPL_MF, color = "green4")) + geom_point(aes(y = SPL_HF, color = "orange3")) + theme(axis.text.x = element_text(angle = 90)) + ylab("SPL")+ ggtitle("MF and HF SPL diurnal pattern, Time subset, 2017")
+day.SPL17.TS
+
+
+#taking average and calculating confidence intervals for sites
+high.av <- aggregate(SPL_HF ~ Time, SPL.both17.TS, mean)
+low.av <- aggregate(SPL_MF ~ Time, SPL.both17.TS, mean)
+
+high.se <- aggregate(SPL_HF ~ Time, SPL.both17.TS, function(x) sd(x)/sqrt(length(x)))
+high.av$SE <- high.se$SPL_HF
+high.av$U.SE <- high.av$SPL_HF + high.av$SE
+high.av$L.SE <- high.av$SPL_HF - high.av$SE
+
+
+low.se <- aggregate(SPL_MF ~ Time, SPL.both17.TS, function(x) sd(x)/sqrt(length(x)))
+low.av$SE <- low.se$SPL_MF
+low.av$U.SE <- low.av$SPL_MF + low.av$SE
+low.av$L.SE <- low.av$SPL_MF - low.av$SE
+
+
+
+
+hftime17.CI <- ggplot(high.av, aes(Time, SPL_HF)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Time), color = "black", pch = 21, size = 6) +
+  labs(x = "Time", y = "SPL_HF", title = "SPL_HF at 4 studied time points, 2017")
+hftime17.CI
+
+mftime17.CI <- ggplot(low.av, aes(Time, SPL_MF)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Time), color = "black", pch = 21, size = 6) +
+  labs(x = "Time", y = "SPL_MF", title = "SPL_MF at 4 studied time points, 2017")
+mftime17.CI
+```
+
+**Diurnal Pattern, Only using 4 time point subset - 2018**
+
+While I know these averages aren't accurate - SPL is log scaled, I just wanted to see the breakdown
+
+```{r combo 4 time subset 2018, echo = FALSE}
+
+#subsetting 4 times
+SPL.both18.3 <- filter(SPL.both18, Time == "03:00")
+SPL.both18.9 <- filter(SPL.both18, Time == "09:00")
+SPL.both18.15 <- filter(SPL.both18, Time == "15:00")
+SPL.both18.21 <- filter(SPL.both18, Time == "21:00")
+
+#binding above dataframes together
+SPL.both18.TS <- rbind(SPL.both18.3, SPL.both18.9, SPL.both18.15, SPL.both18.21)
+
+#renaming columns
+names(SPL.both18.TS) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF")
+
+#making plot
+day.SPL18.TS <- ggplot(data = SPL.both18.TS, aes(x= Time)) + geom_point(aes(y = SPL_MF, color = "green4")) + geom_point(aes(y = SPL_HF, color = "orange3")) + theme(axis.text.x = element_text(angle = 90)) + ylab("SPL")+ ggtitle("MF and HF SPL diurnal pattern, Time subset, 2018")
+day.SPL18.TS
+
+
+#taking average and calculating confidence intervals for sites
+high.av <- aggregate(SPL_HF ~ Time, SPL.both18.TS, mean)
+low.av <- aggregate(SPL_MF ~ Time, SPL.both18.TS, mean)
+
+high.se <- aggregate(SPL_HF ~ Time, SPL.both18.TS, function(x) sd(x)/sqrt(length(x)))
+high.av$SE <- high.se$SPL_HF
+high.av$U.SE <- high.av$SPL_HF + high.av$SE
+high.av$L.SE <- high.av$SPL_HF - high.av$SE
+
+
+low.se <- aggregate(SPL_MF ~ Time, SPL.both18.TS, function(x) sd(x)/sqrt(length(x)))
+low.av$SE <- low.se$SPL_MF
+low.av$U.SE <- low.av$SPL_MF + low.av$SE
+low.av$L.SE <- low.av$SPL_MF - low.av$SE
+
+
+
+
+hftime18.CI <- ggplot(high.av, aes(Time, SPL_HF)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Time), color = "black", pch = 21, size = 6) +
+  labs(x = "Time", y = "SPL_HF", title = "SPL_HF at 4 studied time points, 2018")
+hftime18.CI
+
+mftime18.CI <- ggplot(low.av, aes(Time, SPL_MF)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Time), color = "black", pch = 21, size = 6) +
+  labs(x = "Time", y = "SPL_MF", title = "SPL_MF at 4 studied time points, 2018")
+mftime18.CI
 ```
 
 
