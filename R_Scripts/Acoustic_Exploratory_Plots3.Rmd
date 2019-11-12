@@ -21,6 +21,7 @@ library(usdm)
 library(hms)
 library(dplyr)
 library(lme4)
+library(MASS)
 ##loading in the ACI/SPL data - wide form
 
 #hourdata
@@ -178,6 +179,31 @@ load("../Raw_Data/AC.DF1.Rdata")
 #making site a character
 AC.DF1$Site <- as.character(AC.DF1$Site)
 
+#writing scale funciton
+center_scale <- function(x) {
+  scale(x, scale = FALSE)
+}
+
+#making duplicate dataframes
+AC.DF1C <- AC.DF1
+
+Snap.HF17C <- Snap.HF17
+Snap.HF18C <- Snap.HF18
+
+#Creating centered AC.DF1 dataframe
+AC.DF1C$SPL_HF <- center_scale(AC.DF1C$SPL_HF)
+AC.DF1C$SPL_Midrange <- center_scale(AC.DF1C$SPL_Midrange)
+AC.DF1C$Snaps <- center_scale(AC.DF1C$Snaps)
+AC.DF1C$Tot_Knocks <- center_scale(AC.DF1C$Tot_Knocks)
+AC.DF1C$Num_Herbivory <- center_scale(AC.DF1C$Num_Herbivory)
+AC.DF1C$Num_L_calls <- center_scale(AC.DF1C$Num_L_calls)
+
+#creating centered Snap.HF17 and 18 dataframes
+Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
+Snap.HF17C$Snaps <- center_scale(Snap.HF17C$Snaps)
+Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
+Snap.HF18C$Snaps <- center_scale(Snap.HF18C$Snaps)
+
 ```
 **Exploratory Plots for 2017-2018 Acoustic/Fish Data**
 
@@ -199,6 +225,7 @@ knock.av$SE <- knock.se$Tot_Knocks
 knock.av$U.SE <- knock.av$Tot_Knocks + knock.av$SE
 knock.av$L.SE <- knock.av$Tot_Knocks - knock.av$SE
 
+
 #making site a character
 knock.av$Site <- as.character(knock.av$Site)
 
@@ -208,7 +235,21 @@ knock.CI <- ggplot(knock.av, aes(Site, Tot_Knocks)) +
   labs(x = "Site", y = "Tot_Knocks", title = "Total Knocks")
 knock.CI
 
+#calculating confidence intervals for Hours
+knock.hav <- aggregate(Tot_Knocks ~ Hour, AC.DF1, mean)
+knock.hse <- aggregate(Tot_Knocks ~ Hour, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+knock.hav$SE <- knock.hse$Tot_Knocks
+knock.hav$U.SE <- knock.hav$Tot_Knocks + knock.hav$SE
+knock.hav$L.SE <- knock.hav$Tot_Knocks - knock.hav$SE
 
+#making site a character
+knock.hav$Hour <- as.character(knock.hav$Hour)
+
+hknock.CI <- ggplot(knock.hav, aes(Hour, Tot_Knocks)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Hour), color = "black", pch = 21, size = 6) +
+  labs(x = "Hour", y = "Tot_Knocks", title = "Total Knocks")
+hknock.CI
 
 ##Snaps
 
@@ -587,6 +628,130 @@ WP.2
 ```
 Wind doesn't seem to impact SPL HF or MF in any particular direction. Although the wind range seems really small.
 
+
+
+##Centered Regressions
+Running basic regressions linking the explanatory to the response at their lowest levels and combined to see how different sites/ hours change the regression - SPL
+
+**Linear Model outputs below each**
+
+```{r cregressions3, echo = FALSE}
+#splitting dataframe by site
+s5c <- filter(AC.DF1C, Site == "5")
+s32c <- filter(AC.DF1C, Site == "32")
+s35c <- filter(AC.DF1C, Site == "35")
+s40c <- filter(AC.DF1C, Site == "40")
+s8c <- filter(AC.DF1C, Site == "8")
+
+#splitting dataframe by hour
+h3c <- filter(AC.DF1C, Hour == "3")
+h9c <- filter(AC.DF1C, Hour == "9")
+h15c <- filter(AC.DF1C, Hour == "15")
+h21c <- filter(AC.DF1C, Hour == "21")
+
+SP.hf2 <- ggplot(Snap.HF17C, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on HF SPL, 2017, split by site")
+
+SP.hf2 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
+shf.lm17c = lm(SPL_HF ~ Snaps, data = Snap.HF17C)
+summary(shf.lm17c)
+```
+
+2017 Snap data, snaps significant.
+
+
+###Mid Frequency
+
+**Mid Frequency **
+
+```{r Cregressions, echo = FALSE}
+#equation for r^2 value
+SP.mf1.1C <- ggplot(AC.DF1C, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, split by site")
+SP.mf1.2C <- ggplot(AC.DF1C, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + ggtitle("Effect of knocks on SPL MF, split by hour")
+
+SP.mf1.1C + ggtitle("Total Knocks effect on SPL MF, split by site") + stat_smooth(method = "lm") 
+SP.mf1.2C + ggtitle("Total Knocks effect on SPL MF, split by hour") + geom_smooth(method = "lm")
+kmf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1C)
+summary(kmf.lmc)
+
+SP.lmf1.1C <- ggplot(AC.DF1C, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site))
+SP.lmf1.1C + ggtitle("Long Calls effect on SPL MF, split by site") + stat_smooth(method = "lm") 
+
+
+SP.hmf1.1C <- ggplot(AC.DF1C, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site))
+SP.hmf1.1C + ggtitle("Herbivory effect on SPL MF, split by site") + stat_smooth(method = "lm")
+
+```
+
+2017-2018 data w/200 samples.  1st plot splits by site and second by hour to show any patterns before I break them down individually.
+
+
+```{r C collinearity, echo = TRUE}
+
+#subsetting only lm variables
+AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour))
+
+vif(AC.DF1Co)
+
+#no colinnearity found between explanatory variables
+#ggpairs(AC.DF1Co)
+
+```
+
+All values are near 1, values of 4 or 5 would be moderate. 1 = no collinearity.  I think this means that we have no collinearity between my explanatory variables
+
+
+**Breakdown by Site**
+
+```{r Cregressions5, echo = FALSE}
+SPmf.5c <- ggplot(s5c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "royalblue4") + ggtitle("Site 5")
+
+SPmf.5c + geom_smooth(method = "lm") + ggtitle("Site 5, MF SPL")
+s5mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s5c)
+summary(s5mf.lmc)
+```
+
+Site 5, knocks not significant.
+
+
+```{r Cregressions6, echo = FALSE}
+SPmf.35c <- ggplot(s35c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SPmf.35c + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL")
+s35mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s35c)
+summary(s35mf.lmc)
+```
+
+Site 35, knocks significant.
+
+```{r Cregressions7, echo = FALSE}
+SPmf.8c <- ggplot(s8c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SPmf.8c + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL")
+s8mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s8c)
+summary(s8mf.lmc)
+```
+
+Site 8, knocks not significant. Negative relationship... thats interesting.
+
+```{r Cregressions8, echo = FALSE}
+SPmf.40c <- ggplot(s40c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SPmf.40c + geom_smooth(method = "lm") + ggtitle("Site 40, MF SPL")
+s40mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s40c)
+summary(s40mf.lmc)
+```
+
+Site 40, knocks not significant.
+
+```{r Cregressions9, echo = FALSE}
+SPmf.32c <- ggplot(s32c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 32")
+
+SPmf.32c + geom_smooth(method = "lm") + ggtitle("Site 32, MF SPL")
+s32mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s32c)
+summary(s32mf.lmc)
+```
+
+Site 32, knocks significant.
 
 #Time-Series Acoustics
 **Acoustics Breakdown** All acoustic metrics (SPL and ACI) are broken down into 2 frequency bands: High Frequency (Frequencies between 1 kHz - 22 kHz) and Mid Frequency (Frequencies between 160 Hz and 1 kHz)
@@ -1239,13 +1404,36 @@ summary(gfit4)
 
 ##Model 4T
 Looking at maximal model + site as a random effect + hour as a categorical (NOT ORDINAL)
-SPL MF ~ Tot_Knocks + Num_L_Calls + Num_Herbivory + Hour + (1|Site)
+SPL MF ~ Tot_Knocks + Num_L_Calls + Num_Herbivory + Hour + (1|Site) 
 ``` {r model 4t, echo = TRUE}
 
 #Adding site as a random effect
 gfit4t <- lmer(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory + Hour + (1|Site), data = AC.DF1)
 
 summary(gfit4t)
+
+```
+
+##Model 4T (ordinal)
+Looking at maximal model + site as a random effect + hour as ORDINAL
+SPL MF ~ Tot_Knocks + Num_L_Calls + Num_Herbivory + Hour + (1|Site)
+
+``` {r model 4to, echo = TRUE}
+#making Hour ordinal
+AC.DF1$Hour_factor <- factor (AC.DF1$Hour, order = TRUE, levels = c("3", "9", "15", "21"))
+AC.DF1$Hour_factor
+#Adding site as a random effect
+gfit4to <- lmer(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory + Hour_factor + (1|Site), data = AC.DF1)
+
+summary(gfit4to)
+
+```
+
+AIC Model selection - removing Site as a random factor so that I can run AIC stepwise 
+```{r AIC, echo = TRUE}
+
+gfitlmto <- lm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory + Hour_factor, data = AC.DF1)
+aicgfitto <- stepAIC(gfitlmto, direction = "backward")
 
 ```
 
