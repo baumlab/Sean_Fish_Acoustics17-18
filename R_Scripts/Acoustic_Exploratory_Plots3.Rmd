@@ -23,6 +23,8 @@ library(dplyr)
 library(lme4)
 library(MASS)
 library(lmerTest)
+library(goft)
+
 ##loading in the ACI/SPL data - wide form
 
 #hourdata
@@ -1632,6 +1634,25 @@ mftime18.CI
 
 #Models
 **Preliminary Models** Looking into the relationships between biogenic sounds (Knocks/Calls and Snaps) and their frequency spectra (MF SPL/HF SPL) respectively.
+##Testing for Normality
+
+```{r normal, echo = TRUE}
+
+shapiro.test(AC.DF1$SPL_Midrange)
+qqnorm(AC.DF1$SPL_Midrange)
+
+ks.test(SPLHF.long$SPL_HF, "pnorm", mean=mean(SPLHF.long$SPL_HF), sd=sd(SPLHF.long$SPL_HF))
+
+ks.test(SPLMF.long$SPL_MF, "pnorm", mean=mean(SPLMF.long$SPL_MF), sd=sd(SPLMF.long$SPL_MF))
+
+gamma_test(AC.DF1$SPL_Midrange)
+weibull_test(AC.DF1$SPL_Midrange)
+
+gamma_test(AC.DF1$SPL_HF)
+weibull_test(AC.DF1$SPL_HF)
+```
+
+Don't seem to have a normal distribution here... Working on testing different distributions.  Not sure what the outputs on the gamma or weibull tests mean
 
 ##Model 1
 Looking at Total Knocks only
@@ -1639,16 +1660,14 @@ SPL MF ~ Tot_Knocks
 ``` {r model 1, echo = TRUE}
 
 #model 1 looking at Total Knocks only
-gfit1 <- glm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1, family = Gamma)
-
+gfit1 <- lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1Co)
+#gfit1 <- glm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1Co)
 summary(gfit1)
 
 par(mfrow = c(2,2))
 plot(gfit1)
 
 summary.glm(gfit1)$coefficients
-
-
 
 ```
 
@@ -1658,15 +1677,15 @@ SPL MF ~ Tot_Knocks + Num_L_Calls
 ``` {r model 2, echo = TRUE}
 
 #model 1 looking at Total Knocks only
-gfit2 <- glm(SPL_Midrange ~ Tot_Knocks + Num_L_calls, data = AC.DF1, family = Gamma)
-
+gfit2 <- lm(SPL_Midrange ~ Tot_Knocks + Num_L_calls, data = AC.DF1Co)
+#gfit2 <- glm(SPL_Midrange ~ Tot_Knocks + Num_L_calls, data = AC.DF1Co, family = "gamma")
 summary(gfit2)
 
 par(mfrow = c(2,2))
 plot(gfit2)
 
 
-summary.glm(gfit2)$coefficients
+#summary.glm(gfit2)$coefficients
 
 
 
