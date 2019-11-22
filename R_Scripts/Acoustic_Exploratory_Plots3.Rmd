@@ -1,7 +1,7 @@
 ---
 title: "Acoustic_2019_Explore3"
 author: "Sean Dimoff"
-date: "October 9, 2019"
+date: "November 21, 2019"
 output: 
   html_document:
     toc: true
@@ -24,6 +24,7 @@ library(lme4)
 library(MASS)
 library(lmerTest)
 library(goft)
+library(magick)
 
 ##loading in the ACI/SPL data - wide form
 
@@ -219,6 +220,37 @@ h3 <- filter(AC.DF1, Hour == "3")
 h9 <- filter(AC.DF1, Hour == "9")
 h15 <- filter(AC.DF1, Hour == "15")
 h21 <- filter(AC.DF1, Hour == "21")
+
+#loading in spectrograms
+#site5
+spec3.5 <- image_read("../Sound_Photos/Spectrogram_Photos/Site5.170712030002.jpg")
+spec9.5  <- image_read("../Sound_Photos/Spectrogram_Photos/Site5.170712090002.jpg")
+spec15.5 <- image_read("../Sound_Photos/Spectrogram_Photos/Site5.170712150002.jpg")
+spec21.5 <- image_read("../Sound_Photos/Spectrogram_Photos/Site5.170712210002.jpg")
+#site8
+spec3.8  <- image_read("../Sound_Photos/Spectrogram_Photos/Site8.170712030002.jpg")
+spec9.8  <- image_read("../Sound_Photos/Spectrogram_Photos/Site8.170712090002.jpg")
+spec15.8 <- image_read("../Sound_Photos/Spectrogram_Photos/Site8.170712150002.jpg")
+spec21.8 <- image_read("../Sound_Photos/Spectrogram_Photos/Site8.170712210002.jpg")
+#site35
+spec3.35  <-image_read("../Sound_Photos/Spectrogram_Photos/Site35.170712030002.jpg")
+spec9.35  <-image_read("../Sound_Photos/Spectrogram_Photos/Site35.170712090002.jpg")
+spec15.35 <-image_read("../Sound_Photos/Spectrogram_Photos/Site35.170712150002.jpg")
+spec21.35 <-image_read("../Sound_Photos/Spectrogram_Photos/Site35.170712210002.jpg")
+#site32
+spec3.32  <-image_read("../Sound_Photos/Spectrogram_Photos/Site32.170712030002.jpg")
+spec9.32  <-image_read("../Sound_Photos/Spectrogram_Photos/Site32.170712090002.jpg")
+spec15.32 <-image_read("../Sound_Photos/Spectrogram_Photos/Site32.170712150002.jpg")
+spec21.32 <-image_read("../Sound_Photos/Spectrogram_Photos/Site32.170712210002.jpg")
+#site40
+spec3.40  <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712030002.jpg")
+spec9.40  <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712090002.jpg")
+spec15.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712150002.jpg")
+spec21.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712210002.jpg")
+
+#making plots into lists
+
+
 
 ```
 **Exploratory Plots for 2017-2018 Acoustic/Fish Data**
@@ -1667,7 +1699,7 @@ summary(gfit1)
 par(mfrow = c(2,2))
 plot(gfit1)
 
-summary.glm(gfit1)$coefficients
+#summary.glm(gfit1)$coefficients
 
 ```
 
@@ -1765,7 +1797,7 @@ summary(gfit5to)
 AIC Model selection - removing Site as a random factor so that I can run AIC stepwise 
 ```{r AIC, echo = TRUE}
 
-gfitlmto <- lm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory + Hour_factor, data = AC.DF1)
+gfitlmto <- lm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory + Hour_factor, data = AC.DF1Co)
 aicgfitto <- stepAIC(gfitlmto, direction = "backward")
 
 ```
@@ -1785,3 +1817,52 @@ summary(fit5)$coefficients
 ````
 
 
+
+
+#Spectrograms
+
+Putting in spectrograms to analyze how the 4 different times sampled look
+
+*Note* All spectrograms are time along the x axis, frequency along the y axis, frequency is zoomed in to just 0 - 3 kHz
+
+Times progression: 3 AM, 9 AM, 3 PM, 9 PM
+
+Site 5
+
+```{r spectrograms5, echo = FALSE}
+spec5t <- image_append(c(spec3.5, spec9.5, spec15.5, spec21.5))
+spec5t <- image_resize(spec5t, "3000")
+spec5t
+```
+
+Site 8
+
+```{r spectrograms8, echo = FALSE}
+spec8t <- image_append(c(spec3.8, spec9.8, spec15.8, spec21.8))
+spec8t <- image_resize(spec8t, "3000")
+spec8t
+```
+
+Site 35
+
+```{r spectrograms35, echo = FALSE}
+spec35t <- image_append(c(spec3.35, spec9.35, spec15.35, spec21.35))
+spec35t <- image_resize(spec35t, "3000")
+spec35t
+```
+
+Site 32
+
+```{r spectrograms32, echo = FALSE}
+spec32t <- image_append(c(spec3.32, spec9.32, spec15.32, spec21.32))
+spec32t <- image_resize(spec32t, "3000")
+spec32t
+```
+
+Site 40
+
+```{r spectrograms40, echo = FALSE}
+spec40t <- image_append(c(spec3.40, spec9.40, spec15.40, spec21.40))
+spec40t <- image_resize(spec40t, "3000")
+spec40t
+```
