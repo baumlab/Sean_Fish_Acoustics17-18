@@ -25,6 +25,7 @@ library(MASS)
 library(lmerTest)
 library(goft)
 library(magick)
+library(MuMIn)
 
 ##loading in the ACI/SPL data - wide form
 
@@ -195,8 +196,8 @@ Snap.HF17C <- Snap.HF17
 Snap.HF18C <- Snap.HF18
 
 #Creating centered AC.DF1 dataframe
-AC.DF1C$SPL_HF <- center_scale(AC.DF1C$SPL_HF)
-AC.DF1C$SPL_Midrange <- center_scale(AC.DF1C$SPL_Midrange)
+#AC.DF1C$SPL_HF <- center_scale(AC.DF1C$SPL_HF)
+#AC.DF1C$SPL_Midrange <- center_scale(AC.DF1C$SPL_Midrange)
 AC.DF1C$Snaps <- center_scale(AC.DF1C$Snaps)
 AC.DF1C$Tot_Knocks <- center_scale(AC.DF1C$Tot_Knocks)
 AC.DF1C$Num_Herbivory <- center_scale(AC.DF1C$Num_Herbivory)
@@ -204,9 +205,9 @@ AC.DF1C$Num_L_calls <- center_scale(AC.DF1C$Num_L_calls)
 
 #creating centered Snap.HF17 and 18 dataframes
 Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
-Snap.HF17C$Snaps <- center_scale(Snap.HF17C$Snaps)
+#Snap.HF17C$Snaps <- center_scale(Snap.HF17C$Snaps)
 Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
-Snap.HF18C$Snaps <- center_scale(Snap.HF18C$Snaps)
+#Snap.HF18C$Snaps <- center_scale(Snap.HF18C$Snaps)
 
 #splitting dataframe by site
 s5 <- filter(AC.DF1, Site == "5")
@@ -247,9 +248,6 @@ spec3.40  <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712030002.j
 spec9.40  <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712090002.jpg")
 spec15.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712150002.jpg")
 spec21.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712210002.jpg")
-
-#making plots into lists
-
 
 
 ```
@@ -1731,6 +1729,7 @@ SPL MF ~ Tot_Knocks + Num_L_Calls + Num_Herbivory
 #model 1 looking at Total Knocks only
 gfit3 <- glm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory, data = AC.DF1, family = Gamma)
 
+
 summary(gfit3)
 
 par(mfrow = c(2,2))
@@ -1793,14 +1792,17 @@ summary(gfit5to)
 
 ```
 
+Using only the two interactions that are significant, Tot_Knocks:Hour and Num_Herbiory:Hour
+``` {r model 6, echo = TRUE}
 
-AIC Model selection - removing Site as a random factor so that I can run AIC stepwise 
-```{r AIC, echo = TRUE}
+gfit6 <- lmer(SPL_Midrange ~ Tot_Knocks:Hour_factor + Num_L_calls + Num_Herbivory:Hour_factor + (1|Site), data = AC.DF1Co)
 
-gfitlmto <- lm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + Num_Herbivory + Hour_factor, data = AC.DF1Co)
-aicgfitto <- stepAIC(gfitlmto, direction = "backward")
+summary(gfit6)
 
+options(na.action = "na.fail")
+dredge(gfit6)
 ```
+
 
 ##Model 5 - HF SPL and Snaps
 Looking at Snaps and their effect on the HF SPL
