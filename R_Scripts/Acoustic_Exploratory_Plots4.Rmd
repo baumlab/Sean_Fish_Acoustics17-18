@@ -1,0 +1,1228 @@
+---
+title: "Acoustic_2019_Explore3"
+author: "Sean Dimoff"
+date: "November 21, 2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(cowplot)
+library(rmarkdown)
+library(knitr)
+library(RColorBrewer)
+library(GGally)
+library(mctest)
+library(usdm)
+library(hms)
+library(dplyr)
+library(lme4)
+library(MASS)
+library(lmerTest)
+library(goft)
+library(magick)
+library(MuMIn)
+
+##loading in the ACI/SPL data - wide form
+
+#hourdata
+#load("../Raw_Data/ACI_BB17hr.Rdata")
+#load("../Raw_Data/ACI_BB18hr.Rdata")
+#load("../Raw_Data/ACI_HF17hr.Rdata")
+#load("../Raw_Data/ACI_HF18hr.Rdata")
+#load("../Raw_Data/ACI_MF17hr.Rdata")
+#load("../Raw_Data/ACI_MF18hr.Rdata")
+#
+#load("../Raw_Data/SPL_BB17hr.Rdata")
+#load("../Raw_Data/SPL_BB18hr.Rdata")
+#load("../Raw_Data/SPL_HF17hr.Rdata")
+#load("../Raw_Data/SPL_HF18hr.Rdata")
+#load("../Raw_Data/SPL_MF17hr.Rdata")
+#load("../Raw_Data/SPL_MF18hr.Rdata")
+
+#All time data
+#load("../Raw_Data/SPL_BB17.Rdata")
+#load("../Raw_Data/SPL_BB18.Rdata")
+
+#load("../Raw_Data/SPLBB17long.Rdata")
+#load("../Raw_Data/SPLBB18long.Rdata")
+
+load("../Raw_Data/SPLHF17long.Rdata")
+load("../Raw_Data/SPLHF18long.Rdata")
+
+
+load("../Raw_Data/SPLMF17long.Rdata")
+load("../Raw_Data/SPLMF18long.Rdata")
+
+
+load("../Raw_Data/SPLHFlong.Rdata")
+load("../Raw_Data/SPLMFlong.Rdata")
+
+load("../Raw_Data/SPLMF.long.wind.Rdata")
+
+#combined SPL and HF dataframes
+load("../Raw_Data/Snap.HF17.Rdata")
+load("../Raw_Data/Snap.HF18.Rdata")
+#changing site to a character
+Snap.HF17$Site.x <- as.character(Snap.HF17$Site.x)
+Snap.HF18$Site.x <- as.character(Snap.HF18$Site.x)
+
+load("../Raw_Data/Snap.HF.Rdata")
+
+
+
+#daydata
+#load("../Raw_Data/ACI_BB17day.Rdata")
+#load("../Raw_Data/ACI_BB18day.Rdata")
+#load("../Raw_Data/ACI_HF17day.Rdata")
+#load("../Raw_Data/ACI_HF18day.Rdata")
+#load("../Raw_Data/ACI_MF17day.Rdata")
+#load("../Raw_Data/ACI_MF18day.Rdata")
+#
+#load("../Raw_Data/SPL_BB17day.Rdata")
+#load("../Raw_Data/SPL_BB18day.Rdata")
+#load("../Raw_Data/SPL_HF17day.Rdata")
+#load("../Raw_Data/SPL_HF18day.Rdata")
+#load("../Raw_Data/SPL_MF17day.Rdata")
+#load("../Raw_Data/SPL_MF18day.Rdata")
+
+#loading ACI/SPL long data for boxplots
+#ACI
+#load("../Raw_Data/ACI_BB17hrlong.Rdata")
+#load("../Raw_Data/ACI_HF17hrlong.Rdata")
+#load("../Raw_Data/ACI_MF17hrlong.Rdata")
+#load("../Raw_Data/ACI_BB18hrlong.Rdata")
+#load("../Raw_Data/ACI_HF18hrlong.Rdata")
+#load("../Raw_Data/ACI_MF18hrlong.Rdata")
+#
+#load("../Raw_Data/ACI_MFhrlong.Rdata")
+#load("../Raw_Data/ACI_HFhrlong.Rdata")
+#load("../Raw_Data/ACI_BBhrlong.Rdata")
+#
+#load("../Raw_Data/ACI_BBhr_av.Rdata")
+#load("../Raw_Data/ACI_HFhr_av.Rdata")
+#load("../Raw_Data/ACI_MFhr_av.Rdata")
+#
+####making year a character
+#ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
+#ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
+#ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
+#
+###SPL
+#load("../Raw_Data/SPL_BB17hrlong.Rdata")
+#load("../Raw_Data/SPL_HF17hrlong.Rdata")
+#load("../Raw_Data/SPL_MF17hrlong.Rdata")
+#load("../Raw_Data/SPL_BB18hrlong.Rdata")
+#load("../Raw_Data/SPL_HF18hrlong.Rdata")
+#load("../Raw_Data/SPL_MF18hrlong.Rdata")
+#
+#load("../Raw_Data/SPL_MFhrlong.Rdata")
+#load("../Raw_Data/SPL_HFhrlong.Rdata")
+#load("../Raw_Data/SPL_BBhrlong.Rdata")
+#
+#load("../Raw_Data/SPL_BBhr_av.Rdata")
+#load("../Raw_Data/SPL_HFhr_av.Rdata")
+#load("../Raw_Data/SPL_MFhr_av.Rdata")
+#
+###making year a character
+#SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
+#SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
+#SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
+#
+##loading in fish call count data
+#load("../Raw_Data/FC.05hr.Rdata")
+#load("../Raw_Data/FC.08hr.Rdata")
+#load("../Raw_Data/FC.32hr.Rdata")
+#load("../Raw_Data/FC.35hr.Rdata")
+#load("../Raw_Data/FC.40hr.Rdata")
+#
+#load("../Raw_Data/FC.CallperDayALL.Rdata")
+#load("../Raw_Data/FC.CallperDay17.Rdata")
+#load("../Raw_Data/FC.CallperDay18.Rdata")
+#
+#load("../Raw_Data/FC.CallperHourALL.Rdata")
+#load("../Raw_Data/FC.CallperHour17.Rdata")
+#load("../Raw_Data/FC.CallperHour18.Rdata")
+
+#loading in total dataframe
+#load("../Raw_Data/AC.DF.Rdata")
+
+
+
+
+##loading in Boat visitation data
+#load("../Raw_Data/BV.all.Rdata")
+#load("../Raw_Data/BV.sum.Rdata")
+
+
+
+
+
+##loading in lunar phase data
+#load("../Raw_Data/LunarPhase2017.Rdata")
+#load("../Raw_Data/LunarPhase2018.Rdata")
+
+
+##loading in fish data
+#load("../Raw_Data/ki_fishabundance.Rdata")
+#load("../Raw_Data/ki_fishabundance17.Rdata")
+#load("../Raw_Data/ki_fishabundance18.Rdata")
+#
+#load("../Raw_Data/ki_fishaverage.Rdata")
+#load("../Raw_Data/ki_fishaverage17.Rdata")
+#load("../Raw_Data/ki_fishaverage18.Rdata")
+
+
+##loading in the full dataframe with all data
+#load("../Raw_Data/AC.DF.Rdata")
+load("../Raw_Data/AC.DF1.Rdata")
+
+#making site a character
+AC.DF1$Site <- as.character(AC.DF1$Site)
+
+#writing scale funciton
+center_scale <- function(x) {
+  scale(x, scale = FALSE)
+}
+
+#making duplicate dataframes
+AC.DF1C <- AC.DF1
+
+Snap.HF17C <- Snap.HF17
+Snap.HF18C <- Snap.HF18
+
+#Creating centered AC.DF1 dataframe
+#AC.DF1C$SPL_HF <- center_scale(AC.DF1C$SPL_HF)
+#AC.DF1C$SPL_Midrange <- center_scale(AC.DF1C$SPL_Midrange)
+AC.DF1C$Snaps <- center_scale(AC.DF1C$Snaps)
+AC.DF1C$Tot_Knocks <- center_scale(AC.DF1C$Tot_Knocks)
+AC.DF1C$Num_Herbivory <- center_scale(AC.DF1C$Num_Herbivory)
+AC.DF1C$Num_L_calls <- center_scale(AC.DF1C$Num_L_calls)
+
+#creating centered Snap.HF17 and 18 dataframes
+Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
+#Snap.HF17C$Snaps <- center_scale(Snap.HF17C$Snaps)
+Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
+#Snap.HF18C$Snaps <- center_scale(Snap.HF18C$Snaps)
+
+#splitting dataframe by site
+s5 <- filter(AC.DF1, Site == "5")
+s32 <- filter(AC.DF1, Site == "32")
+s35 <- filter(AC.DF1, Site == "35")
+s40 <- filter(AC.DF1, Site == "40")
+s8 <- filter(AC.DF1, Site == "8")
+
+#splitting dataframe by hour
+h3 <- filter(AC.DF1, Hour == "3")
+h9 <- filter(AC.DF1, Hour == "9")
+h15 <- filter(AC.DF1, Hour == "15")
+h21 <- filter(AC.DF1, Hour == "21")
+
+#loading in spectrograms
+#site5
+spec3.5 <- image_read("../Sound_Photos/Spectrogram_Photos/Site5.170712030002.jpg")
+spec9.5  <- image_read("../Sound_Photos/Spectrogram_Photos/Site5.170712090002.jpg")
+spec15.5 <- image_read("../Sound_Photos/Spectrogram_Photos/Site5.170712150002.jpg")
+spec21.5 <- image_read("../Sound_Photos/Spectrogram_Photos/Site5.170712210002.jpg")
+#site8
+spec3.8  <- image_read("../Sound_Photos/Spectrogram_Photos/Site8.170712030002.jpg")
+spec9.8  <- image_read("../Sound_Photos/Spectrogram_Photos/Site8.170712090002.jpg")
+spec15.8 <- image_read("../Sound_Photos/Spectrogram_Photos/Site8.170712150002.jpg")
+spec21.8 <- image_read("../Sound_Photos/Spectrogram_Photos/Site8.170712210002.jpg")
+#site35
+spec3.35  <-image_read("../Sound_Photos/Spectrogram_Photos/Site35.170712030002.jpg")
+spec9.35  <-image_read("../Sound_Photos/Spectrogram_Photos/Site35.170712090002.jpg")
+spec15.35 <-image_read("../Sound_Photos/Spectrogram_Photos/Site35.170712150002.jpg")
+spec21.35 <-image_read("../Sound_Photos/Spectrogram_Photos/Site35.170712210002.jpg")
+#site32
+spec3.32  <-image_read("../Sound_Photos/Spectrogram_Photos/Site32.170712030002.jpg")
+spec9.32  <-image_read("../Sound_Photos/Spectrogram_Photos/Site32.170712090002.jpg")
+spec15.32 <-image_read("../Sound_Photos/Spectrogram_Photos/Site32.170712150002.jpg")
+spec21.32 <-image_read("../Sound_Photos/Spectrogram_Photos/Site32.170712210002.jpg")
+#site40
+spec3.40  <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712030002.jpg")
+spec9.40  <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712090002.jpg")
+spec15.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712150002.jpg")
+spec21.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712210002.jpg")
+
+
+```
+
+**Exploratory Plots for 2017-2018 Acoustic/Fish Data**
+
+**Purpose** To explore the Acoustic data gathered in 2017 and 2018 to expose important trends between sites, diurnal patterns, fish abundance, lunar phase, and coral reef acoustics.
+
+#Validations
+
+**Combined Model** All variables are matched to the files that were used for Fish call counts (3:00, 9:00, 15:00, 21:00)
+
+##Confidence Intervals
+```{r CI, echo = FALSE}
+
+##Knocks
+
+#taking average and calculating confidence intervals for sites
+knock.av <- aggregate(Tot_Knocks ~ Site, AC.DF1, mean)
+knock.se <- aggregate(Tot_Knocks ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+knock.av$SE <- knock.se$Tot_Knocks
+knock.av$U.SE <- knock.av$Tot_Knocks + knock.av$SE
+knock.av$L.SE <- knock.av$Tot_Knocks - knock.av$SE
+
+
+#making site a character
+knock.av$Site <- as.character(knock.av$Site)
+
+knock.CI <- ggplot(knock.av, aes(Site, Tot_Knocks)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Tot_Knocks", title = "Total Knocks")
+knock.CI
+
+#calculating confidence intervals for Hours
+knock.hav <- aggregate(Tot_Knocks ~ Hour, AC.DF1, mean)
+knock.hse <- aggregate(Tot_Knocks ~ Hour, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+knock.hav$SE <- knock.hse$Tot_Knocks
+knock.hav$U.SE <- knock.hav$Tot_Knocks + knock.hav$SE
+knock.hav$L.SE <- knock.hav$Tot_Knocks - knock.hav$SE
+
+#making site a character
+knock.hav$Hour <- as.character(knock.hav$Hour)
+
+hknock.CI <- ggplot(knock.hav, aes(Hour, Tot_Knocks)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Hour), color = "black", pch = 21, size = 6) +
+  labs(x = "Hour", y = "Tot_Knocks", title = "Total Knocks")
+hknock.CI
+
+##Snaps
+
+#snaps by site
+snap.av <- aggregate(Snaps ~ Site, AC.DF1, mean)
+snap.se <- aggregate(Snaps ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+snap.av$SE <- snap.se$Snaps
+snap.av$U.SE <- snap.av$Snaps + snap.av$SE
+snap.av$L.SE <- snap.av$Snaps - snap.av$SE
+
+#making site a character
+snap.av$Site <- as.character(snap.av$Site)
+
+snap.CI <- ggplot(snap.av, aes(Site, Snaps)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Snaps", title = "Snaps per site")
+snap.CI
+
+
+##Long Calls
+
+#LC by site
+LC.av <- aggregate(Num_L_calls ~ Site, AC.DF1, mean)
+LC.se <- aggregate(Num_L_calls ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+LC.av$SE <- LC.se$Num_L_calls
+LC.av$U.SE <- LC.av$Num_L_calls + LC.av$SE
+LC.av$L.SE <- LC.av$Num_L_calls - LC.av$SE
+
+#making site a character
+LC.av$Site <- as.character(LC.av$Site)
+
+LC.CI <- ggplot(LC.av, aes(Site, Num_L_calls)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Long Calls", title = "Long Calls per site")
+LC.CI
+
+##Herbivory
+
+#LC by site
+H.av <- aggregate(Num_Herbivory ~ Site, AC.DF1, mean)
+H.se <- aggregate(Num_Herbivory ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+H.av$SE <- H.se$Num_Herbivory
+H.av$U.SE <- H.av$Num_Herbivory + H.av$SE
+H.av$L.SE <- H.av$Num_Herbivory - H.av$SE
+
+#making site a character
+H.av$Site <- as.character(H.av$Site)
+
+H.CI <- ggplot(H.av, aes(Site, Num_Herbivory)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Herbivory", title = "Herbivory per site")
+H.CI
+
+
+
+
+```
+
+##Distributions
+
+```{r histogram, echo = FALSE}
+#plotting count histogram
+
+Count.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Tot_Knocks)) + geom_histogram()
+Herb.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_Herbivory)) + geom_histogram()
+LC.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_L_calls)) + geom_histogram()
+Snap.hist <- ggplot(data = Snap.HF17, aes(Snap.HF17$Snaps)) + geom_histogram()
+
+hist.p <- plot_grid(Count.hist, Herb.hist, LC.hist,Snap.hist, nrow = 2, ncol = 2)
+hist.p
+
+#plotting distributions of SPL response variables
+MF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_Midrange)) + geom_histogram() + ggtitle("MF SPL distribution")
+#BB.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_BB)) + geom_histogram() + ggtitle("BB distribution")
+HF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_HF)) + geom_histogram() + ggtitle("HF SPL distribution")
+
+hist1.p <- plot_grid(MF.hist, HF.hist, nrow = 1, ncol = 2)
+hist1.p
+
+#plotting distributions of ACI response variables
+MF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_Midrange)) + geom_histogram() + ggtitle("MF ACI distribution")
+#BB.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_BB)) + geom_histogram()
+HF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_HF)) + geom_histogram() + ggtitle("HF ACI distribution")
+
+hist2.p <- plot_grid(MF.hist1, HF.hist1, nrow = 1, ncol = 2)
+hist2.p
+
+
+```
+
+
+
+
+##Regressions
+Running basic regressions linking the explanatory to the response at their lowest levels and combined to see how different sites/ hours change the regression - SPL
+
+**Linear Model outputs below each**
+
+```{r regressions3, echo = FALSE}
+
+SP.hf2 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on HF SPL, 2017, split by site")
+
+#pdf(file="../Figures/Snap_SPL_Regression2017.pdf", width = 11, height = 7)
+SP.hf2 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
+#dev.off()
+
+shf.lm17 = lm(SPL_HF ~ Snaps, data = Snap.HF17)
+summary(shf.lm17)
+
+#pdf(file="../Figures/Snap_SPL_Regression.pdf", width = 11, height = 7)
+#SP.hf3 <- ggplot(Snap.HF, aes(Snaps, SPL_HF)) + geom_point() + geom_smooth(method = "lm")
+#SP.hf3
+#dev.off()
+
+SP.hf2.1 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on HF SPL, 2017, split by site") + facet_wrap(~Site.x)
+SP.hf2.1 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
+```
+
+2017 Snap data, snaps significant.
+
+When you break it down by site, site 32 has the opposite relationship with high frequency and snaps.
+
+###High Frequency
+
+**2017 Snap/HF SPL Site Breakdown **
+
+```{r regressions5snap, echo = FALSE}
+#splitting dataframe by site
+s17s5 <-  filter(Snap.HF17, Site.x == "5")
+s17s32 <- filter(Snap.HF17, Site.x == "32")
+s17s35 <- filter(Snap.HF17, Site.x == "35")
+s17s40 <- filter(Snap.HF17, Site.x == "40")
+s17s8 <-  filter(Snap.HF17, Site.x == "8")
+
+SP.17hf5 <- ggplot(s17s5, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 5, 2017") + geom_smooth(method = "lm")
+SP.17hf5
+sp5lm17 = lm(SPL_HF ~Snaps, data = s17s5)
+summary(sp5lm17)
+```
+
+```{r regression8snap, echo = FALSE}
+SP.17hf8 <- ggplot(s17s8, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 8, 2017") + geom_smooth(method = "lm")
+SP.17hf8
+sp8lm17 = lm(SPL_HF ~Snaps, data = s17s8)
+summary(sp8lm17)
+```
+
+```{r regression35snap, echo = FALSE}
+SP.17hf35 <- ggplot(s17s35, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 35, 2017") + geom_smooth(method = "lm")
+SP.17hf35
+sp35lm17 = lm(SPL_HF ~Snaps, data = s17s35)
+summary(sp35lm17)
+```
+
+```{r regression40snap, echo = FALSE}
+SP.17hf40 <- ggplot(s17s40, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 40, 2017") + geom_smooth(method = "lm")
+SP.17hf40
+sp40lm17 = lm(SPL_HF ~Snaps, data = s17s40)
+summary(sp40lm17)
+```
+
+```{r regression32snap, echo = FALSE}
+SP.17hf32 <- ggplot(s17s32, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 32, 2017") + geom_smooth(method = "lm")
+SP.17hf32
+sp32lm17 = lm(SPL_HF ~Snaps, data = s17s32)
+summary(sp32lm17)
+```
+
+**2018 Snap/HF SPL**
+```{r regressions18, echo = FALSE}
+
+SP.hf4 <- ggplot(Snap.HF18, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2018, split by site")
+SP.hf4
+```
+
+Removing outliers
+
+```{r regressions4, echo = FALSE}
+#extreme outliers in 2018 - snap counts in the hundreds rather than thousands, going to find and remove them and run again
+## Check that 2 divers were at all sites
+low.snap <- Snap.HF18[Snap.HF18$Snaps <1000, ]
+# Remove anything with fewer than 2 observers 
+
+Snap.HF18E <- Snap.HF18[!(Snap.HF18$ds.id %in% low.snap$ds.id),]
+#now rerunning without the 3 outliers
+
+SP.hf4E <- ggplot(Snap.HF18E, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2018, split by site, outliers removed")
+
+SP.hf4E + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2018")
+shf.lm18E = lm(SPL_HF ~ Snaps, data = Snap.HF18)
+summary(shf.lm18E)
+
+SP.hf4E.1 <- ggplot(Snap.HF18E, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2018, split by site, outliers removed") + facet_wrap(~Site.x)
+
+SP.hf4E.1 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2018")
+```
+
+2018 Snap data with outliers removed. Snaps significant.
+
+When split by sight, site 32 has a flat relationship.
+
+**2018 Snap/HF SPL Site Breakdown **
+
+```{r regressions5snap18, echo = FALSE}
+#splitting dataframe by site
+s18s5 <-  filter(Snap.HF18E, Site.x == "5")
+s18s32 <- filter(Snap.HF18E, Site.x == "32")
+s18s35 <- filter(Snap.HF18E, Site.x == "35")
+s18s40 <- filter(Snap.HF18E, Site.x == "40")
+s18s8 <-  filter(Snap.HF18E, Site.x == "8")
+
+SP.18hf5 <- ggplot(s18s5, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 5, 2018") + geom_smooth(method = "lm")
+SP.18hf5
+sp5lm18 = lm(SPL_HF ~Snaps, data = s18s5)
+summary(sp5lm18)
+```
+
+```{r regression8snap18, echo = FALSE}
+SP.18hf8 <- ggplot(s18s8, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 8, 2018") + geom_smooth(method = "lm")
+SP.18hf8
+sp8lm18 = lm(SPL_HF ~Snaps, data = s18s8)
+summary(sp8lm18)
+```
+
+```{r regression35snap18, echo = FALSE}
+SP.18hf35 <- ggplot(s18s35, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 35, 2018") + geom_smooth(method = "lm")
+SP.18hf35
+sp35lm18 = lm(SPL_HF ~Snaps, data = s18s35)
+summary(sp35lm18)
+```
+
+```{r regression40snap18, echo = FALSE}
+SP.18hf40 <- ggplot(s18s40, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 40, 2018") + geom_smooth(method = "lm")
+SP.18hf40
+sp40lm18 = lm(SPL_HF ~Snaps, data = s18s40)
+summary(sp40lm18)
+```
+
+```{r regression32snap18, echo = FALSE}
+SP.18hf32 <- ggplot(s18s32, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 32, 2018") + geom_smooth(method = "lm")
+SP.18hf32
+sp32lm18 = lm(SPL_HF ~Snaps, data = s18s32)
+summary(sp32lm18)
+```
+
+###Mid Frequency
+
+**Mid Frequency **
+
+```{r regressions, echo = FALSE}
+#equation for r^2 value
+#SP.mf1.3 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point()
+SP.mf1.1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, split by site")
+SP.mf1.2 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + ggtitle("Effect of knocks on SPL MF, split by hour")
+
+SP.mf1.1 + ggtitle("Total Knocks effect on SPL MF, split by site") + stat_smooth(method = "lm") 
+SP.mf1.2 + ggtitle("Total Knocks effect on SPL MF, split by hour") + geom_smooth(method = "lm")
+kmf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1)
+summary(kmf.lm)
+
+#pdf(file="../Figures/Knocks_MF_Regression.pdf", width = 11, height = 7)
+#SP.mf1.3 + stat_smooth(method = "lm")
+#dev.off()
+```
+
+
+
+2017-2018 data w/200 samples.  1st plot splits by site and second by hour to show any patterns before I break them down individually.
+
+
+**Breakdown by Site**
+
+```{r regressions5, echo = FALSE}
+SPmf.5 <- ggplot(s5, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "royalblue4") + ggtitle("Site 5")
+
+SPmf.5 + geom_smooth(method = "lm") + ggtitle("Site 5, MF SPL")
+s5mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s5)
+summary(s5mf.lm)
+```
+
+Site 5, knocks not significant.
+
+
+```{r regressions6, echo = FALSE}
+SPmf.35 <- ggplot(s35, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SPmf.35 + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL")
+s35mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s35)
+summary(s35mf.lm)
+```
+
+Site 35, knocks significant.
+
+Removing 2 outliers > 150
+
+```{r regressions6E, echo = FALSE}
+
+h.knock35 <- s35[s35$Tot_Knocks >150, ]
+# Remove anything with fewer than 2 observers 
+
+s35E <- s35[!(s35$st.id %in% h.knock35$st.id),]
+#now rerunning without the 2 outliers
+
+SPmf.35E <- ggplot(s35E, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SPmf.35E + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL - outliers removed")
+s35mf.lmE = lm(SPL_Midrange ~ Tot_Knocks, data = s35E)
+summary(s35mf.lmE)
+
+```
+
+```{r regressions7, echo = FALSE}
+SPmf.8 <- ggplot(s8, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SPmf.8 + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL")
+s8mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s8)
+summary(s8mf.lm)
+```
+
+Site 8, knocks not significant. Negative relationship... thats interesting.
+
+Removing Outlier
+
+```{r regressions7E, echo = FALSE}
+
+h.knock8 <- s8[s8$Tot_Knocks >200, ]
+# Remove anything with fewer than 2 observers 
+
+s8E <- s8[!(s8$st.id %in% h.knock8$st.id),]
+#now rerunning without the 2 outliers
+
+SPmf.8E <- ggplot(s8E, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SPmf.8E + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL - outlier removed")
+s8mf.lmE = lm(SPL_Midrange ~ Tot_Knocks, data = s8E)
+summary(s8mf.lmE)
+
+```
+
+
+```{r regressions8, echo = FALSE}
+SPmf.40 <- ggplot(s40, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SPmf.40 + geom_smooth(method = "lm") + ggtitle("Site 40, MF SPL")
+s40mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s40)
+summary(s40mf.lm)
+```
+
+Site 40, knocks not significant.
+
+```{r regressions9, echo = FALSE}
+SPmf.32 <- ggplot(s32, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 32")
+
+SPmf.32 + geom_smooth(method = "lm") + ggtitle("Site 32, MF SPL")
+s32mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s32)
+summary(s32mf.lm)
+```
+
+Site 32, knocks significant.
+
+### Mid Frequency - Hourly Breakdown
+**Breakdown by Hour**
+
+```{r regressions10, echo = FALSE}
+SPmf.h3 <- ggplot(h3, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM")
+
+SPmf.h3 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+h3mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h3)
+summary(h3mf.lm)
+```
+
+3AM, knocks not significant.
+
+Splitting by site to see if any site has a relationship
+
+```{r regressions10.1 , echo = FALSE}
+SPmf.h3.1 <- ggplot(h3, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM") + facet_wrap(~Site)
+SPmf.h3.1
+SPmf.h3.1 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+```
+
+
+```{r regressions11, echo = FALSE}
+SPmf.h9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM")
+
+SPmf.h9 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+h9mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h9)
+summary(h9mf.lm)
+```
+
+9AM, knocks significant
+
+Splitting by site
+
+```{r regressions11.1, echo = FALSE}
+SPmf.h9.1 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM") + facet_wrap(~Site)
+
+SPmf.h9.1 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+```
+
+
+```{r regressions12, echo = FALSE}
+SPmf.h15 <- ggplot(h15, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM")
+
+SPmf.h15 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+h15mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h15)
+summary(h15mf.lm)
+```
+
+3PM, knocks not significant
+
+Splitting by site
+
+```{r regressions12.1, echo = FALSE}
+SPmf.h15.1 <- ggplot(h15, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM") + facet_wrap(~Site)
+
+SPmf.h15.1 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+```
+
+
+```{r regressions13, echo = FALSE}
+SPmf.h21 <- ggplot(h21, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM")
+
+SPmf.h21 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+h21mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h21)
+summary(h21mf.lm)
+```
+
+9PM, knocks not significant.
+
+Splitting by site.
+
+```{r regressions13.1, echo = FALSE}
+SPmf.h21.1 <- ggplot(h21, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM") + facet_wrap(~Site)
+
+SPmf.h21.1 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+```
+
+###Mid Frequency Hourly Breakdown (Long Calls)
+
+```{r regressions LC 3 AM, echo = FALSE}
+SPlc.h3 <- ggplot(h3, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM")
+SPlc.h3 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+
+SPlc.h3.1 <- ggplot(h3, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM") + facet_wrap(~Site)
+SPlc.h3.1 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+
+```
+
+3 AM, long calls don't seem to explain a great deal of the relationship at any site
+
+```{r regressions LC 9 AM, echo = FALSE}
+SPlc.h9 <- ggplot(h9, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM")
+SPlc.h9 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+SPlc.h9.1 <- ggplot(h9, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM") + facet_wrap(~Site)
+SPlc.h9.1 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+```
+
+9 AM, long calls don't seem to explain the relationship at any site
+
+```{r regressions LC 15 PM, echo = FALSE}
+SPlc.h15 <- ggplot(h15, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM")
+SPlc.h15 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+SPlc.h15.1 <- ggplot(h15, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM") + facet_wrap(~Site)
+SPlc.h15.1 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+```
+
+3 PM, long calls don't seem to explain the relationship
+
+```{r regressions LC 21 PM, echo = FALSE}
+SPlc.h21 <- ggplot(h21, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM")
+SPlc.h21 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+SPlc.h21.1 <- ggplot(h21, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM") + facet_wrap(~Site)
+SPlc.h21.1 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+```
+
+9 PM, long calls don't seem to explain the relationship
+
+###Mid Frequency Hourly Breakdown (Herbivory)
+
+```{r regressions Herb 3 AM, echo = FALSE}
+SPherb.h3 <- ggplot(h3, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM")
+SPherb.h3 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+
+SPherb.h3.1 <- ggplot(h3, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM") + facet_wrap(~Site)
+SPherb.h3.1 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+
+```
+
+3 AM, Extremely low herbivory at all sites.  No relationship
+
+```{r regressions Herb 9 AM, echo = FALSE}
+SPherb.h9 <- ggplot(h9, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM")
+SPherb.h9 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+SPherb.h9.1 <- ggplot(h9, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM") + facet_wrap(~Site)
+SPherb.h9.1 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+```
+
+Again, extremely low herbivory, no relationship.
+
+```{r regressions Herb 15 PM, echo = FALSE}
+SPherb.h15 <- ggplot(h15, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM")
+SPherb.h15 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+SPherb.h15.1 <- ggplot(h15, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM") + facet_wrap(~Site)
+SPherb.h15.1 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+```
+
+Higher herbivory.  Seems like there is a relationship at site 40, 8, and 35.
+
+```{r regressions Herb 21 PM, echo = FALSE}
+SPherb.h21 <- ggplot(h21, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM")
+SPherb.h21 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+SPherb.h21.1 <- ggplot(h21, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM") + facet_wrap(~Site)
+SPherb.h21.1 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+```
+
+Higher herbivory here as well, although there is no positive relationship at any site.
+
+**Summary**
+Knocks significantly explained SPLMF at sites 35 and 32 and at 9AM.
+
+###Abiotic Regressions (Wind) -SPL
+Running basic regressions linking the wind to SPL at both HF and MF to see if wind speed is significantly affecting the sound
+```{r abiotic regressions, echo = FALSE}
+#equation for r^2 value
+
+WP.1 <- ggplot(Snap.HF, aes(Wind.Speed, SPL_HF)) + geom_point(aes(color = Site)) + ggtitle("Effect of Wind on HF SPL") + stat_smooth(method = "glm")
+WP.1
+
+#making site a character
+SPLMF.long.wind$Site <- as.character(SPLMF.long.wind$Site)
+WP.2 <- ggplot(SPLMF.long.wind, aes(Wind.Speed, SPL_MF)) + geom_point(aes(color = Site)) + ggtitle("Effect of wind on MF SPL") + stat_smooth(method = "glm")
+WP.2
+
+
+```
+Wind doesn't seem to impact SPL HF or MF in any particular direction. Although the wind range seems really small.
+
+
+
+##Centered Regressions
+Running basic regressions linking the explanatory to the response at their lowest levels and combined to see how different sites/ hours change the regression - SPL
+
+**Linear Model outputs below each**
+
+```{r cregressions3, echo = FALSE}
+#splitting dataframe by site
+s5c <- filter(AC.DF1C, Site == "5")
+s32c <- filter(AC.DF1C, Site == "32")
+s35c <- filter(AC.DF1C, Site == "35")
+s40c <- filter(AC.DF1C, Site == "40")
+s8c <- filter(AC.DF1C, Site == "8")
+
+#splitting dataframe by hour
+h3c <- filter(AC.DF1C, Hour == "3")
+h9c <- filter(AC.DF1C, Hour == "9")
+h15c <- filter(AC.DF1C, Hour == "15")
+h21c <- filter(AC.DF1C, Hour == "21")
+
+SP.hf2 <- ggplot(Snap.HF17C, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on HF SPL, 2017, split by site")
+
+SP.hf2 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
+shf.lm17c = lm(SPL_HF ~ Snaps, data = Snap.HF17C)
+summary(shf.lm17c)
+```
+
+2017 Snap data, snaps significant.
+
+
+###Mid Frequency
+
+**Mid Frequency **
+
+```{r Cregressions, echo = FALSE}
+#equation for r^2 value
+SP.mf1.1C <- ggplot(AC.DF1C, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, split by site")
+SP.mf1.2C <- ggplot(AC.DF1C, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + ggtitle("Effect of knocks on SPL MF, split by hour")
+
+SP.mf1.1C + ggtitle("Total Knocks effect on SPL MF, split by site") + stat_smooth(method = "lm") 
+SP.mf1.2C + ggtitle("Total Knocks effect on SPL MF, split by hour") + geom_smooth(method = "lm")
+kmf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1C)
+summary(kmf.lmc)
+
+SP.lmf1.1C <- ggplot(AC.DF1C, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site))
+SP.lmf1.1C + ggtitle("Long Calls effect on SPL MF, split by site") + stat_smooth(method = "lm") 
+
+
+SP.hmf1.1C <- ggplot(AC.DF1C, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site))
+SP.hmf1.1C + ggtitle("Herbivory effect on SPL MF, split by site") + stat_smooth(method = "lm")
+
+```
+
+2017-2018 data w/200 samples.  1st plot splits by site and second by hour to show any patterns before I break them down individually.
+
+
+```{r C collinearity, echo = TRUE}
+
+#subsetting only lm variables
+AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour))
+
+vif(AC.DF1Co)
+
+#no colinnearity found between explanatory variables
+#ggpairs(AC.DF1Co)
+
+```
+
+All values are near 1, values of 4 or 5 would be moderate. 1 = no collinearity.  I think this means that we have no collinearity between my explanatory variables
+
+
+**Breakdown by Site**
+
+```{r Cregressions5, echo = FALSE}
+SPmf.5c <- ggplot(s5c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "royalblue4") + ggtitle("Site 5")
+
+SPmf.5c + geom_smooth(method = "lm") + ggtitle("Site 5, MF SPL")
+s5mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s5c)
+summary(s5mf.lmc)
+```
+
+Site 5, knocks not significant.
+
+
+```{r Cregressions6, echo = FALSE}
+SPmf.35c <- ggplot(s35c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
+
+SPmf.35c + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL")
+s35mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s35c)
+summary(s35mf.lmc)
+```
+
+Site 35, knocks significant.
+
+```{r Cregressions7, echo = FALSE}
+SPmf.8c <- ggplot(s8c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
+
+SPmf.8c + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL")
+s8mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s8c)
+summary(s8mf.lmc)
+```
+
+Site 8, knocks not significant. Negative relationship... thats interesting.
+
+```{r Cregressions8, echo = FALSE}
+SPmf.40c <- ggplot(s40c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 40")
+
+SPmf.40c + geom_smooth(method = "lm") + ggtitle("Site 40, MF SPL")
+s40mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s40c)
+summary(s40mf.lmc)
+```
+
+Site 40, knocks not significant.
+
+```{r Cregressions9, echo = FALSE}
+SPmf.32c <- ggplot(s32c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 32")
+
+SPmf.32c + geom_smooth(method = "lm") + ggtitle("Site 32, MF SPL")
+s32mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s32c)
+summary(s32mf.lmc)
+```
+
+Site 32, knocks significant.
+
+#Time-Series Acoustics
+**Acoustics Breakdown** All acoustic metrics (SPL and ACI) are broken down into 2 frequency bands: High Frequency (Frequencies between 1 kHz - 22 kHz) and Mid Frequency (Frequencies between 160 Hz and 1 kHz)
+
+*Note* 2017 had a 10 minute duty cycle with 5 minutes recording while 2018 had a 15 minute duty cycle with 5 minutes recording, so the number of files averages differs between years
+
+## Diurnal Deployment Plots
+
+```{r supp diurnal plots, echo = FALSE, fig.width = 25, fig.length = 40}
+#High frequency
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+hfsupp <- ggplot(SPLHF.long, aes(x=Time, y=SPL_HF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+hfsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+# Mid frequency
+mfsupp <- ggplot(SPLMF.long, aes(x=Time, y=SPL_MF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+mfsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+# Combo Plots
+#creating combined dataframe
+SPL.both17 <- cbind(SPLMF17.long, SPLHF17.long$SPL_HF)
+SPL.both17$Year <- 2017
+SPL.both18 <- cbind(SPLMF18.long, SPLHF18.long$SPL_HF)
+SPL.both18$Year <- 2018
+#renaming columns
+names(SPL.both17) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF", "Year")
+names(SPL.both18) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF", "Year")
+
+SPL.both <- rbind(SPL.both17, SPL.both18)
+
+comsupp <- ggplot(SPL.both, aes(x=Time)) + geom_point(aes(y = SPL_HF, color = Site)) + geom_point(aes(y = SPL_MF, color = Site))+ facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+comsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+```
+
+**Total Deployment Plots**
+
+```{r supp tot plots, echo = FALSE, fig.width = 25, fig.length = 40}
+#High frequency
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+hfsupp.t <- ggplot(SPLHF.long, aes(x=datetime, y=SPL_HF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "free") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+hfsupp.t + scale_x_datetime(date_breaks = "1 day")
+
+# Mid frequency
+mfsupp.t <- ggplot(SPLMF.long, aes(x=datetime, y=SPL_MF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "free") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+mfsupp.t + scale_x_datetime(date_breaks = "1 day")
+
+# Combo Plots
+#creating combined dataframe
+SPL.both17 <- cbind(SPLMF17.long, SPLHF17.long$SPL_HF)
+SPL.both17$Year <- 2017
+SPL.both18 <- cbind(SPLMF18.long, SPLHF18.long$SPL_HF)
+SPL.both18$Year <- 2018
+#renaming columns
+names(SPL.both17) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF", "Year")
+names(SPL.both18) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF", "Year")
+
+SPL.both <- rbind(SPL.both17, SPL.both18)
+
+comsupp.t <- ggplot(SPL.both, aes(x=datetime)) + geom_point(aes(y = SPL_HF, color = Site)) + geom_point(aes(y = SPL_MF, color = Site))+ facet_grid(rows = vars(Site), cols = vars(Year), scales = "free") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+comsupp.t + scale_x_datetime(date_breaks = "1 day")
+
+```
+
+
+
+#Models
+
+**Preliminary Models** Looking into the relationships between biogenic sounds (Knocks/Calls and Snaps) and their frequency spectra (MF SPL/HF SPL) respectively.
+
+##Testing for Normality
+
+```{r normal, echo = TRUE}
+
+shapiro.test(AC.DF1$SPL_Midrange)
+qqnorm(AC.DF1$SPL_Midrange)
+
+ks.test(SPLHF.long$SPL_HF, "pnorm", mean=mean(SPLHF.long$SPL_HF), sd=sd(SPLHF.long$SPL_HF))
+
+ks.test(SPLMF.long$SPL_MF, "pnorm", mean=mean(SPLMF.long$SPL_MF), sd=sd(SPLMF.long$SPL_MF))
+
+gamma_test(AC.DF1$SPL_Midrange)
+weibull_test(AC.DF1$SPL_Midrange)
+
+gamma_test(AC.DF1$SPL_HF)
+weibull_test(AC.DF1$SPL_HF)
+```
+
+Don't seem to have a normal distribution here... Working on testing different distributions.  Not sure what the outputs on the gamma or weibull tests mean
+
+
+##Model 1
+Using only the two interactions that are significant, Tot_Knocks:Hour and Num_Herbiory:Hour, removing Long calls because it isn't significant and adding site and year as fixed effects 
+
+Using years combined
+
+``` {r model 1, echo = TRUE}
+#subsetting only lm variables
+AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour, Year))
+
+#making Hour ordinal
+AC.DF1Co$Hour_factor <- factor (AC.DF1$Hour, order = TRUE, levels = c("3", "9", "15", "21"))
+
+
+fit1 <- lm(SPL_Midrange ~ Tot_Knocks:Hour_factor + Num_Herbivory:Hour_factor + Site + Year , data = AC.DF1Co)
+
+summary(fit1)
+
+#options(na.action = "na.fail")
+#dredge(gfit6)
+```
+
+Interaction between Site and Tot_Knocks with Hour as fixed effect
+
+``` {r model 1i, echo = TRUE}
+
+fit1i <- lm(SPL_Midrange ~ Tot_Knocks:Site + Num_Herbivory + Hour_factor + Year, data = AC.DF1Co)
+summary(fit1i)
+```
+
+##Splitting by Year
+
+Splitting by year and then using site as a fixed effect
+
+2017
+
+```{r model split 2017, echo = TRUE}
+#2017
+AC.DF17 <- AC.DF1Co[which(AC.DF1Co$Year == 17),]
+#2018
+AC.DF18 <- AC.DF1Co[which(AC.DF1Co$Year == 18),]
+
+fit17 <- lm(SPL_Midrange ~ Tot_Knocks:Hour_factor + Num_Herbivory:Hour_factor + Site, data = AC.DF17)
+summary(fit17)
+
+```
+
+2018
+
+```{r model split 2018, echo = TRUE}
+
+fit18 <- lm(SPL_Midrange ~ Tot_Knocks:Hour_factor + Num_Herbivory:Hour_factor + Site, data = AC.DF1Co)
+summary(fit18)
+```
+
+
+##Model 2 - HF SPL and Snaps
+Looking at Snaps and their effect on the HF SPL
+
+Using Site and Year as fixed effects here
+
+``` {r model 2t, echo = TRUE}
+fit2t <- lm(SPL_HF ~ Snaps + Site + Year, data = AC.DF1)
+summary(fit2t)
+
+par(mfrow = c(2,2))
+plot(fit2t)
+
+summary(fit2t)$coefficients
+````
+
+Using interaction between Site and Snaps here and Year is fixed
+
+``` {r model 2i, echo = TRUE}
+fit2i <- lm(SPL_HF ~ Snaps:Site + Year, data = AC.DF1)
+summary(fit2i)
+
+par(mfrow = c(2,2))
+plot(fit2i)
+
+summary(fit2i)$coefficients
+````
+
+
+#Spectrograms
+
+Putting in spectrograms to analyze how the 4 different times sampled look
+
+*Note* All spectrograms are time along the x axis, frequency along the y axis, frequency is zoomed in to just 0 - 3 kHz
+
+Times progression: 3 AM, 9 AM, 3 PM, 9 PM
+
+Site 5
+
+```{r spectrograms5, echo = FALSE}
+spec5t <- image_append(c(spec3.5, spec9.5, spec15.5, spec21.5))
+spec5t <- image_resize(spec5t, "3000")
+spec5t
+```
+
+Site 8
+
+```{r spectrograms8, echo = FALSE}
+spec8t <- image_append(c(spec3.8, spec9.8, spec15.8, spec21.8))
+spec8t <- image_resize(spec8t, "3000")
+spec8t
+```
+
+Site 35
+
+```{r spectrograms35, echo = FALSE}
+spec35t <- image_append(c(spec3.35, spec9.35, spec15.35, spec21.35))
+spec35t <- image_resize(spec35t, "3000")
+spec35t
+```
+
+Site 32
+
+```{r spectrograms32, echo = FALSE}
+spec32t <- image_append(c(spec3.32, spec9.32, spec15.32, spec21.32))
+spec32t <- image_resize(spec32t, "3000")
+spec32t
+```
+
+Site 40
+
+```{r spectrograms40, echo = FALSE}
+spec40t <- image_append(c(spec3.40, spec9.40, spec15.40, spec21.40))
+spec40t <- image_resize(spec40t, "3000")
+spec40t
+```
+
+#Intensity
+```{r intensity, echo = FALSE}
+#going to run this on site 5 first to make sure that it works
+AC.S5 <- AC.DF1[which(AC.DF1$Site=="5"),]
+
+#ordering the dataframe
+attach(AC.S5)
+AC.5order <- AC.S5[order(SPL_Midrange),]
+detach(AC.S5)
+
+#selecting top 10 rows (lowest SPL)
+low5 <- AC.5order[1:10,]
+
+#writing csv so that I have this in excel
+#write.csv(low5, file = "../Raw_Data/Site5LowSPL.csv")
+
+
+#selecting the bottom 10 rows (highest SPL)
+high5 <- AC.5order[31:40,]
+
+#writing csv so I have this in excel
+#write.csv(high5, file = "../Raw_Data/Site5HighSPL.csv")
+
+
+```

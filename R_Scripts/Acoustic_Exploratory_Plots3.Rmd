@@ -251,6 +251,7 @@ spec21.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712210002.j
 
 
 ```
+
 **Exploratory Plots for 2017-2018 Acoustic/Fish Data**
 
 **Purpose** To explore the Acoustic data gathered in 2017 and 2018 to expose important trends between sites, diurnal patterns, fish abundance, lunar phase, and coral reef acoustics.
@@ -988,6 +989,18 @@ Site 32, knocks significant.
 Plots of high frequency patterns, notice diurnal patterns with highest SPL at night and lowest during the day (this is shown in the literature), also notice the clear splits by site.
 
 **Total Deployment, 2017**
+
+```{r supp plots, echo = FALSE, fig.width = 20, fig.length = 30}
+#High frequency
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+hfsupp <- ggplot(SPLHF.long, aes(x=Time, y=SPL_HF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+hfsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+mfsupp <- ggplot(SPLMF.long, aes(x=Time, y=SPL_MF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+mfsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+```
 
 ```{r hf spl no av, echo = FALSE}
 #splitting dataframe by site - 2017
@@ -1867,4 +1880,30 @@ Site 40
 spec40t <- image_append(c(spec3.40, spec9.40, spec15.40, spec21.40))
 spec40t <- image_resize(spec40t, "3000")
 spec40t
+```
+
+#Intensity
+```{r intensity, echo = FALSE}
+#going to run this on site 5 first to make sure that it works
+AC.S5 <- AC.DF1[which(AC.DF1$Site=="5"),]
+
+#ordering the dataframe
+attach(AC.S5)
+AC.5order <- AC.S5[order(SPL_Midrange),]
+detach(AC.S5)
+
+#selecting top 10 rows (lowest SPL)
+low5 <- AC.5order[1:10,]
+
+#writing csv so that I have this in excel
+#write.csv(low5, file = "../Raw_Data/Site5LowSPL.csv")
+
+
+#selecting the bottom 10 rows (highest SPL)
+high5 <- AC.5order[31:40,]
+
+#writing csv so I have this in excel
+#write.csv(high5, file = "../Raw_Data/Site5HighSPL.csv")
+
+
 ```

@@ -408,19 +408,19 @@ SPL_BB18$datetime <- as.POSIXct(paste(SPL_BB18$Date, SPL_BB18$Time), format = "%
 
 
 
-save(SPL_BB17, file = "Raw_Data/SPL_BB17.Rdata")
-save(SPL_BB18, file = "Raw_Data/SPL_BB18.Rdata")
+#save(SPL_BB17, file = "Raw_Data/SPL_BB17.Rdata")
+#save(SPL_BB18, file = "Raw_Data/SPL_BB18.Rdata")
 
-save(SPLBB17.long, file = "Raw_Data/SPLBB17long.Rdata")
-save(SPLBB18.long, file = "Raw_Data/SPLBB18long.Rdata")
+#save(SPLBB17.long, file = "Raw_Data/SPLBB17long.Rdata")
+#save(SPLBB18.long, file = "Raw_Data/SPLBB18long.Rdata")
 
 ## HF SPL ####
 #pulling columns before merge
-SPL_HF_32 <- s32.17 %>% select(SPL_HF, Date, Time)
-SPL_HF_35 <- s35.17 %>% select(SPL_HF, Date, Time)
-SPL_HF_40 <- s40.17 %>% select(SPL_HF, Date, Time)
-SPL_HF_5 <- s5.17 %>% select(SPL_HF, Date, Time)
-SPL_HF_8 <- s8.17 %>% select(SPL_HF, Date, Time)
+SPL_HF_32 <- s32.17 %>% dplyr::select(SPL_HF, Date, Time)
+SPL_HF_35 <- s35.17 %>% dplyr::select(SPL_HF, Date, Time)
+SPL_HF_40 <- s40.17 %>% dplyr::select(SPL_HF, Date, Time)
+SPL_HF_5 <- s5.17 %>% dplyr::select(SPL_HF, Date, Time)
+SPL_HF_8 <- s8.17 %>% dplyr::select(SPL_HF, Date, Time)
 
 #Merging dataframes matching on date and time
 SPL_HF <- merge(SPL_HF_32, SPL_HF_35, by = c('Date', 'Time'))
@@ -437,11 +437,11 @@ SPL_HF17 <- SPL_HF
 names(SPL_HF17) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
 
 #splitting the wide dataframe into several dataframes so that I can make a long form dataframe
-SPL_HF32 <- select(SPL_HF17, Date, Time, s32)
-SPL_HF35 <- select(SPL_HF17, Date, Time, s35)
-SPL_HF40 <- select(SPL_HF17, Date, Time, s40)
-SPL_HF5 <- select(SPL_HF17, Date, Time, s5)
-SPL_HF8 <- select(SPL_HF17, Date, Time, s8)
+SPL_HF32 <- dplyr::select(SPL_HF17, Date, Time, s32)
+SPL_HF35 <- dplyr::select(SPL_HF17, Date, Time, s35)
+SPL_HF40 <- dplyr::select(SPL_HF17, Date, Time, s40)
+SPL_HF5 <- dplyr::select(SPL_HF17, Date, Time, s5)
+SPL_HF8 <- dplyr::select(SPL_HF17, Date, Time, s8)
 
 #adding site column to each dataframe
 SPL_HF32$Site <- 32
@@ -476,11 +476,11 @@ SPL_HF17$datetime <- as.POSIXct(paste(SPL_HF17$Date, SPL_HF17$Time), format = "%
 
 #2018
 #pulling columns before merge
-SPL_HF_32 <- s32.18 %>% select(SPL_HF, Date, Time)
-SPL_HF_35 <- s35.18 %>% select(SPL_HF, Date, Time)
-SPL_HF_40 <- s40.18 %>% select(SPL_HF, Date, Time)
-SPL_HF_5 <- s5.18 %>% select(SPL_HF, Date, Time)
-SPL_HF_8 <- s8.18 %>% select(SPL_HF, Date, Time)
+SPL_HF_32 <- s32.18 %>% dplyr::select(SPL_HF, Date, Time)
+SPL_HF_35 <- s35.18 %>% dplyr::select(SPL_HF, Date, Time)
+SPL_HF_40 <- s40.18 %>% dplyr::select(SPL_HF, Date, Time)
+SPL_HF_5 <- s5.18 %>% dplyr::select(SPL_HF, Date, Time)
+SPL_HF_8 <- s8.18 %>% dplyr::select(SPL_HF, Date, Time)
 
 #Merging dataframes matching on date and time
 SPL_HF <- merge(SPL_HF_32, SPL_HF_35, by = c('Date', 'Time'))
@@ -497,11 +497,11 @@ SPL_HF18 <- SPL_HF
 names(SPL_HF18) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
 
 #splitting the wide dataframe into several dataframes so that I can make a long form dataframe
-SPL_HF32 <- select(SPL_HF18, Date, Time, s32)
-SPL_HF35 <- select(SPL_HF18, Date, Time, s35)
-SPL_HF40 <- select(SPL_HF18, Date, Time, s40)
-SPL_HF5 <- select(SPL_HF18, Date, Time, s5)
-SPL_HF8 <- select(SPL_HF18, Date, Time, s8)
+SPL_HF32 <- dplyr::select(SPL_HF18, Date, Time, s32)
+SPL_HF35 <- dplyr::select(SPL_HF18, Date, Time, s35)
+SPL_HF40 <- dplyr::select(SPL_HF18, Date, Time, s40)
+SPL_HF5 <- dplyr::select(SPL_HF18, Date, Time, s5)
+SPL_HF8 <- dplyr::select(SPL_HF18, Date, Time, s8)
 
 #adding site column to each dataframe
 SPL_HF32$Site <- 32
@@ -533,8 +533,15 @@ SPL_HF18$Date <- paste0(SPL_HF18$Date, "-2018")
 SPL_HF18$datetime <- as.POSIXct(paste(SPL_HF18$Date, SPL_HF18$Time), format = "%d-%m-%Y %H:%M")
 
 
+#adding year column to each dataframe
+SPL17 <- SPLHF17.long
+SPL18 <- SPLHF18.long
+
+SPL17$Year <- 2017
+SPL18$Year <- 2018
+
 #combining dataframes into one long dataframe
-SPLHF.long <- rbind(SPLHF17.long, SPLHF18.long)
+SPLHF.long <- rbind(SPL17, SPL18)
 
 #changing site to character
 SPLHF17.long$Site <- as.character(SPLHF17.long$Site)
@@ -548,11 +555,11 @@ save(SPLHF18.long, file = "Raw_Data/SPLHF18long.Rdata")
 save(SPLHF.long, file = "Raw_Data/SPLHFlong.Rdata")
 ## MF SPL ####
 #pulling columns before merge
-SPL_MF_32 <- s32.17 %>% select(SPL_Midrange, Date, Time)
-SPL_MF_35 <- s35.17 %>% select(SPL_Midrange, Date, Time)
-SPL_MF_40 <- s40.17 %>% select(SPL_Midrange, Date, Time)
-SPL_MF_5 <- s5.17 %>% select(SPL_Midrange, Date, Time)
-SPL_MF_8 <- s8.17 %>% select(SPL_Midrange, Date, Time)
+SPL_MF_32 <- s32.17 %>% dplyr::select(SPL_Midrange, Date, Time)
+SPL_MF_35 <- s35.17 %>% dplyr::select(SPL_Midrange, Date, Time)
+SPL_MF_40 <- s40.17 %>% dplyr::select(SPL_Midrange, Date, Time)
+SPL_MF_5 <- s5.17 %>% dplyr::select(SPL_Midrange, Date, Time)
+SPL_MF_8 <- s8.17 %>% dplyr::select(SPL_Midrange, Date, Time)
 
 #Merging dataframes matching on date and time
 SPL_MF <- merge(SPL_MF_32, SPL_MF_35, by = c('Date', 'Time'))
@@ -569,11 +576,11 @@ SPL_MF17 <- SPL_MF
 names(SPL_MF17) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
 
 #splitting the wide dataframe into several dataframes so that I can make a long form dataframe
-SPL_MF32 <- select(SPL_MF17, Date, Time, s32)
-SPL_MF35 <- select(SPL_MF17, Date, Time, s35)
-SPL_MF40 <- select(SPL_MF17, Date, Time, s40)
-SPL_MF5 <- select(SPL_MF17, Date, Time, s5)
-SPL_MF8 <- select(SPL_MF17, Date, Time, s8)
+SPL_MF32 <- dplyr::select(SPL_MF17, Date, Time, s32)
+SPL_MF35 <- dplyr::select(SPL_MF17, Date, Time, s35)
+SPL_MF40 <- dplyr::select(SPL_MF17, Date, Time, s40)
+SPL_MF5 <- dplyr::select(SPL_MF17, Date, Time, s5)
+SPL_MF8 <- dplyr::select(SPL_MF17, Date, Time, s8)
 
 #adding site column to each dataframe
 SPL_MF32$Site <- 32
@@ -608,11 +615,11 @@ SPL_MF17$datetime <- as.POSIXct(paste(SPL_MF17$Date, SPL_MF17$Time), format = "%
 
 #2018
 #pulling columns before merge
-SPL_MF_32 <- s32.18 %>% select(SPL_Midrange, Date, Time)
-SPL_MF_35 <- s35.18 %>% select(SPL_Midrange, Date, Time)
-SPL_MF_40 <- s40.18 %>% select(SPL_Midrange, Date, Time)
-SPL_MF_5 <- s5.18 %>% select(SPL_Midrange, Date, Time)
-SPL_MF_8 <- s8.18 %>% select(SPL_Midrange, Date, Time)
+SPL_MF_32 <- s32.18 %>% dplyr::select(SPL_Midrange, Date, Time)
+SPL_MF_35 <- s35.18 %>% dplyr::select(SPL_Midrange, Date, Time)
+SPL_MF_40 <- s40.18 %>% dplyr::select(SPL_Midrange, Date, Time)
+SPL_MF_5 <- s5.18 %>% dplyr::select(SPL_Midrange, Date, Time)
+SPL_MF_8 <- s8.18 %>% dplyr::select(SPL_Midrange, Date, Time)
 
 #Merging dataframes matching on date and time
 SPL_MF <- merge(SPL_MF_32, SPL_MF_35, by = c('Date', 'Time'))
@@ -629,11 +636,11 @@ SPL_MF18 <- SPL_MF
 names(SPL_MF18) <- c("Date", "Time", "s32", "s35", "s40", "s8", "s5")
 
 #splitting the wide dataframe into several dataframes so that I can make a long form dataframe
-SPL_MF32 <- select(SPL_MF18, Date, Time, s32)
-SPL_MF35 <- select(SPL_MF18, Date, Time, s35)
-SPL_MF40 <- select(SPL_MF18, Date, Time, s40)
-SPL_MF5 <- select(SPL_MF18, Date, Time, s5)
-SPL_MF8 <- select(SPL_MF18, Date, Time, s8)
+SPL_MF32 <- dplyr::select(SPL_MF18, Date, Time, s32)
+SPL_MF35 <- dplyr::select(SPL_MF18, Date, Time, s35)
+SPL_MF40 <- dplyr::select(SPL_MF18, Date, Time, s40)
+SPL_MF5 <- dplyr::select(SPL_MF18, Date, Time, s5)
+SPL_MF8 <- dplyr::select(SPL_MF18, Date, Time, s8)
 
 #adding site column to each dataframe
 SPL_MF32$Site <- 32
@@ -665,7 +672,14 @@ SPL_MF18$Date <- paste0(SPL_MF18$Date, "-2018")
 SPL_MF18$datetime <- as.POSIXct(paste(SPL_MF18$Date, SPL_MF18$Time), format = "%d-%m-%Y %H:%M")
 
 #combining dataframes into one long dataframe
-SPLMF.long <- rbind(SPLMF17.long, SPLMF18.long)
+SPLMF17 <- SPLMF17.long
+SPLMF18 <- SPLMF18.long
+
+#adding year
+SPLMF17$Year <- 2017
+SPLMF18$Year <- 2018
+
+SPLMF.long <- rbind(SPLMF17, SPLMF18)
 
 #making site a character
 SPLMF17.long$Site <- as.character(SPLMF17.long$Site)
