@@ -249,6 +249,27 @@ spec9.40  <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712090002.j
 spec15.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712150002.jpg")
 spec21.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712210002.jpg")
 
+#loading in selection tables
+ST12.17.21 <- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170712210002.Table.1.selections.txt")
+ST25.18.15 <- read.delim(file = "../Raw_Data/Selection_Tables/1677987850.180625150002.Table.1.selections.txt")
+ST13.17.03<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170713030002.Table.1.selections.txt")
+ST13.17.21<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170713210002.Table.1.selections.txt")
+ST14.17.03<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170714030002.Table.1.selections.txt")
+ST14.17.21<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170714210002.Table.1.selections.txt")
+ST21.17.03<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170721030002.Table.1.selections.txt")
+ST12.17.15<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170712150002.Table.1.selections.txt")
+ST19.17.03<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170719030002.Table.1.selections.txt")
+ST14.17.15<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170714150002.Table.1.selections.txt")
+ST27.18.09<- read.delim(file = "../Raw_Data/Selection_Tables/1677987850.180627090002.Table.1.selections.txt")
+ST20.18.09<- read.delim(file = "../Raw_Data/Selection_Tables/1677987850.180620090002.Table.1.selections.txt")
+ST25.18.09<- read.delim(file = "../Raw_Data/Selection_Tables/1677987850.180625090002.Table.1.selections.txt")
+ST26.18.09<- read.delim(file = "../Raw_Data/Selection_Tables/1677987850.180626090002.Table.1.selections.txt")
+ST24.18.09<- read.delim(file = "../Raw_Data/Selection_Tables/1677987850.180624090002.Table.1.selections.txt")
+ST19.17.09<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170719090002.Table.1.selections.txt")
+ST12.17.09<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170712090002.Table.1.selections.txt")
+ST21.17.09<- read.delim(file = "../Raw_Data/Selection_Tables/1677987881.170721090002.Table.1.selections.txt")
+ST20.18.03<- read.delim(file = "../Raw_Data/Selection_Tables/1677987850.180620030004.Table.1.selections.txt")
+ST20.18.21<- read.delim(file = "../Raw_Data/Selection_Tables/1677987850.180620210002.Table.1.selections.txt")
 
 ```
 
