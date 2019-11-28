@@ -1,0 +1,263 @@
+#2017-2018 Selection Table Cleaning Script
+##The purpose of this script is to reorganize the data into more manageable dataframes
+##There will be 2 dataframes, one for comparisons in knock intensity, one for comparisons in 
+
+#
+library(dplyr)
+
+
+
+#loading in selection tables
+ST12.17.21 <- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170712210002.Table.1.selections.txt")
+ST25.18.15 <- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180625150002.Table.1.selections.txt")
+ST13.17.03<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170713030002.Table.1.selections.txt")
+ST13.17.21<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170713210002.Table.1.selections.txt")
+ST14.17.03<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170714030002.Table.1.selections.txt")
+ST14.17.21<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170714210002.Table.1.selections.txt")
+ST21.17.03<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170721030002.Table.1.selections.txt")
+ST12.17.15<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170712150002.Table.1.selections.txt")
+ST19.17.03<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170719030002.Table.1.selections.txt")
+ST14.17.15<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170714150002.Table.1.selections.txt")
+ST27.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180627090002.Table.1.selections.txt")
+ST20.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180620090002.Table.1.selections.txt")
+ST25.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180625090002.Table.1.selections.txt")
+ST26.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180626090002.Table.1.selections.txt")
+ST24.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180624090002.Table.1.selections.txt")
+ST19.17.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170719090002.Table.1.selections.txt")
+ST12.17.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170712090002.Table.1.selections.txt")
+ST21.17.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170721090002.Table.1.selections.txt")
+ST20.18.03<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180620030004.Table.1.selections.txt")
+ST20.18.21<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180620210002.Table.1.selections.txt")
+
+
+#loading in selection tables from Mid_SPL selections
+Mid20.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180620090002.SPLMid.selections.txt")
+Mid27.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180627090002.SPLMid.selections.txt")
+Mid25.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180625090002.SPLMid.selections.txt")
+Mid26.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180626090002.SPLMid.selections.txt")
+Mid24.18.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180624090002.SPLMid.selections.txt")
+Mid19.17.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170719090002.SPLMid.selections.txt")
+Mid12.17.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170712090002.SPLMid.selections.txt")
+Mid21.17.09<- read.delim(file = "Raw_Data/Selection_Tables/1677987881.170721090002.SPLMid.selections.txt")
+Mid20.18.03<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180620030004.SPLMid.selections.txt")
+Mid20.18.21<- read.delim(file = "Raw_Data/Selection_Tables/1677987850.180620210002.SPLMid.selections.txt")
+
+
+#adding date column to each dataframe
+ST12.17.21$Date <- "12_07_17"
+ST25.18.15$Date <- "25_06_18"
+ST13.17.03$Date <- "13_07_17"
+ST14.17.03$Date <- "14_07_17"
+ST21.17.03$Date <- "21_07_17"
+ST12.17.15$Date <- "12_07_17"
+ST19.17.03$Date <- "19_07_17"
+ST14.17.15$Date <- "14_07_17"
+ST27.18.09$Date <- "27_06_18"
+ST20.18.09$Date <- "20_06_18"
+ST25.18.09$Date <- "25_06_18"
+ST26.18.09$Date <- "26_06_18"
+ST24.18.09$Date <- "24_06_18"
+ST19.17.09$Date <- "19_07_17"
+ST12.17.09$Date <- "12_07_17"
+ST21.17.09$Date <- "21_07_17"
+ST20.18.03$Date <- "20_06_18"
+ST20.18.21$Date <- "20_06_18"
+
+Mid20.18.09$Date <- "20_06_18"
+Mid27.18.09$Date <- "27_06_18"
+Mid25.18.09$Date <- "25_06_18"
+Mid26.18.09$Date <- "26_06_18"
+Mid24.18.09$Date <- "24_06_18"
+Mid19.17.09$Date <- "19_07_17"
+Mid12.17.09$Date <- "12_07_17"
+Mid21.17.09$Date <- "21_07_17"
+Mid20.18.03$Date <- "20_06_18"
+Mid20.18.21$Date <- "20_06_18"
+
+#Adding hour column to each dataframe
+ST12.17.21$Hour <- 21
+ST25.18.15$Hour <- 15
+ST13.17.03$Hour <- 3
+ST14.17.03$Hour <- 3
+ST21.17.03$Hour <- 3
+ST12.17.15$Hour <- 15
+ST19.17.03$Hour <- 3
+ST14.17.15$Hour <- 15
+ST27.18.09$Hour <- 9
+ST20.18.09$Hour <- 9
+ST25.18.09$Hour <- 9
+ST26.18.09$Hour <- 9
+ST24.18.09$Hour <- 9
+ST19.17.09$Hour <- 9
+ST12.17.09$Hour <- 9
+ST21.17.09$Hour <- 9
+ST20.18.03$Hour <- 3
+ST20.18.21$Hour <- 21
+
+Mid20.18.09$Hour <- 9
+Mid27.18.09$Hour <- 9
+Mid25.18.09$Hour <- 9
+Mid26.18.09$Hour <- 9
+Mid24.18.09$Hour <- 9
+Mid19.17.09$Hour <- 9
+Mid12.17.09$Hour <- 9
+Mid21.17.09$Hour <- 9
+Mid20.18.03$Hour <- 3
+Mid20.18.21$Hour <- 21
+
+#Adding year column to each dataframe
+ST12.17.21$Year <- 17
+ST25.18.15$Year <- 18
+ST13.17.03$Year <- 17
+ST14.17.03$Year <- 17
+ST21.17.03$Year <- 17
+ST12.17.15$Year <- 17
+ST19.17.03$Year <- 17
+ST14.17.15$Year <- 17
+ST27.18.09$Year <- 18
+ST20.18.09$Year <- 18
+ST25.18.09$Year <- 18
+ST26.18.09$Year <- 18
+ST24.18.09$Year <- 18
+ST19.17.09$Year <- 17
+ST12.17.09$Year <- 17
+ST21.17.09$Year <- 17
+ST20.18.03$Year <- 18
+ST20.18.21$Year <- 18
+
+Mid20.18.09$Year <- 18
+Mid27.18.09$Year <- 18
+Mid25.18.09$Year <- 18
+Mid26.18.09$Year <- 18
+Mid24.18.09$Year <- 18
+Mid19.17.09$Year <- 17
+Mid12.17.09$Year <- 17
+Mid21.17.09$Year <- 17
+Mid20.18.03$Year <- 18
+Mid20.18.21$Year <- 18
+
+#seperating selection tables into three parts: knocks, Mid_SPL selections, and other calls
+
+#knocks
+ST17.1<- ST12.17.21[which(ST12.17.21$Comments==""),]
+ST18.1<- ST25.18.15[which(ST25.18.15$Comments==""),]
+ST17.2<- ST13.17.03[which(ST13.17.03$Comments==""),]
+ST17.3<- ST14.17.03[which(ST14.17.03$Comments==""),]
+ST17.4<- ST21.17.03[which(ST21.17.03$Comments==""),]
+ST17.5<- ST12.17.15[which(ST12.17.15$Comments==""),]
+ST17.6<- ST19.17.03[which(ST19.17.03$Comments==""),]
+ST17.7<- ST14.17.15[which(ST14.17.15$Comments==""),]
+ST18.2<- ST27.18.09[which(ST27.18.09$Comments==""),]
+ST18.3<- ST20.18.09[which(ST20.18.09$Comments==""),]
+ST18.4<- ST25.18.09[which(ST25.18.09$Comments==""),]
+ST18.5<- ST26.18.09[which(ST26.18.09$Comments==""),]
+ST18.6<- ST24.18.09[which(ST24.18.09$Comments==""),]
+ST17.8<- ST19.17.09[which(ST19.17.09$Comments==""),]
+ST17.9<- ST12.17.09[which(ST12.17.09$Comments==""),]
+ST17.10<- ST21.17.09[which(ST21.17.09$Comments==""),]
+ST18.7<- ST20.18.03[which(ST20.18.03$Comments==""),]
+ST18.8<- ST20.18.21[which(ST20.18.21$Comments==""),]
+
+#some aren't working
+
+
+
+#getting references
+Ref17.1<- ST12.17.21[which(ST12.17.21$Comments=="Reference"),]
+Ref18.1<- ST25.18.15[which(ST25.18.15$Comments=="Reference"),]
+Ref17.2<- ST13.17.03[which(ST13.17.03$Comments=="Reference"),]
+Ref17.3<- ST14.17.03[which(ST14.17.03$Comments=="Reference"),]
+Ref17.4<- ST21.17.03[which(ST21.17.03$Comments=="Reference"),]
+Ref17.5<- ST12.17.15[which(ST12.17.15$Comments=="Reference"),]
+Ref17.6<- ST19.17.03[which(ST19.17.03$Comments=="Reference"),]
+Ref17.7<- ST14.17.15[which(ST14.17.15$Comments=="Reference"),]
+Ref18.2<- ST27.18.09[which(ST27.18.09$Comments=="Reference"),]
+Ref18.3<- ST20.18.09[which(ST20.18.09$Comments=="Reference"),]
+Ref18.4<- ST25.18.09[which(ST25.18.09$Comments=="Reference"),]
+Ref18.5<- ST26.18.09[which(ST26.18.09$Comments=="Reference"),]
+Ref18.6<- ST24.18.09[which(ST24.18.09$Comments=="Reference"),]
+Ref17.8<- ST19.17.09[which(ST19.17.09$Comments=="Reference"),]
+Ref17.9<- ST12.17.09[which(ST12.17.09$Comments=="Reference"),]
+Ref17.10<- ST21.17.09[which(ST21.17.09$Comments=="Reference"),]
+Ref18.7<- ST20.18.03[which(ST20.18.03$Comments=="Reference"),]
+Ref18.8<- ST20.18.21[which(ST20.18.21$Comments=="Reference"),]
+
+#17.1 - 17.10
+#18.1 - 18.8
+
+#Mid Selections
+MT17.1<- ST12.17.21[which(ST12.17.21$Comments=="Mid_Selection"),]
+MT18.1<- ST25.18.15[which(ST25.18.15$Comments=="Mid_Selection"),]
+MT17.2<- ST13.17.03[which(ST13.17.03$Comments=="Mid_Selection"),]
+MT17.3<- ST14.17.03[which(ST14.17.03$Comments=="Mid_Selection"),]
+MT17.4<- ST21.17.03[which(ST21.17.03$Comments=="Mid_Selection"),]
+MT17.5<- ST12.17.15[which(ST12.17.15$Comments=="Mid_Selection"),]
+MT17.6<- ST19.17.03[which(ST19.17.03$Comments=="Mid_Selection"),]
+MT17.7<- ST14.17.15[which(ST14.17.15$Comments=="Mid_Selection"),]
+MT18.2<- ST27.18.09[which(ST27.18.09$Comments=="Mid_Selection"),]
+MT18.3<- ST20.18.09[which(ST20.18.09$Comments=="Mid_Selection"),]
+MT18.4<- ST25.18.09[which(ST25.18.09$Comments=="Mid_Selection"),]
+MT18.5<- ST26.18.09[which(ST26.18.09$Comments=="Mid_Selection"),]
+MT18.6<- ST24.18.09[which(ST24.18.09$Comments=="Mid_Selection"),]
+MT17.8<- ST19.17.09[which(ST19.17.09$Comments=="Mid_Selection"),]
+MT17.9<- ST12.17.09[which(ST12.17.09$Comments=="Mid_Selection"),]
+MT17.10<- ST21.17.09[which(ST21.17.09$Comments=="Mid_Selection"),]
+MT18.7<- ST20.18.03[which(ST20.18.03$Comments=="Mid_Selection"),]
+MT18.8<- ST20.18.21[which(ST20.18.21$Comments=="Mid_Selection"),]
+
+#filling in the empty dataframes from seperate selection tables
+MT18.2 <- Mid20.18.09
+MT18.3 <- Mid27.18.09
+MT18.4 <- Mid25.18.09
+MT18.5 <- Mid26.18.09
+MT18.6 <- Mid24.18.09
+MT17.10 <- Mid19.17.09
+MT17.8 <- Mid12.17.09
+MT17.9 <- Mid21.17.09
+MT18.7 <- Mid20.18.03
+MT18.8 <- Mid20.18.21
+
+#rbinding everything together
+Ktot <- rbind(ST17.1, ST17.2, ST17.3, ST17.4, ST17.5, ST17.6, ST17.7, ST17.8, ST17.9, ST17.10, ST18.1, ST18.2, ST18.3, ST18.4, 
+              ST18.5, ST18.6, ST18.7, ST18.8)
+
+Reftot <- rbind(Ref17.1, Ref17.2, Ref17.3, Ref17.4, Ref17.5, Ref17.6, Ref17.7, Ref17.8, Ref17.9, Ref17.10, Ref18.1, Ref18.2, 
+                Ref18.3, Ref18.4, Ref18.5, Ref18.6, Ref18.7, Ref18.8)
+
+
+#for MT I need to remove comments column
+MT17.1 <- subset(MT17.1, select = -c(Comments))
+MT17.2 <- subset(MT17.2, select = -c(Comments))
+MT17.3 <- subset(MT17.3, select = -c(Comments))
+MT17.4 <- subset(MT17.4, select = -c(Comments))
+MT17.5 <- subset(MT17.5, select = -c(Comments))
+MT17.6 <- subset(MT17.6, select = -c(Comments))
+MT17.7 <- subset(MT17.7, select = -c(Comments))
+MT17.8 <- subset(MT17.8, select = -c(Comments))
+MT17.9 <- subset(MT17.9, select = -c(Comments))
+MT17.10 <-subset(MT17.10, select = -c(Comments))
+MT18.1 <- subset(MT18.1, select = -c(Comments))
+MT18.2 <- subset(MT18.2, select = -c(Comments))
+MT18.3 <- subset(MT18.3, select = -c(Comments))
+MT18.4 <- subset(MT18.4, select = -c(Comments))
+MT18.5 <- subset(MT18.5, select = -c(Comments))
+MT18.6 <- subset(MT18.6, select = -c(Comments))
+MT18.7 <- subset(MT18.7, select = -c(Comments))
+MT18.8 <- subset(MT18.8, select = -c(Comments))
+
+
+
+#rbinding everything together
+Mtot <- rbind(MT17.1, MT17.2, MT17.3, MT17.4, MT17.5, MT17.6, MT17.7, MT17.8, MT17.9, MT17.10, MT18.1, MT18.2, MT18.3, MT18.4,
+              MT18.5, MT18.6, MT18.7, MT18.8)
+
+#Creating column that creates unique ID for date and time
+s32.17$Time <- paste(s32.17$Hour,s32.17$Minute, sep= ":")
+
+Ktot$DH <- paste(Ktot$Date, Ktot$Hour, sep= "-")
+Reftot$DH <- paste(Reftot$Date, Reftot$Hour, sep= "-")
+
+#merging by unique ID
+KtotE <- merge(Ktot, Reftot[, c("DH", "Energy")], by = "DH")
+KtotP <- merge(Ktot, Reftot[, c("DH", "Peak.Power.Density..dB.FS.")], by = "DH")
+KtotI <- merge(Ktot, Reftot[, c("DH", "Inband.Power..dB.FS.", by = "DH")])

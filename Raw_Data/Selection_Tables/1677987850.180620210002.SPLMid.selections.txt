@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Center Freq (Hz)	Delta Freq (Hz)	Delta Power (dB FS)	Delta Time (s)	Inband Power (dB FS)	Length (frames)	Peak Freq (Hz)	Peak Power Density (dB FS)	Max Time (s)	Energy	Peak Amp (U)
+3	Spectrogram 1	1	129.945183462	135.006388735	56.872	1056.872	269.531	1000.000		5.0612	-64.91	139	210.938	-66.69	133.9479	-8.038	
+4	Spectrogram 1	1	189.945992947	194.993073927	71.090	1071.090	269.531	1000.000		5.0471	-62.59	139	105.469	-60.41	193.1927	-5.719	
+2	Spectrogram 1	1	69.926328653	74.973409633	77.647	1077.647	257.812	1000.000		5.0471	-65.56	139	210.938	-65.51	70.2187	-8.691	
+1	Spectrogram 1	1	9.943502816	15.009416187	49.412	1049.412	234.375	1000.000		5.0659	-62.22	139	82.031	-52.59	11.5937	-5.344	
