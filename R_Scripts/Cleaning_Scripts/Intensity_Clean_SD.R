@@ -312,6 +312,50 @@ sm19.09<- sm19.09[which(sm19.09$View=="Spectrogram 1"),]
 sm21.03<- sm21.03[which(sm21.03$View=="Spectrogram 1"),]
 sm21.09<- sm21.09[which(sm21.09$View=="Spectrogram 1"),]
 
+#small selections reference
+ref20.03<- sm20.03[5,]
+ref20.09<- sm20.09[5,]
+ref20.21<- sm20.21[5,]
+ref24.09<- sm24.09[5,]
+ref25.09<- sm25.09[5,]
+ref25.15<- sm25.15[5,]
+ref26.09<- sm26.09[5,]
+ref27.09<- sm27.09[5,]
+ref12.09<- sm12.09[5,]
+ref12.15<- sm12.15[5,]
+ref12.21<- sm12.21[5,]
+ref13.03<- sm13.03[5,]
+ref13.21<- sm13.21[5,]
+ref14.03<- sm14.03[5,]
+ref14.15<- sm14.15[5,]
+ref14.21<- sm14.21[5,]
+ref19.03<- sm19.03[5,]
+ref19.09<- sm19.09[5,]
+ref21.03<- sm21.03[5,]
+ref21.09<- sm21.09[5,]
+
+#small selections
+sm20.03<- sm20.03[1:4,]
+sm20.09<- sm20.09[1:4,]
+sm20.21<- sm20.21[1:4,]
+sm24.09<- sm24.09[1:4,]
+sm25.09<- sm25.09[1:4,]
+sm25.15<- sm25.15[1:4,]
+sm26.09<- sm26.09[1:4,]
+sm27.09<- sm27.09[1:4,]
+sm12.09<- sm12.09[1:4,]
+sm12.15<- sm12.15[1:4,]
+sm12.21<- sm12.21[1:4,]
+sm13.03<- sm13.03[1:4,]
+sm13.21<- sm13.21[1:4,]
+sm14.03<- sm14.03[1:4,]
+sm14.15<- sm14.15[1:4,]
+sm14.21<- sm14.21[1:4,]
+sm19.03<- sm19.03[1:4,]
+sm19.09<- sm19.09[1:4,]
+sm21.03<- sm21.03[1:4,]
+sm21.09<- sm21.09[1:4,]
+
 #filling in the empty dataframes from seperate selection tables
 MT18.2 <- Mid20.18.09
 MT18.3 <- Mid27.18.09
@@ -331,6 +375,28 @@ Ktot <- rbind(ST17.1, ST17.2, ST17.3, ST17.4, ST17.5, ST17.6, ST17.7, ST17.8, ST
 Reftot <- rbind(Ref17.1, Ref17.2, Ref17.3, Ref17.4, Ref17.5, Ref17.6, Ref17.7, Ref17.8, Ref17.9, Ref17.10, Ref18.1, Ref18.2, 
                 Ref18.3, Ref18.4, Ref18.5, Ref18.6, Ref18.7, Ref18.8)
 
+Ref2 <- rbind(ref20.03,
+  ref20.09,
+  ref20.21,
+  ref24.09,
+  ref25.09,
+  ref25.15,
+  ref26.09,
+  ref27.09,
+  ref12.09,
+  ref12.15,
+  ref12.21,
+  ref13.03,
+  ref13.21,
+  ref14.03,
+  ref14.15,
+  ref14.21,
+  ref19.03,
+  ref19.09,
+  ref21.03
+  
+)
+
 Stot <- rbind(sm20.03,
   sm20.09,
   sm20.21,
@@ -349,9 +415,9 @@ Stot <- rbind(sm20.03,
   sm14.21,
   sm19.03,
   sm19.09,
-  sm21.03,
-  sm21.09
+  sm21.03
 )
+#21.09 removed because its missing stuff
 
 #for MT I need to remove comments column
 MT17.1 <- subset(MT17.1, select = -c(Comments))
@@ -384,6 +450,7 @@ Mtot <- rbind(MT17.1, MT17.2, MT17.3, MT17.4, MT17.5, MT17.6, MT17.7, MT17.8, MT
 #Creating column that creates unique ID for date and time
 Ktot$DH <- paste(Ktot$Date, Ktot$Hour, sep= "-")
 Reftot$DH <- paste(Reftot$Date, Reftot$Hour, sep= "-")
+Ref2$DH <- paste(Ref2$Date, Ref2$Hour, sep= "-")
 
 #merging by unique ID
 KtotE <- merge(Ktot, Reftot[, c("DH", "Energy")], by = "DH")
@@ -405,8 +472,8 @@ KtotE <- merge(KtotE, AC.DF1[, c("st.id", "SPL_Midrange")], by = "st.id", all = 
 KtotP <- merge(KtotP, AC.DF1[, c("st.id", "SPL_Midrange")], by = "st.id", all = FALSE)
 
 #saving dataframes
-save(KtotE, file= "Raw_Data/KtotE.Rdata")
-save(KtotP, file= "Raw_Data/KtotP.Rdata")
+#save(KtotE, file= "Raw_Data/KtotE.Rdata")
+#save(KtotP, file= "Raw_Data/KtotP.Rdata")
 
 ######## M tot ##############
 
@@ -427,7 +494,7 @@ MtotP$st.id <-paste0(MtotP$DH, "_5")
 MtotP <- merge(MtotP, AC.DF1[, c("st.id", "SPL_Midrange")], by = "st.id", all = FALSE)
 
 #saving dataframe
-save(MtotP, file = "Raw_Data/MtotP.Rdata")
+#save(MtotP, file = "Raw_Data/MtotP.Rdata")
 
 ######## S tot ################
 
@@ -435,11 +502,11 @@ save(MtotP, file = "Raw_Data/MtotP.Rdata")
 Stot$DH <- paste(Stot$Date, Stot$Hour, sep= "-")
 
 #merging with Reftot by unique ID
-StotP <- merge(Stot, Reftot[, c("DH", "Peak.Power.Density..dB.FS.")], by = "DH")
-
+StotP <- merge(Stot, Ref2[, c("DH", "Peak.Power.Density..dB.FS.")], by = "DH")
+StotP <- merge(StotP, Ref2[, c("DH", "Avg.Power.Density..dB.FS.")], by = "DH")
 #subtracting values from reference values
 StotP$PowerDiff <- StotP$Peak.Power.Density..dB.FS..x - StotP$Peak.Power.Density..dB.FS..y
-
+StotP$AvPowerDiff <- StotP$Avg.Power.Density..dB.FS..x - StotP$Avg.Power.Density..dB.FS..y
 #Adding SPL values
 #adding site to the end of DH so that I can match with the AC.DF1 dataframe
 StotP$st.id <-paste0(StotP$DH, "_5")

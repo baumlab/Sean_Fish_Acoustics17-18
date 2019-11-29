@@ -1,5 +1,5 @@
 ---
-title: "Acoustic_2019_Explore3"
+title: "Acoustic_2019_Explore4"
 author: "Sean Dimoff"
 date: "November 21, 2019"
 output: 
@@ -569,6 +569,7 @@ summary(s32mf.lm)
 
 Site 32, knocks significant.
 
+
 ### Mid Frequency - Hourly Breakdown
 **Breakdown by Hour**
 
@@ -894,12 +895,20 @@ Site 32, knocks significant.
 
 ## Diurnal Deployment Plots
 
-```{r supp diurnal plots, echo = FALSE, fig.width = 25, fig.length = 40}
+```{r supp diurnal plots, echo = FALSE, fig.width = 10, fig.length = 24}
 #High frequency
 SPLHF.long$Site <- as.character(SPLHF.long$Site)
 
+#removing outliers from site 35 in 2018
+low.hf <- SPLHF.long[SPLHF.long$SPL_HF <105, ]
+# Remove anything with fewer than 2 observers 
+
+SPLHF.long <- SPLHF.long[!(SPLHF.long$SPL_HF %in% low.hf$SPL_HF),]
+#now rerunning without the 3 outliers
+
 hfsupp <- ggplot(SPLHF.long, aes(x=Time, y=SPL_HF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
 hfsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
 
 # Mid frequency
 mfsupp <- ggplot(SPLMF.long, aes(x=Time, y=SPL_MF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
@@ -924,7 +933,7 @@ comsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00
 
 **Total Deployment Plots**
 
-```{r supp tot plots, echo = FALSE, fig.width = 25, fig.length = 40}
+```{r supp tot plots, echo = FALSE, fig.width = 10, fig.length = 24}
 #High frequency
 SPLHF.long$Site <- as.character(SPLHF.long$Site)
 
@@ -1179,6 +1188,15 @@ SPhigh$Group <- "High"
 
 #rebinding
 SPtot <- rbind(SPlow, SPhigh)
+
+#removing outliers
+#low.SP <- SPtot[SPtot$AvPowerDiff <1, ]
+
+# Remove anything with fewer than 2 observers 
+
+#SPtot <- SPtot[!(SPtot$st.id %in% low.SP$st.id),]
+#now rerunning without the 3 outliers
+
 ```
 
 Grouped based on being either from the Top 10 SPL files (High) o the Bottom 10 SPL files (Low)
@@ -1238,5 +1256,19 @@ I narrowed it down to the band of background noise I think is creating the diffe
 
 ```{r small power plots, echo = FALSE}
 
-ggplot(SPtot, aes(x = Group, y = PowerDiff)) + geom_boxplot() + stat_summary(fun.y = mean, color = "blue", geom = "point")
+ggplot(SPtot, aes(x = Group, y = PowerDiff)) + geom_boxplot() + stat_summary(fun.y = mean, color = "blue", geom = "point") + ggtitle("Peak Power")
+ggplot(SPtot, aes(x = Group, y = AvPowerDiff)) + geom_boxplot() + stat_summary(fun.y = mean, color = "blue", geom = "point") + ggtitle("Average Power")
+
+APD.av <- aggregate(AvPowerDiff ~ Group, SPtot, mean)
+APD.se <- aggregate(AvPowerDiff ~ Group, SPtot, function(x) sd(x)/sqrt(length(x)))
+APD.av$SE <- APD.se$AvPowerDiff
+APD.av$U.SE <- APD.av$AvPowerDiff + APD.av$SE
+APD.av$L.SE <- APD.av$AvPowerDiff - APD.av$SE
+
+
+APD.CI <- ggplot(APD.av, aes(Group, AvPowerDiff)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Group), color = "black", pch = 21, size = 6) +
+  labs(x = "Group", y = "AvPowerDiff", title = "Average Power")
+APD.CI
 ```
