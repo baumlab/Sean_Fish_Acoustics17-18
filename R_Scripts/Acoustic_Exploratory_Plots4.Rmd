@@ -27,29 +27,7 @@ library(goft)
 library(magick)
 library(MuMIn)
 
-##loading in the ACI/SPL data - wide form
-
-#hourdata
-#load("../Raw_Data/ACI_BB17hr.Rdata")
-#load("../Raw_Data/ACI_BB18hr.Rdata")
-#load("../Raw_Data/ACI_HF17hr.Rdata")
-#load("../Raw_Data/ACI_HF18hr.Rdata")
-#load("../Raw_Data/ACI_MF17hr.Rdata")
-#load("../Raw_Data/ACI_MF18hr.Rdata")
-#
-#load("../Raw_Data/SPL_BB17hr.Rdata")
-#load("../Raw_Data/SPL_BB18hr.Rdata")
-#load("../Raw_Data/SPL_HF17hr.Rdata")
-#load("../Raw_Data/SPL_HF18hr.Rdata")
-#load("../Raw_Data/SPL_MF17hr.Rdata")
-#load("../Raw_Data/SPL_MF18hr.Rdata")
-
-#All time data
-#load("../Raw_Data/SPL_BB17.Rdata")
-#load("../Raw_Data/SPL_BB18.Rdata")
-
-#load("../Raw_Data/SPLBB17long.Rdata")
-#load("../Raw_Data/SPLBB18long.Rdata")
+#loading in SPL data
 
 load("../Raw_Data/SPLHF17long.Rdata")
 load("../Raw_Data/SPLHF18long.Rdata")
@@ -73,110 +51,6 @@ Snap.HF18$Site.x <- as.character(Snap.HF18$Site.x)
 
 load("../Raw_Data/Snap.HF.Rdata")
 
-
-
-#daydata
-#load("../Raw_Data/ACI_BB17day.Rdata")
-#load("../Raw_Data/ACI_BB18day.Rdata")
-#load("../Raw_Data/ACI_HF17day.Rdata")
-#load("../Raw_Data/ACI_HF18day.Rdata")
-#load("../Raw_Data/ACI_MF17day.Rdata")
-#load("../Raw_Data/ACI_MF18day.Rdata")
-#
-#load("../Raw_Data/SPL_BB17day.Rdata")
-#load("../Raw_Data/SPL_BB18day.Rdata")
-#load("../Raw_Data/SPL_HF17day.Rdata")
-#load("../Raw_Data/SPL_HF18day.Rdata")
-#load("../Raw_Data/SPL_MF17day.Rdata")
-#load("../Raw_Data/SPL_MF18day.Rdata")
-
-#loading ACI/SPL long data for boxplots
-#ACI
-#load("../Raw_Data/ACI_BB17hrlong.Rdata")
-#load("../Raw_Data/ACI_HF17hrlong.Rdata")
-#load("../Raw_Data/ACI_MF17hrlong.Rdata")
-#load("../Raw_Data/ACI_BB18hrlong.Rdata")
-#load("../Raw_Data/ACI_HF18hrlong.Rdata")
-#load("../Raw_Data/ACI_MF18hrlong.Rdata")
-#
-#load("../Raw_Data/ACI_MFhrlong.Rdata")
-#load("../Raw_Data/ACI_HFhrlong.Rdata")
-#load("../Raw_Data/ACI_BBhrlong.Rdata")
-#
-#load("../Raw_Data/ACI_BBhr_av.Rdata")
-#load("../Raw_Data/ACI_HFhr_av.Rdata")
-#load("../Raw_Data/ACI_MFhr_av.Rdata")
-#
-####making year a character
-#ACI_BB.hr.long$Year <- as.character(ACI_BB.hr.long$Year)
-#ACI_HF.hr.long$Year <- as.character(ACI_HF.hr.long$Year)
-#ACI_MF.hr.long$Year <- as.character(ACI_MF.hr.long$Year)
-#
-###SPL
-#load("../Raw_Data/SPL_BB17hrlong.Rdata")
-#load("../Raw_Data/SPL_HF17hrlong.Rdata")
-#load("../Raw_Data/SPL_MF17hrlong.Rdata")
-#load("../Raw_Data/SPL_BB18hrlong.Rdata")
-#load("../Raw_Data/SPL_HF18hrlong.Rdata")
-#load("../Raw_Data/SPL_MF18hrlong.Rdata")
-#
-#load("../Raw_Data/SPL_MFhrlong.Rdata")
-#load("../Raw_Data/SPL_HFhrlong.Rdata")
-#load("../Raw_Data/SPL_BBhrlong.Rdata")
-#
-#load("../Raw_Data/SPL_BBhr_av.Rdata")
-#load("../Raw_Data/SPL_HFhr_av.Rdata")
-#load("../Raw_Data/SPL_MFhr_av.Rdata")
-#
-###making year a character
-#SPL_BB.hr.long$Year <- as.character(SPL_BB.hr.long$Year)
-#SPL_HF.hr.long$Year <- as.character(SPL_HF.hr.long$Year)
-#SPL_MF.hr.long$Year <- as.character(SPL_MF.hr.long$Year)
-#
-##loading in fish call count data
-#load("../Raw_Data/FC.05hr.Rdata")
-#load("../Raw_Data/FC.08hr.Rdata")
-#load("../Raw_Data/FC.32hr.Rdata")
-#load("../Raw_Data/FC.35hr.Rdata")
-#load("../Raw_Data/FC.40hr.Rdata")
-#
-#load("../Raw_Data/FC.CallperDayALL.Rdata")
-#load("../Raw_Data/FC.CallperDay17.Rdata")
-#load("../Raw_Data/FC.CallperDay18.Rdata")
-#
-#load("../Raw_Data/FC.CallperHourALL.Rdata")
-#load("../Raw_Data/FC.CallperHour17.Rdata")
-#load("../Raw_Data/FC.CallperHour18.Rdata")
-
-#loading in total dataframe
-#load("../Raw_Data/AC.DF.Rdata")
-
-
-
-
-##loading in Boat visitation data
-#load("../Raw_Data/BV.all.Rdata")
-#load("../Raw_Data/BV.sum.Rdata")
-
-
-
-
-
-##loading in lunar phase data
-#load("../Raw_Data/LunarPhase2017.Rdata")
-#load("../Raw_Data/LunarPhase2018.Rdata")
-
-
-##loading in fish data
-#load("../Raw_Data/ki_fishabundance.Rdata")
-#load("../Raw_Data/ki_fishabundance17.Rdata")
-#load("../Raw_Data/ki_fishabundance18.Rdata")
-#
-#load("../Raw_Data/ki_fishaverage.Rdata")
-#load("../Raw_Data/ki_fishaverage17.Rdata")
-#load("../Raw_Data/ki_fishaverage18.Rdata")
-
-
 ##loading in the full dataframe with all data
 #load("../Raw_Data/AC.DF.Rdata")
 load("../Raw_Data/AC.DF1.Rdata")
@@ -196,8 +70,6 @@ Snap.HF17C <- Snap.HF17
 Snap.HF18C <- Snap.HF18
 
 #Creating centered AC.DF1 dataframe
-#AC.DF1C$SPL_HF <- center_scale(AC.DF1C$SPL_HF)
-#AC.DF1C$SPL_Midrange <- center_scale(AC.DF1C$SPL_Midrange)
 AC.DF1C$Snaps <- center_scale(AC.DF1C$Snaps)
 AC.DF1C$Tot_Knocks <- center_scale(AC.DF1C$Tot_Knocks)
 AC.DF1C$Num_Herbivory <- center_scale(AC.DF1C$Num_Herbivory)
@@ -205,9 +77,7 @@ AC.DF1C$Num_L_calls <- center_scale(AC.DF1C$Num_L_calls)
 
 #creating centered Snap.HF17 and 18 dataframes
 Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
-#Snap.HF17C$Snaps <- center_scale(Snap.HF17C$Snaps)
 Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
-#Snap.HF18C$Snaps <- center_scale(Snap.HF18C$Snaps)
 
 #splitting dataframe by site
 s5 <- filter(AC.DF1, Site == "5")
@@ -249,6 +119,33 @@ spec9.40  <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712090002.j
 spec15.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712150002.jpg")
 spec21.40 <-image_read("../Sound_Photos/Spectrogram_Photos/Site40.170712210002.jpg")
 
+#loading in zoomed spectrograms
+spec20.3 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987850.180620030004.jpg")
+spec20.9 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987850.180620090002.jpg")
+spec20.21 <- image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987850.180620210002.jpg")
+spec24.9 <- image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987850.180624090002.jpg")
+spec25.9 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987850.180625090002.png.jpg")
+spec26.9 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987850.180626090002.jpg")
+spec27.9 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987850.180627090002.jpg")
+spec12.9 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170712090002.jpg")
+spec12.21 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170712210002.jpg")
+spec13.3 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170713030002.jpg")
+spec13.21 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170713210002.jpg")
+spec19.3 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170719030002.jpg")
+spec19.9 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170719090002.jpg")
+spec21.9 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170721090002.jpg")
+
+spec14.15 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170714150002.jpg")
+spec12.15 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170712150002.jpg")
+spec14.21 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170714210002.jpg")
+spec21.3 <-image_read("../Sound_Photos/Small_Spectrogram_Photos/1677987881.170721030002.jpg")
+
+
+#loading power data
+load("../Raw_Data/KtotE.Rdata")
+load("../Raw_Data/KtotP.Rdata")
+load("../Raw_Data/MtotP.Rdata")
+load("../Raw_Data/StotP.Rdata")
 
 ```
 
@@ -360,33 +257,45 @@ H.CI
 
 ##Distributions
 
+Red is the Mean Line
+
+Blue is the Median Line
+
 ```{r histogram, echo = FALSE}
 #plotting count histogram
 
-Count.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Tot_Knocks)) + geom_histogram()
-Herb.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_Herbivory)) + geom_histogram()
-LC.hist <- ggplot(data = AC.DF1, aes(AC.DF1$Num_L_calls)) + geom_histogram()
-Snap.hist <- ggplot(data = Snap.HF17, aes(Snap.HF17$Snaps)) + geom_histogram()
-
-hist.p <- plot_grid(Count.hist, Herb.hist, LC.hist,Snap.hist, nrow = 2, ncol = 2)
-hist.p
-
 #plotting distributions of SPL response variables
-MF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_Midrange)) + geom_histogram() + ggtitle("MF SPL distribution")
+MF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_Midrange)) + geom_histogram() + ggtitle("MF SPL distribution") + geom_vline(aes(xintercept = mean(SPL_Midrange)), color = "red", linetype ="dashed", size = 1) + geom_vline(aes(xintercept = median(SPL_Midrange)), color = "blue", linetype = "dotted", size = 1)
 #BB.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_BB)) + geom_histogram() + ggtitle("BB distribution")
-HF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_HF)) + geom_histogram() + ggtitle("HF SPL distribution")
+HF.hist <- ggplot(data = SPLHF.long, aes(SPLHF.long$SPL_HF)) + geom_histogram() + ggtitle("HF SPL distribution") + geom_vline(aes(xintercept = mean(SPL_HF)), color = "red", linetype ="dashed", size = 1) + geom_vline(aes(xintercept = median(SPL_HF)), color = "blue", linetype = "dotted", size = 1)
 
 hist1.p <- plot_grid(MF.hist, HF.hist, nrow = 1, ncol = 2)
 hist1.p
 
-#plotting distributions of ACI response variables
-MF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_Midrange)) + geom_histogram() + ggtitle("MF ACI distribution")
-#BB.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_BB)) + geom_histogram()
-HF.hist1 <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_HF)) + geom_histogram() + ggtitle("HF ACI distribution")
+```
 
-hist2.p <- plot_grid(MF.hist1, HF.hist1, nrow = 1, ncol = 2)
-hist2.p
+Stats for Mid Frequency SPL
 
+```{r descriptive stats, echo = FALSE}
+summary(AC.DF1$SPL_Midrange)
+```
+
+Variance of MF
+
+```{r variance, echo = FALSE}
+var(AC.DF1$SPL_Midrange)
+```
+
+Stats for High Frequency SPL
+
+```{r descriptive stats 2, echo = FALSE}
+summary(SPLHF.long$SPL_HF)
+```
+
+Variance of HF
+
+```{r variance 2, echo = FALSE}
+var(SPLHF.long$SPL_HF)
 
 ```
 
@@ -1202,7 +1111,7 @@ spec40t
 ```
 
 #Intensity
-```{r intensity, echo = FALSE}
+```{r intensityprep , echo = FALSE}
 #going to run this on site 5 first to make sure that it works
 AC.S5 <- AC.DF1[which(AC.DF1$Site=="5"),]
 
@@ -1224,5 +1133,110 @@ high5 <- AC.5order[31:40,]
 #writing csv so I have this in excel
 #write.csv(high5, file = "../Raw_Data/Site5HighSPL.csv")
 
+#prepping to plot distributions Ktot
 
+#seperating into the high or low values
+KElow <- filter(KtotE, st.id %in% low5$st.id)
+KEhigh <- filter(KtotE, st.id %in% high5$st.id)
+
+KPlow <- filter(KtotP, st.id %in% low5$st.id)
+KPhigh <- filter(KtotP, st.id %in% high5$st.id)
+
+#adding column for grouping
+KElow$Group <- "Low"
+KEhigh$Group <- "High"
+
+KPlow$Group <- "Low"
+KPhigh$Group <- "High"
+
+#rebinding these together
+KEtot <- rbind(KElow, KEhigh)
+KPtot <- rbind(KPlow, KPhigh)
+
+
+#Prepping to plot distributions Mtot
+
+#seperating into the high or low values
+MPlow <- filter(MtotP, st.id %in% low5$st.id)
+MPhigh <- filter(MtotP, st.id %in% high5$st.id)
+
+#Adding column for grouping
+MPlow$Group <- "Low"
+MPhigh$Group <- "High"
+
+#rebinding
+MPtot <- rbind(MPlow, MPhigh)
+
+##Prepping to plot distributions Stot
+
+#seperating into the high or low values
+SPlow <- filter(StotP, st.id %in% low5$st.id)
+SPhigh <- filter(StotP, st.id %in% high5$st.id)
+
+#Adding column for grouping
+SPlow$Group <- "Low"
+SPhigh$Group <- "High"
+
+#rebinding
+SPtot <- rbind(SPlow, SPhigh)
+```
+
+Grouped based on being either from the Top 10 SPL files (High) o the Bottom 10 SPL files (Low)
+
+```{r power plots, echo = FALSE}
+#ggplot(KEtot, aes(x = EnergyDiff)) +
+#  geom_histogram(data=subset(KEtot, Group == "Low"), fill = "red", alpha = 0.2) + 
+#  geom_histogram(data=subset(KEtot, Group == "High"), fill = "blue", alpha = 0.2)
+
+ggplot(KPtot, aes(x = PowerDiff)) +
+  geom_histogram(data=subset(KPtot, Group == "Low"), fill = "red", alpha = 0.2) +
+  geom_histogram(data=subset(KPtot, Group == "High"), fill = "blue", alpha = 0.2)
+
+ggplot(KPtot, aes(x = Group, y = PowerDiff)) + geom_boxplot()
+
+```
+
+Well, it sure doesn't look like the differences are stemming from the knocks themselves. Lets look at the frequency band as a whole.
+
+Here are some zoomed in spectrograms.  I did this because I think background or "unidentifiable" noise is creating the differences we see.
+
+My 5 highest Mid-SPL's at site 5 come from these 5 files they are all at 9 AM (interestingly, they are all from 2018)
+
+```{r zoom spectro, echo = FALSE}
+spechigh <- image_append(c(spec20.9, spec27.9, spec25.9, spec26.9, spec24.9))
+spechigh <- image_resize(spechigh, "5000")
+spechigh
+
+```
+
+My 5 lowest Mid-SPL's at site 5 comes from these 5 files, none are from 9 AM (they are all from 2017)
+
+The times they come from are: 15, 3, 15, 3, 21
+
+```{r zoom spectro2, echo = FALSE}
+speclow <- image_append(c(spec14.15, spec19.3, spec12.15, spec21.3, spec14.21))
+speclow <- image_resize(speclow, "5000")
+speclow
+
+```
+
+*Mid Frequency Samples*
+
+So for this next set of plots.  I took ~4 samples from each file that were 5 seconds long and extended from ~ 60 Hz to 1 kHz.  Samples were taken at :10, 1:10, 2:10, and 3:10 in each file.
+
+```{r mid power plots, echo = FALSE}
+#ggplot(MPtot, aes(x = PowerDiff)) + 
+#  geom_histogram(data=subset(MPtot, Group == "Low"), fill = "red", alpha = 0.2) +
+#  geom_histogram(data=subset(MPtot, Group == "High"), fill = "blue", alpha = 0.2)
+
+ggplot(MPtot, aes(x = Group, y = PowerDiff)) + geom_boxplot() + stat_summary(fun.y = mean, color = "blue", geom = "point")
+```
+
+*100 - 600 Hz Samples*
+
+I narrowed it down to the band of background noise I think is creating the difference. I took 4 10 second samples in each file.
+
+```{r small power plots, echo = FALSE}
+
+ggplot(SPtot, aes(x = Group, y = PowerDiff)) + geom_boxplot() + stat_summary(fun.y = mean, color = "blue", geom = "point")
 ```
