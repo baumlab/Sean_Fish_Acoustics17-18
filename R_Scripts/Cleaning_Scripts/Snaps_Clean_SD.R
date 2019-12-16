@@ -196,7 +196,7 @@ snaps <- rbind(snap.17, snap.18)
 AC.DF1 <- merge(AC.DF, snaps, by = "st.id")
 
 #save AC.DF1 as a datafile
-save(AC.DF1, file="Raw_Data/AC.DF1.Rdata")
+#save(AC.DF1, file="Raw_Data/AC.DF1.Rdata")
 
 
 # I am losing rows here - 113 of them, so I gotta figure out why this is
@@ -285,6 +285,50 @@ Snap.HF <- rbind(Snap.HF17, Snap.HF18)
 
 #making site a character
 Snap.HF$Site <- as.character(Snap.HF$Site)
+
+#making new column that takes hour and makes it continuous
+Snap.HF <- Snap.HF %>% separate(Time, into = c("Hour", "Minutes"), sep = ":")
+
+Snap.HF$Hour <- as.numeric(Snap.HF$Hour)
+
+
+#binning time to create different categories of time
+#1st attempt - split into standard quarters at 6, 12, 18, 24 Hr
+Snap.HF$tg <- "NULL"
+Snap.HF.length <- length(Snap.HF$Site)
+
+for (i in 1:nrow(Snap.HF)) {
+  if(Snap.HF$Hour[i] ==0) {
+    Snap.HF$tg[i] == "Early"
+  }
+}
+
+for (i in 1:nrow(Snap.HF)) {
+  if(Snap.HF$Hour[i] > 0 & Snap.HF$Hour[i] < 6) {
+    Snap.HF$tg[i] == "Early"
+  } else if(Snap.HF$Hour[i] >= 6 & Snap.HF$Hour[i] < 12) {
+    Snap.HF$tg[i] == "MidMorning"  
+  } else if(Snap.HF$Hour[i] >= 12 & Snap.HF$Hour[i] < 18) {
+    Snap.HF$tg[i] == "Afternoon"
+  } else if(Snap.HF$Hour[i] >= 18 & Snap.HF$Hour[i] < 24)
+    Snap.HF$tg[i] == "Evening"
+}
+
+
+for (i in 1:nrow(data)) {             #for every row in each row of dataframe(data)
+  if(!is.na(data$mass[i]) == TRUE) {  #if the value of the row in the mass column is not NA then...
+    if(data$species[i]=="L. pictus") { #if the value of the row in the species column is L. pictus then
+      lpc <- lpc + 1#countvar         #then add one to the count variable
+      lpm <- lpm + data$mass[i]       #then add the value in the i'th row of mass column to the mass variable
+    } else if(data$species[i]=="S. franciscanus") { #do this for the next species
+      sfc <- sfc + 1                    #add one to the count variable
+      sfm <- sfm + data$mass[i]         #add the mass to the mass variable for each row
+    } else if(data$species[i]=="S. purpuratus") { #do this for the final species
+      spc <- spc +1                     #add one to the count variable
+      spm <- spm + data$mass[i]         #add the mass to the mass variable
+    }
+  } 
+}
 
 save(Snap.HF, file="Raw_Data/Snap.HF.Rdata")
 

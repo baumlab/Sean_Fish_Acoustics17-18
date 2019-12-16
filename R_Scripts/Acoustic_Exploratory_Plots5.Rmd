@@ -1,7 +1,7 @@
 ---
 title: "Acoustic_2019_Explore4"
 author: "Sean Dimoff"
-date: "November 21, 2019"
+date: "'r format(Sys.time(), '%d %B, %Y')'"
 output: 
   html_document:
     toc: true
@@ -80,7 +80,7 @@ Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
 Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
 
 #subsetting only lm variables
-AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour, Year))
+AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, ACI_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour, Year))
 
 #making Hour ordinal
 AC.DF1Co$Hour_factor <- factor (AC.DF1$Hour, order = TRUE, levels = c("3", "9", "15", "21"))
@@ -306,7 +306,15 @@ var(SPLHF.long$SPL_HF)
 
 ```
 
+ACI histogram
 
+```{r aci histogram, echo = FALSE}
+
+ACI.mf.hist <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_Midrange)) + geom_histogram() + ggtitle("MF ACI distribution") + geom_vline(aes(xintercept = mean(ACI_Midrange)), color = 
+                     "red", linetype = "dashed", size = 1) + geom_vline(aes(xintercept = median(ACI_Midrange)), color = "blue", linetype = "dotted", size = 1)
+
+ACI.mf.hist
+```
 
 
 ##Regressions
@@ -463,7 +471,7 @@ summary(sp32lm18)
 
 ###Mid Frequency
 
-**Mid Frequency **
+**Mid Frequency - SPL **
 
 ```{r regressions, echo = FALSE}
 #equation for r^2 value
@@ -481,180 +489,53 @@ summary(kmf.lm)
 #dev.off()
 ```
 
+**Mid Frequency - ACI**
 
-
-2017-2018 data w/200 samples.  1st plot splits by site and second by hour to show any patterns before I break them down individually.
-
-
-**Breakdown by Site**
-
-```{r regressions5, echo = FALSE}
-SPmf.5 <- ggplot(s5, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "royalblue4") + ggtitle("Site 5")
-
-SPmf.5 + geom_smooth(method = "lm") + ggtitle("Site 5, MF SPL")
-s5mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s5)
-summary(s5mf.lm)
-```
-
-Site 5, knocks not significant.
-
-
-```{r regressions6, echo = FALSE}
-SPmf.35 <- ggplot(s35, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
-
-SPmf.35 + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL")
-s35mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s35)
-summary(s35mf.lm)
-```
-
-Site 35, knocks significant.
-
-Removing 2 outliers > 150
-
-```{r regressions6E, echo = FALSE}
-
-h.knock35 <- s35[s35$Tot_Knocks >150, ]
-# Remove anything with fewer than 2 observers 
-
-s35E <- s35[!(s35$st.id %in% h.knock35$st.id),]
-#now rerunning without the 2 outliers
-
-SPmf.35E <- ggplot(s35E, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
-
-SPmf.35E + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL - outliers removed")
-s35mf.lmE = lm(SPL_Midrange ~ Tot_Knocks, data = s35E)
-summary(s35mf.lmE)
-
-```
-
-```{r regressions7, echo = FALSE}
-SPmf.8 <- ggplot(s8, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
-
-SPmf.8 + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL")
-s8mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s8)
-summary(s8mf.lm)
-```
-
-Site 8, knocks not significant. Negative relationship... thats interesting.
-
-Removing Outlier
-
-```{r regressions7E, echo = FALSE}
-
-h.knock8 <- s8[s8$Tot_Knocks >200, ]
-# Remove anything with fewer than 2 observers 
-
-s8E <- s8[!(s8$st.id %in% h.knock8$st.id),]
-#now rerunning without the 2 outliers
-
-SPmf.8E <- ggplot(s8E, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
-
-SPmf.8E + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL - outlier removed")
-s8mf.lmE = lm(SPL_Midrange ~ Tot_Knocks, data = s8E)
-summary(s8mf.lmE)
-
+```{r aci regressions, echo = FALSE}
+ACI.mf1.1 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, colored by site")
+ACI.mf.lm = glm(ACI_Midrange ~ Tot_Knocks + Year, data = AC.DF1, family = "Gamma")
+ACI.mf.lm1 = glm(ACI_Midrange ~ Num_L_calls + Year, data = AC.DF1, family = "Gamma")
+ACI.mf.lm2 = glm(ACI_Midrange ~ Num_Herbivory + Year, data = AC.DF1, family = "Gamma")
+summary(ACI.mf.lm)
+summary(ACI.mf.lm1)
+summary(ACI.mf.lm2)
 ```
 
 
-```{r regressions8, echo = FALSE}
-SPmf.40 <- ggplot(s40, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 40")
+**Breakdown by Site - SPL**
 
-SPmf.40 + geom_smooth(method = "lm") + ggtitle("Site 40, MF SPL")
-s40mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s40)
-summary(s40mf.lm)
+```{r site spl breakdown, echo = FALSE}
+#creating equations to put on facet_grid
+site.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + stat_smooth(method = "lm") + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + ggtitle("Effect of knocks on SPL MF") + theme(legend.position = "none")
+site.mf
+
 ```
 
-Site 40, knocks not significant.
+**Breakdown by Site - ACI**
 
-```{r regressions9, echo = FALSE}
-SPmf.32 <- ggplot(s32, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 32")
+```{r site aci breakdown, echo = FALSE}
+#creating equations to put on facet_grid
+site.aci.mf <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point(aes(color = Site)) + stat_smooth(method = "lm") + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + ggtitle("Effect of knocks on ACI MF") + theme(legend.position = "none")
+site.aci.mf
 
-SPmf.32 + geom_smooth(method = "lm") + ggtitle("Site 32, MF SPL")
-s32mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = s32)
-summary(s32mf.lm)
 ```
-
-Site 32, knocks significant.
-
 
 ### Mid Frequency - Hourly Breakdown
-**Breakdown by Hour**
+**Breakdown by Hour - SPL**
 
-```{r regressions10, echo = FALSE}
-SPmf.h3 <- ggplot(h3, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM")
-
-SPmf.h3 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
-h3mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h3)
-summary(h3mf.lm)
-```
-
-3AM, knocks not significant.
-
-Splitting by site to see if any site has a relationship
-
-```{r regressions10.1 , echo = FALSE}
-SPmf.h3.1 <- ggplot(h3, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM") + facet_wrap(~Site)
-SPmf.h3.1
-SPmf.h3.1 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
-```
-
-
-```{r regressions11, echo = FALSE}
-SPmf.h9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM")
-
-SPmf.h9 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
-h9mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h9)
-summary(h9mf.lm)
-```
-
-9AM, knocks significant
-
-Splitting by site
-
-```{r regressions11.1, echo = FALSE}
-SPmf.h9.1 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM") + facet_wrap(~Site)
-
-SPmf.h9.1 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+```{r hour spl breakdown, echo = FALSE}
+#creating equations to put on facet_grid
+hour.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + stat_smooth(method = "lm") + facet_grid(rows = vars(Hour), cols = vars(Year), scales = "fixed") + ggtitle("Effect of knocks on SPL MF") + theme(legend.position = "none")
+hour.mf
 
 ```
 
+**Breakdown by Hour - ACI**
 
-```{r regressions12, echo = FALSE}
-SPmf.h15 <- ggplot(h15, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM")
-
-SPmf.h15 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
-h15mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h15)
-summary(h15mf.lm)
-```
-
-3PM, knocks not significant
-
-Splitting by site
-
-```{r regressions12.1, echo = FALSE}
-SPmf.h15.1 <- ggplot(h15, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM") + facet_wrap(~Site)
-
-SPmf.h15.1 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
-
-```
-
-
-```{r regressions13, echo = FALSE}
-SPmf.h21 <- ggplot(h21, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM")
-
-SPmf.h21 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
-h21mf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = h21)
-summary(h21mf.lm)
-```
-
-9PM, knocks not significant.
-
-Splitting by site.
-
-```{r regressions13.1, echo = FALSE}
-SPmf.h21.1 <- ggplot(h21, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM") + facet_wrap(~Site)
-
-SPmf.h21.1 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+```{r hour aci breakdown, echo = FALSE}
+#creating equations to put on facet_grid
+hour.aci.mf <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point(aes(color = Hour)) + stat_smooth(method = "lm") + facet_grid(rows = vars(Hour), cols = vars(Year), scales = "fixed") + ggtitle("Effect of knocks on ACI MF") + theme(legend.position = "none")
+hour.aci.mf
 
 ```
 
@@ -995,28 +876,7 @@ weibull_test(AC.DF1$SPL_HF)
 Don't seem to have a normal distribution here... Working on testing different distributions.  Not sure what the outputs on the gamma or weibull tests mean
 
 
-##Model 1
-Using only the two interactions that are significant, Tot_Knocks:Hour and Num_Herbiory:Hour, removing Long calls because it isn't significant and adding site and year as fixed effects 
-
-Using years combined
-
-``` {r model 1, echo = TRUE}
-fit1 <- lm(SPL_Midrange ~ Tot_Knocks:Hour_factor + Num_Herbivory:Hour_factor + Site + Year , data = AC.DF1Co)
-
-summary(fit1)
-
-#options(na.action = "na.fail")
-#dredge(gfit6)
-```
-
-Interaction between Site and Tot_Knocks with Hour as fixed effect
-
-``` {r model 1i, echo = TRUE}
-
-fit1i <- lm(SPL_Midrange ~ Tot_Knocks:Site + Num_Herbivory + Hour_factor + Year, data = AC.DF1Co)
-summary(fit1i)
-```
-
+##Mid-Frequency SPL Model
 Maximal Model with Bill
 
 ```{r model max, echo = TRUE}
@@ -1038,33 +898,34 @@ summary(fit.m2)
 plot(fit.m2)
 
 ```
-##Splitting by Year
 
-Splitting by year and then using site as a fixed effect
+##Mid-Frequency ACI Model
+Maximal model following Bill's method
 
-2017
+- gamma distribution due to the left skew of the data
 
-```{r model split 2017, echo = TRUE}
-#2017
-AC.DF17 <- AC.DF1Co[which(AC.DF1Co$Year == 17),]
-#2018
-AC.DF18 <- AC.DF1Co[which(AC.DF1Co$Year == 18),]
+```{r model aci max, echo = TRUE}
+fit.a <- glm(ACI_Midrange ~(Tot_Knocks + Num_Herbivory + Num_L_calls)*(Site + Hour_factor) + Year, data = AC.DF1Co, family = "Gamma")
+summary(fit.a)
+stepAIC(fit.a)
+plot(fit.a)
 
-fit17 <- lm(SPL_Midrange ~ Tot_Knocks:Hour_factor + Num_Herbivory:Hour_factor + Site, data = AC.DF17)
-summary(fit17)
+AICc(fit.a, ACI.mf.lm)
 
 ```
 
-2018
+Most parsimonious and best model from the AIC stepwise model selection
 
-```{r model split 2018, echo = TRUE}
+```{r model fit2, echo = TRUE}
+#ACI_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Site + Year + Num_Herbivory:Site
 
-fit18 <- lm(SPL_Midrange ~ Tot_Knocks:Hour_factor + Num_Herbivory:Hour_factor + Site, data = AC.DF1Co)
-summary(fit18)
+fit.a2 <- glm(ACI_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Site + Num_Herbivory:Site, data = AC.DF1Co, family = "Gamma")
+summary(fit.a2)
+  
+
 ```
 
-
-##Model 2 - HF SPL and Snaps
+##High Frequency SPL Model
 Looking at Snaps and their effect on the HF SPL
 
 Using Site and Year as fixed effects here
@@ -1149,156 +1010,3 @@ spec40t <- image_resize(spec40t, "3000")
 spec40t
 ```
 
-#Intensity
-```{r intensityprep , echo = FALSE}
-#going to run this on site 5 first to make sure that it works
-AC.S5 <- AC.DF1[which(AC.DF1$Site=="5"),]
-
-#ordering the dataframe
-attach(AC.S5)
-AC.5order <- AC.S5[order(SPL_Midrange),]
-detach(AC.S5)
-
-#selecting top 10 rows (lowest SPL)
-low5 <- AC.5order[1:10,]
-
-#writing csv so that I have this in excel
-#write.csv(low5, file = "../Raw_Data/Site5LowSPL.csv")
-
-
-#selecting the bottom 10 rows (highest SPL)
-high5 <- AC.5order[31:40,]
-
-#writing csv so I have this in excel
-#write.csv(high5, file = "../Raw_Data/Site5HighSPL.csv")
-
-#prepping to plot distributions Ktot
-
-#seperating into the high or low values
-KElow <- filter(KtotE, st.id %in% low5$st.id)
-KEhigh <- filter(KtotE, st.id %in% high5$st.id)
-
-KPlow <- filter(KtotP, st.id %in% low5$st.id)
-KPhigh <- filter(KtotP, st.id %in% high5$st.id)
-
-#adding column for grouping
-KElow$Group <- "Low"
-KEhigh$Group <- "High"
-
-KPlow$Group <- "Low"
-KPhigh$Group <- "High"
-
-#rebinding these together
-KEtot <- rbind(KElow, KEhigh)
-KPtot <- rbind(KPlow, KPhigh)
-
-
-#Prepping to plot distributions Mtot
-
-#seperating into the high or low values
-MPlow <- filter(MtotP, st.id %in% low5$st.id)
-MPhigh <- filter(MtotP, st.id %in% high5$st.id)
-
-#Adding column for grouping
-MPlow$Group <- "Low"
-MPhigh$Group <- "High"
-
-#rebinding
-MPtot <- rbind(MPlow, MPhigh)
-
-##Prepping to plot distributions Stot
-
-#seperating into the high or low values
-SPlow <- filter(StotP, st.id %in% low5$st.id)
-SPhigh <- filter(StotP, st.id %in% high5$st.id)
-
-#Adding column for grouping
-SPlow$Group <- "Low"
-SPhigh$Group <- "High"
-
-#rebinding
-SPtot <- rbind(SPlow, SPhigh)
-
-#removing outliers
-#low.SP <- SPtot[SPtot$AvPowerDiff <1, ]
-
-# Remove anything with fewer than 2 observers 
-
-#SPtot <- SPtot[!(SPtot$st.id %in% low.SP$st.id),]
-#now rerunning without the 3 outliers
-
-```
-
-Grouped based on being either from the Top 10 SPL files (High) o the Bottom 10 SPL files (Low)
-
-```{r power plots, echo = FALSE}
-#ggplot(KEtot, aes(x = EnergyDiff)) +
-#  geom_histogram(data=subset(KEtot, Group == "Low"), fill = "red", alpha = 0.2) + 
-#  geom_histogram(data=subset(KEtot, Group == "High"), fill = "blue", alpha = 0.2)
-
-ggplot(KPtot, aes(x = PowerDiff)) +
-  geom_histogram(data=subset(KPtot, Group == "Low"), fill = "red", alpha = 0.2) +
-  geom_histogram(data=subset(KPtot, Group == "High"), fill = "blue", alpha = 0.2)
-
-ggplot(KPtot, aes(x = Group, y = PowerDiff)) + geom_boxplot()
-
-```
-
-Well, it sure doesn't look like the differences are stemming from the knocks themselves. Lets look at the frequency band as a whole.
-
-Here are some zoomed in spectrograms.  I did this because I think background or "unidentifiable" noise is creating the differences we see.
-
-My 5 highest Mid-SPL's at site 5 come from these 5 files they are all at 9 AM (interestingly, they are all from 2018)
-
-```{r zoom spectro, echo = FALSE}
-spechigh <- image_append(c(spec20.9, spec27.9, spec25.9, spec26.9, spec24.9))
-spechigh <- image_resize(spechigh, "5000")
-spechigh
-
-```
-
-My 5 lowest Mid-SPL's at site 5 comes from these 5 files, none are from 9 AM (they are all from 2017)
-
-The times they come from are: 15, 3, 15, 3, 21
-
-```{r zoom spectro2, echo = FALSE}
-speclow <- image_append(c(spec14.15, spec19.3, spec12.15, spec21.3, spec14.21))
-speclow <- image_resize(speclow, "5000")
-speclow
-
-```
-
-*Mid Frequency Samples*
-
-So for this next set of plots.  I took ~4 samples from each file that were 5 seconds long and extended from ~ 60 Hz to 1 kHz.  Samples were taken at :10, 1:10, 2:10, and 3:10 in each file.
-
-```{r mid power plots, echo = FALSE}
-#ggplot(MPtot, aes(x = PowerDiff)) + 
-#  geom_histogram(data=subset(MPtot, Group == "Low"), fill = "red", alpha = 0.2) +
-#  geom_histogram(data=subset(MPtot, Group == "High"), fill = "blue", alpha = 0.2)
-
-ggplot(MPtot, aes(x = Group, y = PowerDiff)) + geom_boxplot() + stat_summary(fun.y = mean, color = "blue", geom = "point")
-```
-
-*100 - 600 Hz Samples*
-
-I narrowed it down to the band of background noise I think is creating the difference. I took 4 10 second samples in each file.
-
-```{r small power plots, echo = FALSE}
-
-ggplot(SPtot, aes(x = Group, y = PowerDiff)) + geom_boxplot() + stat_summary(fun.y = mean, color = "blue", geom = "point") + ggtitle("Peak Power")
-ggplot(SPtot, aes(x = Group, y = AvPowerDiff)) + geom_boxplot() + stat_summary(fun.y = mean, color = "blue", geom = "point") + ggtitle("Average Power")
-
-APD.av <- aggregate(AvPowerDiff ~ Group, SPtot, mean)
-APD.se <- aggregate(AvPowerDiff ~ Group, SPtot, function(x) sd(x)/sqrt(length(x)))
-APD.av$SE <- APD.se$AvPowerDiff
-APD.av$U.SE <- APD.av$AvPowerDiff + APD.av$SE
-APD.av$L.SE <- APD.av$AvPowerDiff - APD.av$SE
-
-
-APD.CI <- ggplot(APD.av, aes(Group, AvPowerDiff)) + 
-  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
-  geom_point(aes(fill = Group), color = "black", pch = 21, size = 6) +
-  labs(x = "Group", y = "AvPowerDiff", title = "Average Power")
-APD.CI
-```
