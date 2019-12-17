@@ -294,41 +294,38 @@ Snap.HF$Hour <- as.numeric(Snap.HF$Hour)
 
 #binning time to create different categories of time
 #1st attempt - split into standard quarters at 6, 12, 18, 24 Hr
-Snap.HF$tg <- "NULL"
-Snap.HF.length <- length(Snap.HF$Site)
 
-for (i in 1:nrow(Snap.HF)) {
-  if(Snap.HF$Hour[i] ==0) {
-    Snap.HF$tg[i] == "Early"
-  }
-}
+Early <- 0:5
+Morning <- 6:11
+Afternoon <- 12:17
+Evening <- 18:23
 
-for (i in 1:nrow(Snap.HF)) {
-  if(Snap.HF$Hour[i] > 0 & Snap.HF$Hour[i] < 6) {
-    Snap.HF$tg[i] == "Early"
-  } else if(Snap.HF$Hour[i] >= 6 & Snap.HF$Hour[i] < 12) {
-    Snap.HF$tg[i] == "MidMorning"  
-  } else if(Snap.HF$Hour[i] >= 12 & Snap.HF$Hour[i] < 18) {
-    Snap.HF$tg[i] == "Afternoon"
-  } else if(Snap.HF$Hour[i] >= 18 & Snap.HF$Hour[i] < 24)
-    Snap.HF$tg[i] == "Evening"
-}
+Night1 <- 0:5
+Night2 <- 19:23
+Day <- 6:18
+
+split1.1 <- 0:3
+split1.2 <- 22:23
+split2 <- 4:9
+split3 <- 10:15
+split4 <- 16:21
+
+Snap.HF$tg[Snap.HF$Hour %in% Early] <- "Early"
+Snap.HF$tg[Snap.HF$Hour %in% Morning] <- "Morning"
+Snap.HF$tg[Snap.HF$Hour %in% Afternoon] <- "Afternoon"
+Snap.HF$tg[Snap.HF$Hour %in% Evening] <- "Evening"
+
+Snap.HF$dn[Snap.HF$Hour %in% Night1] <- "Night"
+Snap.HF$dn[Snap.HF$Hour %in% Night2] <- "Night"
+Snap.HF$dn[Snap.HF$Hour %in% Day] <- "Day"
+
+Snap.HF$ns[Snap.HF$Hour %in% split1.1] <- "9PM-3AM"
+Snap.HF$ns[Snap.HF$Hour %in% split1.2] <- "9PM-3AM"
+Snap.HF$ns[Snap.HF$Hour %in% split2] <- "3AM-9AM"
+Snap.HF$ns[Snap.HF$Hour %in% split3] <- "9AM-3PM"
+Snap.HF$ns[Snap.HF$Hour %in% split4] <- "9PM-3AM"
 
 
-for (i in 1:nrow(data)) {             #for every row in each row of dataframe(data)
-  if(!is.na(data$mass[i]) == TRUE) {  #if the value of the row in the mass column is not NA then...
-    if(data$species[i]=="L. pictus") { #if the value of the row in the species column is L. pictus then
-      lpc <- lpc + 1#countvar         #then add one to the count variable
-      lpm <- lpm + data$mass[i]       #then add the value in the i'th row of mass column to the mass variable
-    } else if(data$species[i]=="S. franciscanus") { #do this for the next species
-      sfc <- sfc + 1                    #add one to the count variable
-      sfm <- sfm + data$mass[i]         #add the mass to the mass variable for each row
-    } else if(data$species[i]=="S. purpuratus") { #do this for the final species
-      spc <- spc +1                     #add one to the count variable
-      spm <- spm + data$mass[i]         #add the mass to the mass variable
-    }
-  } 
-}
 
 save(Snap.HF, file="Raw_Data/Snap.HF.Rdata")
 

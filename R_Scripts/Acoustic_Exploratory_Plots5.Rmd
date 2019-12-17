@@ -499,6 +499,9 @@ ACI.mf.lm2 = glm(ACI_Midrange ~ Num_Herbivory + Year, data = AC.DF1, family = "G
 summary(ACI.mf.lm)
 summary(ACI.mf.lm1)
 summary(ACI.mf.lm2)
+
+ACI.mf.lmALL = glm(ACI_Midrange ~ Tot_Knocks+ Site + Year + Hour, data = AC.DF1, family = "Gamma")
+summary(ACI.mf.lmALL)
 ```
 
 
@@ -926,39 +929,28 @@ summary(fit.a2)
 ```
 
 ##High Frequency SPL Model
-Looking at Snaps and their effect on the HF SPL
 
-Using Site and Year as fixed effects here
+Determining which is the best way to group the snaps by time
 
-``` {r model 2t, echo = TRUE}
-fit2t <- lm(SPL_HF ~ Snaps + Site + Year, data = AC.DF1)
-summary(fit2t)
+tg = quarters (00-05, 06-11, 12-17, 18-23)
+dn = day night (18-05, 6-17)
+ns = nine cycle (22-03, 04-09, 10-15, 16-21)
 
-par(mfrow = c(2,2))
-plot(fit2t)
+```{r model snaps, echo = TRUE}
+fit.tg <- lm(SPL_HF ~ Snaps*tg*Site + Year, data = Snap.HF)
+fit.dn <- lm(SPL_HF ~ Snaps*dn*Site + Year, data = Snap.HF)
+fit.ns <- lm(SPL_HF ~ Snaps*ns*Site + Year, data = Snap.HF)
 
-summary(fit2t)$coefficients
-````
+AICc(fit.tg, fit.dn, fit.ns)
 
-
-
-```{r model snaps with time, echo = TRUE}
-fit.s <- lm(SPL_HF ~ Snaps*Time*Site + Year, data = Snap.HF)
-
-summary(fit.s)
 
 ```
 
-Using interaction between Site and Snaps here and Year is fixed
+Quartering the day was the best model, using time groups 0-5, 6-11, 12-17, 18-23
 
 ``` {r model 2i, echo = TRUE}
-fit2i <- lm(SPL_HF ~ Snaps:Site + Year, data = AC.DF1)
-summary(fit2i)
+stepAIC(fit.tg)
 
-par(mfrow = c(2,2))
-plot(fit2i)
-
-summary(fit2i)$coefficients
 ````
 
 
