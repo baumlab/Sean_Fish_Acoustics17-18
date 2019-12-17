@@ -34,6 +34,28 @@ sum(is.na(FC.all$Num_L_calls))
 sum(is.na(FC.all$Num_Herbivory))
 # no missing values so we are good to go
 
+#removing files with boat noise
+
+#pulling out all comments that include "boat" so that I can isolate files with boat noise
+FC.boat <- FC.all[grep("Boat", FC.all$Comment), ]
+unique(FC.all$Comment)
+
+#renaming columns
+names(FC.boat) <- c("Site", "Date", "Time", "TIR", "Knocks", "KT", "KT#", "Tot_Knocks", "L_Calls", "Call Type", "Herbivory", "Comment")
+
+#creating date - time - site ID's
+#seperating time into hour and minute
+FC.boat <- FC.boat %>% separate(Time, into = c("Hour", "Minute", "Second"), sep = ":")
+#pasting date then hour then site
+FC.boat$st.id <- paste(FC.boat$Date,FC.boat$Hour, sep= "-")
+FC.boat$st.id <- paste(FC.boat$st.id, FC.boat$Site, sep = "_")
+
+#creating a list of st.id's that have boat noise
+boat.list <- unique(FC.boat$st.id)
+
+#saving boat.list so that I can use it to pull out boat files
+save(boat.list, file="Raw_Data/boatlist.Rdata")
+
 
 ## Summing values by Hour (ALL SITES)####
 

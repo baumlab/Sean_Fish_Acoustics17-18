@@ -1,5 +1,5 @@
 ---
-title: "Acoustic_2019_Explore4"
+title: "Acoustic_2019_Explore5"
 author: "Sean Dimoff"
 date: "'r format(Sys.time(), '%d %B, %Y')'"
 output: 
@@ -54,6 +54,14 @@ load("../Raw_Data/Snap.HF.Rdata")
 ##loading in the full dataframe with all data
 #load("../Raw_Data/AC.DF.Rdata")
 load("../Raw_Data/AC.DF1.Rdata")
+
+#loading in boat.list
+load("../Raw_Data/boatlist.Rdata")
+
+#removing site/date id's from AC.DF1 that have boat noise in the files
+AC.DF1 <- AC.DF1[!(AC.DF1$st.id %in% boat.list),]
+
+#removes 4 from 40, 2 from 32, 1 from 35, and one from 5
 
 #making site a character
 AC.DF1$Site <- as.character(AC.DF1$Site)
@@ -636,148 +644,6 @@ Higher herbivory here as well, although there is no positive relationship at any
 
 **Summary**
 Knocks significantly explained SPLMF at sites 35 and 32 and at 9AM.
-
-###Abiotic Regressions (Wind) -SPL
-Running basic regressions linking the wind to SPL at both HF and MF to see if wind speed is significantly affecting the sound
-```{r abiotic regressions, echo = FALSE}
-#equation for r^2 value
-
-WP.1 <- ggplot(Snap.HF, aes(Wind.Speed, SPL_HF)) + geom_point(aes(color = Site)) + ggtitle("Effect of Wind on HF SPL") + stat_smooth(method = "glm")
-WP.1
-
-#making site a character
-SPLMF.long.wind$Site <- as.character(SPLMF.long.wind$Site)
-WP.2 <- ggplot(SPLMF.long.wind, aes(Wind.Speed, SPL_MF)) + geom_point(aes(color = Site)) + ggtitle("Effect of wind on MF SPL") + stat_smooth(method = "glm")
-WP.2
-
-
-```
-Wind doesn't seem to impact SPL HF or MF in any particular direction. Although the wind range seems really small.
-
-
-
-##Centered Regressions
-Running basic regressions linking the explanatory to the response at their lowest levels and combined to see how different sites/ hours change the regression - SPL
-
-**Linear Model outputs below each**
-
-```{r cregressions3, echo = FALSE}
-#splitting dataframe by site
-s5c <- filter(AC.DF1C, Site == "5")
-s32c <- filter(AC.DF1C, Site == "32")
-s35c <- filter(AC.DF1C, Site == "35")
-s40c <- filter(AC.DF1C, Site == "40")
-s8c <- filter(AC.DF1C, Site == "8")
-
-#splitting dataframe by hour
-h3c <- filter(AC.DF1C, Hour == "3")
-h9c <- filter(AC.DF1C, Hour == "9")
-h15c <- filter(AC.DF1C, Hour == "15")
-h21c <- filter(AC.DF1C, Hour == "21")
-
-SP.hf2 <- ggplot(Snap.HF17C, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on HF SPL, 2017, split by site")
-
-SP.hf2 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
-shf.lm17c = lm(SPL_HF ~ Snaps, data = Snap.HF17C)
-summary(shf.lm17c)
-```
-
-2017 Snap data, snaps significant.
-
-
-###Mid Frequency
-
-**Mid Frequency **
-
-```{r Cregressions, echo = FALSE}
-#equation for r^2 value
-SP.mf1.1C <- ggplot(AC.DF1C, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, split by site")
-SP.mf1.2C <- ggplot(AC.DF1C, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + ggtitle("Effect of knocks on SPL MF, split by hour")
-
-SP.mf1.1C + ggtitle("Total Knocks effect on SPL MF, split by site") + stat_smooth(method = "lm") 
-SP.mf1.2C + ggtitle("Total Knocks effect on SPL MF, split by hour") + geom_smooth(method = "lm")
-kmf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1C)
-summary(kmf.lmc)
-
-SP.lmf1.1C <- ggplot(AC.DF1C, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site))
-SP.lmf1.1C + ggtitle("Long Calls effect on SPL MF, split by site") + stat_smooth(method = "lm") 
-
-
-SP.hmf1.1C <- ggplot(AC.DF1C, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site))
-SP.hmf1.1C + ggtitle("Herbivory effect on SPL MF, split by site") + stat_smooth(method = "lm")
-
-```
-
-2017-2018 data w/200 samples.  1st plot splits by site and second by hour to show any patterns before I break them down individually.
-
-
-```{r C collinearity, echo = TRUE}
-
-#subsetting only lm variables
-AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour))
-
-vif(AC.DF1Co)
-
-#no colinnearity found between explanatory variables
-#ggpairs(AC.DF1Co)
-
-```
-
-All values are near 1, values of 4 or 5 would be moderate. 1 = no collinearity.  I think this means that we have no collinearity between my explanatory variables
-
-
-**Breakdown by Site**
-
-```{r Cregressions5, echo = FALSE}
-SPmf.5c <- ggplot(s5c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "royalblue4") + ggtitle("Site 5")
-
-SPmf.5c + geom_smooth(method = "lm") + ggtitle("Site 5, MF SPL")
-s5mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s5c)
-summary(s5mf.lmc)
-```
-
-Site 5, knocks not significant.
-
-
-```{r Cregressions6, echo = FALSE}
-SPmf.35c <- ggplot(s35c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 35")
-
-SPmf.35c + geom_smooth(method = "lm") + ggtitle("Site 35, MF SPL")
-s35mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s35c)
-summary(s35mf.lmc)
-```
-
-Site 35, knocks significant.
-
-```{r Cregressions7, echo = FALSE}
-SPmf.8c <- ggplot(s8c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Orange") + ggtitle("Site 8")
-
-SPmf.8c + geom_smooth(method = "lm") + ggtitle("Site 8, MF SPL")
-s8mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s8c)
-summary(s8mf.lmc)
-```
-
-Site 8, knocks not significant. Negative relationship... thats interesting.
-
-```{r Cregressions8, echo = FALSE}
-SPmf.40c <- ggplot(s40c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 40")
-
-SPmf.40c + geom_smooth(method = "lm") + ggtitle("Site 40, MF SPL")
-s40mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s40c)
-summary(s40mf.lmc)
-```
-
-Site 40, knocks not significant.
-
-```{r Cregressions9, echo = FALSE}
-SPmf.32c <- ggplot(s32c, aes(Tot_Knocks, SPL_Midrange)) + geom_point(color = "Red") + ggtitle("Site 32")
-
-SPmf.32c + geom_smooth(method = "lm") + ggtitle("Site 32, MF SPL")
-s32mf.lmc = lm(SPL_Midrange ~ Tot_Knocks, data = s32c)
-summary(s32mf.lmc)
-```
-
-Site 32, knocks significant.
 
 #Time-Series Acoustics
 **Acoustics Breakdown** All acoustic metrics (SPL and ACI) are broken down into 2 frequency bands: High Frequency (Frequencies between 1 kHz - 22 kHz) and Mid Frequency (Frequencies between 160 Hz and 1 kHz)
