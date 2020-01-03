@@ -1,5 +1,5 @@
 ---
-title: "Acoustic_2019_Explore6"
+title: "Acoustic_2019_Explore7"
 author: "Sean Dimoff"
 date: "'r format(Sys.time(), '%d %B, %Y')'"
 output: 
@@ -746,6 +746,9 @@ Don't seem to have a normal distribution here... Working on testing different di
 
 
 ##Mid-Frequency SPL Model
+
+###Maximal Model
+
 Maximal Model with Bill
 
 ```{r model max, echo = TRUE}
@@ -756,6 +759,7 @@ summary(fit.m)
 stepAIC(fit.m)
 ```
 
+###Best MF-SPL Model
 Next is the best model from AIC stepwise model selection
 
 ```{r model fit, echo = TRUE}
@@ -770,7 +774,22 @@ plot(fit.m2)
 
 ```
 
+###Interaction Plots
+
+```{r ip2, echo = FALSE}
+IP4 <- interaction.plot(AC.DF1Co$Tot_Knocks, AC.DF1Co$Site, AC.DF1Co$SPL_Midrange)
+
+IP5 <- interaction.plot(AC.DF1Co$Tot_Knocks, AC.DF1Co$Hour, AC.DF1Co$SPL_Midrange)
+
+IP4
+IP5
+
+```
+
 ##Mid-Frequency ACI Model
+
+
+###Maximal Model
 Maximal model following Bill's method
 
 - gamma distribution due to the left skew of the data
@@ -784,6 +803,7 @@ AICc(fit.a, ACI.mf.lm)
 
 ```
 
+###Best Model
 Most parsimonious and best model from the AIC stepwise model selection
 
 ```{r model fit2, echo = TRUE}
@@ -796,6 +816,8 @@ summary(fit.a2)
 ```
 
 ##High Frequency SPL Model
+
+###Manual Model Selection
 
 Determining which is the best way to group the snaps by time
 
@@ -821,7 +843,9 @@ AICc(fit.tg, fit.dn, fit.ns, fit.t12, fit.t12t, fit.tgt, fit.dnt, fit.nst)
 
 ```
 
-Quartering the day was the best model, using time groups 0-5, 6-11, 12-17, 18-23
+
+###Best Model
+Best model was the one that split time at 9:20 and 21:40
 
 ``` {r model 2i, echo = TRUE}
 stepAIC(fit.t12)
@@ -829,55 +853,30 @@ stepAIC(fit.t12)
 #SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site
 
 snap.model <- lm(SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site, data = Snap.HF)
+
+anova(snap.model)
+
 summary(snap.model)
+
+plot(snap.model)
+
+
+
 ````
 
+###Interaction Plots
 
-#Spectrograms
+``` {r model ip, echo = FALSE}
+IP1 <- interaction.plot(Snap.HF$t12, Snap.HF$Snaps, Snap.HF$SPL_HF)
 
-Putting in spectrograms to analyze how the 4 different times sampled look
+IP2 <- interaction.plot(Snap.HF$Site, Snap.HF$Snaps, Snap.HF$SPL_HF)
 
-*Note* All spectrograms are time along the x axis, frequency along the y axis, frequency is zoomed in to just 0 - 3 kHz
+IP3 <- interaction.plot(Snap.HF$t12, Snap.HF$Site, Snap.HF$SPL_HF)
 
-Times progression: 3 AM, 9 AM, 3 PM, 9 PM
+IP1
+IP2
+IP3
 
-Site 5
+````
 
-```{r spectrograms5, echo = FALSE}
-spec5t <- image_append(c(spec3.5, spec9.5, spec15.5, spec21.5))
-spec5t <- image_resize(spec5t, "3000")
-spec5t
-```
-
-Site 8
-
-```{r spectrograms8, echo = FALSE}
-spec8t <- image_append(c(spec3.8, spec9.8, spec15.8, spec21.8))
-spec8t <- image_resize(spec8t, "3000")
-spec8t
-```
-
-Site 35
-
-```{r spectrograms35, echo = FALSE}
-spec35t <- image_append(c(spec3.35, spec9.35, spec15.35, spec21.35))
-spec35t <- image_resize(spec35t, "3000")
-spec35t
-```
-
-Site 32
-
-```{r spectrograms32, echo = FALSE}
-spec32t <- image_append(c(spec3.32, spec9.32, spec15.32, spec21.32))
-spec32t <- image_resize(spec32t, "3000")
-spec32t
-```
-
-Site 40
-
-```{r spectrograms40, echo = FALSE}
-spec40t <- image_append(c(spec3.40, spec9.40, spec15.40, spec21.40))
-spec40t <- image_resize(spec40t, "3000")
-spec40t
-```
 

@@ -260,8 +260,8 @@ Snap.HF18 <- merge(snap.181, SPLHF18.long, by = "ds.id")
 
 #saving my new dataframes
 
-save(Snap.HF17, file="Raw_Data/Snap.HF17.Rdata")
-save(Snap.HF18, file="Raw_Data/Snap.HF18.Rdata")
+#save(Snap.HF17, file="Raw_Data/Snap.HF17.Rdata")
+#save(Snap.HF18, file="Raw_Data/Snap.HF18.Rdata")
 
 #stacking these so that I get one total dataframe
 
@@ -287,13 +287,23 @@ Snap.HF <- rbind(Snap.HF17, Snap.HF18)
 Snap.HF$Site <- as.character(Snap.HF$Site)
 
 #making new column that takes hour and makes it continuous
+
+Snap.HF$Time2 <- sub(":", "", Snap.HF$Time)
+  
 Snap.HF <- Snap.HF %>% separate(Time, into = c("Hour", "Minutes"), sep = ":")
 
 Snap.HF$Hour <- as.numeric(Snap.HF$Hour)
 
 
+
+
 #binning time to create different categories of time
 #1st attempt - split into standard quarters at 6, 12, 18, 24 Hr
+
+Time1.1 <- 0:920
+Time1.2 <- 2141:2400
+Time2 <- 921:2140
+
 
 Early <- 0:5
 Morning <- 6:11
@@ -309,6 +319,10 @@ split1.2 <- 22:23
 split2 <- 4:9
 split3 <- 10:15
 split4 <- 16:21
+
+Snap.HF$t12[Snap.HF$Time2 %in% Time1.1] <- "High"
+Snap.HF$t12[Snap.HF$Time2 %in% Time1.2] <- "High"
+Snap.HF$t12[Snap.HF$Time2 %in% Time2] <- "Low"
 
 Snap.HF$tg[Snap.HF$Hour %in% Early] <- "Early"
 Snap.HF$tg[Snap.HF$Hour %in% Morning] <- "Morning"
