@@ -26,6 +26,7 @@ library(lmerTest)
 library(goft)
 library(magick)
 library(MuMIn)
+library(car)
 
 #loading in SPL data
 
@@ -86,6 +87,8 @@ AC.DF1C$Num_L_calls <- center_scale(AC.DF1C$Num_L_calls)
 #creating centered Snap.HF17 and 18 dataframes
 Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
 Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
+
+Snap.HF$Snaps <- center_scale(Snap.HF$Snaps)
 
 #subsetting only lm variables
 AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, ACI_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour, Year))
@@ -724,25 +727,32 @@ comsupp.t + scale_x_datetime(date_breaks = "1 day")
 
 **Preliminary Models** Looking into the relationships between biogenic sounds (Knocks/Calls and Snaps) and their frequency spectra (MF SPL/HF SPL) respectively.
 
-##Testing for Normality
+##Testing for Distribution
 
 ```{r normal, echo = TRUE}
 
 shapiro.test(AC.DF1$SPL_Midrange)
 qqnorm(AC.DF1$SPL_Midrange)
 
-ks.test(SPLHF.long$SPL_HF, "pnorm", mean=mean(SPLHF.long$SPL_HF), sd=sd(SPLHF.long$SPL_HF))
+#ks.test(SPLHF.long$SPL_HF, "pnorm", mean=mean(SPLHF.long$SPL_HF), sd=sd(SPLHF.long$SPL_HF))
 
-ks.test(SPLMF.long$SPL_MF, "pnorm", mean=mean(SPLMF.long$SPL_MF), sd=sd(SPLMF.long$SPL_MF))
+#ks.test(SPLMF.long$SPL_MF, "pnorm", mean=mean(SPLMF.long$SPL_MF), sd=sd(SPLMF.long$SPL_MF))
 
-gamma_test(AC.DF1$SPL_Midrange)
-weibull_test(AC.DF1$SPL_Midrange)
+ggplot(data = Snap.HF, aes(Snap.HF$SPL_HF)) + geom_histogram() + ggtitle("HF SPL distribution")
 
-gamma_test(AC.DF1$SPL_HF)
-weibull_test(AC.DF1$SPL_HF)
+ggplot(data = AC.DF1, aes(AC.DF1$ACI_Midrange)) + geom_histogram() + ggtitle("MF ACI distribution")
+
+ggplot(data = AC.DF1, aes(AC.DF1$ACI_HF)) + geom_histogram() + ggtitle("HF ACI distribution")
+
+
+gamma_test(AC.DF1$ACI_Midrange)
+gamma_test(AC.DF1$ACI_HF)
+
+gamma_test(Snap.HF$SPL_HF)
+
 ```
 
-Don't seem to have a normal distribution here... Working on testing different distributions.  Not sure what the outputs on the gamma or weibull tests mean
+Don't seem to have a normal distribution here... Working on testing different distributions.  Can't find what the p-values indicate for these gamma tests
 
 
 ##Mid-Frequency SPL Model
@@ -768,7 +778,7 @@ Next is the best model from AIC stepwise model selection
 
 fit.m2 <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Site + Hour + Year + Tot_Knocks:Site + Tot_Knocks:Hour + Num_Herbivory:Site + Num_L_calls:Site + Num_L_calls:Hour, data = AC.DF1Co)
 
-anova(fit.m2)
+Anova(fit.m2, type=3)
 summary(fit.m2)
 plot(fit.m2)
 
@@ -815,6 +825,19 @@ summary(fit.a2)
 
 ```
 
+
+##High Frequency ACI Model
+```{r high freq ACI, echo = TRUE}
+
+#fit.hfaci <- glm(ACI_HF ~(Snaps*t12*Site) + Year, data = Snap.HF, family = "Gamma")
+#summary(fit.a)
+#stepAIC(fit.a)
+
+#AICc(fit.a, ACI.mf.lm)
+
+
+
+```
 ##High Frequency SPL Model
 
 ###Manual Model Selection
@@ -854,7 +877,7 @@ stepAIC(fit.t12)
 
 snap.model <- lm(SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site, data = Snap.HF)
 
-anova(snap.model)
+Anova(snap.model, type = 3)
 
 summary(snap.model)
 
@@ -878,5 +901,87 @@ IP2
 IP3
 
 ````
+
+##High Frequency SPL Model - fixing distribution
+
+###trying different data transformations
+
+Because my QQ plot above is so skewed I am going to try to transform the data to fit a normal distribution
+
+First, checking my distribution of all of my data
+
+```{r distribution, echo = FALSE}
+
+ggplot(data = Snap.HF, aes(Snap.HF$SPL_HF)) + geom_histogram() + ggtitle("HF SPL distribution")
+
+```
+
+Second, backtransformed (Because SPL is inherently log transformed)
+
+```{r transform, echo = TRUE}
+
+Snap.HF$btdata <- exp(Snap.HF$SPL_HF)
+
+snap.modelbt <- lm(btdata ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site, data = Snap.HF)
+
+plot(snap.modelbt)
+
+```
+
+Reciprocal transformation
+
+```{r reciprocal transform, echo = TRUE}
+Snap.HF$recdata <- 1/(Snap.HF$SPL_HF)
+
+snap.modelrec <- lm(recdata ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site, data = Snap.HF)
+
+plot(snap.modelrec)
+```
+
+
+###Gamma distribution
+
+Determining which is the best way to group the snaps by time * with a gamma distribution
+
+tg = quarters (00-05, 06-11, 12-17, 18-23)
+dn = day night (18-05, 6-17)
+ns = nine cycle (22-03, 04-09, 10-15, 16-21)
+t12 = my half and half cycle (2140 - 920, 920 - 2140)
+
+```{r model snaps2, echo = TRUE}
+fit.tg <- glm(SPL_HF ~ Snaps*tg*Site + Year, data = Snap.HF, family = "Gamma")
+fit.dn <- glm(SPL_HF ~ Snaps*dn*Site + Year, data = Snap.HF, family = "Gamma")
+fit.ns <- glm(SPL_HF ~ Snaps*ns*Site + Year, data = Snap.HF, family = "Gamma")
+fit.t12 <- glm(SPL_HF ~Snaps*t12*Site + Year, data = Snap.HF, family = "Gamma")
+
+#models that have a 2 way interaction and time seperately as a factor
+fit.t12t <- glm(SPL_HF ~ Snaps*Site + t12 + Year, data = Snap.HF, family = "Gamma")
+fit.tgt <- glm(SPL_HF ~ Snaps*Site + tg + Year, data = Snap.HF, family = "Gamma")
+fit.dnt <- glm(SPL_HF ~ Snaps*Site + dn + Year, data = Snap.HF, family = "Gamma")
+fit.nst <- glm(SPL_HF ~ Snaps*Site + ns + Year, data = Snap.HF, family = "Gamma")
+
+AICc(fit.tg, fit.dn, fit.ns, fit.t12, fit.t12t, fit.tgt, fit.dnt, fit.nst)
+
+```
+
+t12 is still the best split, like before
+
+Gamma distribution, using a glm
+
+```{r hf gamma, echo = TRUE}
+snap.model2 <- glm(SPL_HF ~ Snaps*t12*Site + Year, data = Snap.HF, family = "Gamma")
+
+stepAIC(snap.model2)
+
+```
+
+Therefore, my most parsimonious model is
+
+```{r hf gamma best, echo = TRUE}
+snap.model2b <- glm(SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site, data = Snap.HF, family = "Gamma")
+
+summary(snap.model2b)
+```
+
 
 
