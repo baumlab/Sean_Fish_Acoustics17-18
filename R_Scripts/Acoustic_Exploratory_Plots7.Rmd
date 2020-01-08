@@ -883,6 +883,7 @@ summary(snap.model)
 
 plot(snap.model)
 
+hist(resid(snap.model))
 
 
 ````
@@ -981,6 +982,8 @@ Therefore, my most parsimonious model is
 snap.model2b <- glm(SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site, data = Snap.HF, family = "Gamma")
 
 summary(snap.model2b)
+
+hist(resid(snap.model))
 ```
 
 
