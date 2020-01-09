@@ -171,79 +171,128 @@ s5.18 <- subset(s5.18, select = -c(Month, Day, Hour, Minute, Seconds))
 
 ## Broadband ACI ####
 #pulling columns before merge
-ACI_BB_32 <- s32.17 %>% select(ACI_BB, Date, Time)
-ACI_BB_35 <- s35.17 %>% select(ACI_BB, Date, Time)
-ACI_BB_40 <- s40.17 %>% select(ACI_BB, Date, Time)
-ACI_BB_5 <- s5.17 %>% select(ACI_BB, Date, Time)
-ACI_BB_8 <- s8.17 %>% select(ACI_BB, Date, Time)
-
-#Merging dataframes matching on date and time
-ACI_BB <- merge(ACI_BB_32, ACI_BB_35, by = c('Date', 'Time'))
-ACI_BB <- merge(ACI_BB, ACI_BB_40, by = c('Date', 'Time'))
-ACI_BB <- merge(ACI_BB, ACI_BB_8, by = c('Date', 'Time'))
-ACI_BB <- merge(ACI_BB, ACI_BB_5, by = c('Date', 'Time'))
-
-#renaming columns
-names(ACI_BB) <- c("Date", "Time", "32", "35", "40", "8", "5")
-
-ACI_BB17 <- ACI_BB
-
-#2018
-#pulling columns before merge
-ACI_BB_32 <- s32.18 %>% select(ACI_BB, Date, Time)
-ACI_BB_35 <- s35.18 %>% select(ACI_BB, Date, Time)
-ACI_BB_40 <- s40.18 %>% select(ACI_BB, Date, Time)
-ACI_BB_5 <- s5.18 %>% select(ACI_BB, Date, Time)
-ACI_BB_8 <- s8.18 %>% select(ACI_BB, Date, Time)
-
-#Merging dataframes matching on date and time
-ACI_BB <- merge(ACI_BB_32, ACI_BB_35, by = c('Date', 'Time'))
-ACI_BB <- merge(ACI_BB, ACI_BB_40, by = c('Date', 'Time'))
-ACI_BB <- merge(ACI_BB, ACI_BB_8, by = c('Date', 'Time'))
-ACI_BB <- merge(ACI_BB, ACI_BB_5, by = c('Date', 'Time'))
-
-ACI_BB18 <- ACI_BB
-
-#renaming columns
-names(ACI_BB18) <- c("Date", "Time", "32", "35", "40", "8", "5")
+#ACI_BB_32 <- s32.17 %>% select(ACI_BB, Date, Time)
+#ACI_BB_35 <- s35.17 %>% select(ACI_BB, Date, Time)
+#ACI_BB_40 <- s40.17 %>% select(ACI_BB, Date, Time)
+#ACI_BB_5 <- s5.17 %>% select(ACI_BB, Date, Time)
+#ACI_BB_8 <- s8.17 %>% select(ACI_BB, Date, Time)
+#
+##Merging dataframes matching on date and time
+#ACI_BB <- merge(ACI_BB_32, ACI_BB_35, by = c('Date', 'Time'))
+#ACI_BB <- merge(ACI_BB, ACI_BB_40, by = c('Date', 'Time'))
+#ACI_BB <- merge(ACI_BB, ACI_BB_8, by = c('Date', 'Time'))
+#ACI_BB <- merge(ACI_BB, ACI_BB_5, by = c('Date', 'Time'))
+#
+##renaming columns
+#names(ACI_BB) <- c("Date", "Time", "32", "35", "40", "8", "5")
+#
+#ACI_BB17 <- ACI_BB
+#
+##2018
+##pulling columns before merge
+#ACI_BB_32 <- s32.18 %>% select(ACI_BB, Date, Time)
+#ACI_BB_35 <- s35.18 %>% select(ACI_BB, Date, Time)
+#ACI_BB_40 <- s40.18 %>% select(ACI_BB, Date, Time)
+#ACI_BB_5 <- s5.18 %>% select(ACI_BB, Date, Time)
+#ACI_BB_8 <- s8.18 %>% select(ACI_BB, Date, Time)
+#
+##Merging dataframes matching on date and time
+#ACI_BB <- merge(ACI_BB_32, ACI_BB_35, by = c('Date', 'Time'))
+#ACI_BB <- merge(ACI_BB, ACI_BB_40, by = c('Date', 'Time'))
+#ACI_BB <- merge(ACI_BB, ACI_BB_8, by = c('Date', 'Time'))
+#ACI_BB <- merge(ACI_BB, ACI_BB_5, by = c('Date', 'Time'))
+#
+#ACI_BB18 <- ACI_BB
+#
+##renaming columns
+#names(ACI_BB18) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
 ## HF ACI ####
+
+# wide format
+
 #pulling columns before merge
-ACI_HF_32 <- s32.17 %>% select(ACI_HF, Date, Time)
-ACI_HF_35 <- s35.17 %>% select(ACI_HF, Date, Time)
-ACI_HF_40 <- s40.17 %>% select(ACI_HF, Date, Time)
-ACI_HF_5 <- s5.17 %>% select(ACI_HF, Date, Time)
-ACI_HF_8 <- s8.17 %>% select(ACI_HF, Date, Time)
+ACI_HF_32.17 <- s32.17 %>% select(ACI_HF, Date, Time)
+ACI_HF_35.17 <- s35.17 %>% select(ACI_HF, Date, Time)
+ACI_HF_40.17 <- s40.17 %>% select(ACI_HF, Date, Time)
+ACI_HF_5.17 <- s5.17 %>% select(ACI_HF, Date, Time)
+ACI_HF_8.17 <- s8.17 %>% select(ACI_HF, Date, Time)
 
 #Merging dataframes matching on date and time
-ACI_HF <- merge(ACI_HF_32, ACI_HF_35, by = c('Date', 'Time'))
-ACI_HF <- merge(ACI_HF, ACI_HF_40, by = c('Date', 'Time'))
-ACI_HF <- merge(ACI_HF, ACI_HF_8, by = c('Date', 'Time'))
-ACI_HF <- merge(ACI_HF, ACI_HF_5, by = c('Date', 'Time'))
+ACI_HF.17 <- merge(ACI_HF_32.17, ACI_HF_35.17, by = c('Date', 'Time'))
+ACI_HF.17 <- merge(ACI_HF.17, ACI_HF_40.17, by = c('Date', 'Time'))
+ACI_HF.17 <- merge(ACI_HF.17, ACI_HF_8.17, by = c('Date', 'Time'))
+ACI_HF.17 <- merge(ACI_HF.17, ACI_HF_5.17, by = c('Date', 'Time'))
 
 #renaming columns
-names(ACI_HF) <- c("Date", "Time", "32", "35", "40", "8", "5")
+names(ACI_HF.17) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
-ACI_HF17 <- ACI_HF
+ACI_HF17 <- ACI_HF.17
+
+# long format
+
+#Creating new site column in each dataframe befoer rbind
+ACI_HF_32.17$Site <- 32
+ACI_HF_35.17$Site <- 35
+ACI_HF_40.17$Site <- 40
+ACI_HF_5.17$Site <- 5
+ACI_HF_8.17$Site <- 8
+
+#rbinding dataframes together
+ACI_HF17_long <- rbind(ACI_HF_32.17, ACI_HF_35.17, ACI_HF_40.17, ACI_HF_5.17, ACI_HF_8.17)
+
+#adding year
+ACI_HF17_long$Year <- 2017
 
 #2018
 #pulling columns before merge
-ACI_HF_32 <- s32.18 %>% select(ACI_HF, Date, Time)
-ACI_HF_35 <- s35.18 %>% select(ACI_HF, Date, Time)
-ACI_HF_40 <- s40.18 %>% select(ACI_HF, Date, Time)
-ACI_HF_5 <- s5.18 %>% select(ACI_HF, Date, Time)
-ACI_HF_8 <- s8.18 %>% select(ACI_HF, Date, Time)
+ACI_HF_32.18 <- s32.18 %>% select(ACI_HF, Date, Time)
+ACI_HF_35.18 <- s35.18 %>% select(ACI_HF, Date, Time)
+ACI_HF_40.18 <- s40.18 %>% select(ACI_HF, Date, Time)
+ACI_HF_5.18 <- s5.18 %>% select(ACI_HF, Date, Time)
+ACI_HF_8.18 <- s8.18 %>% select(ACI_HF, Date, Time)
 
 #Merging dataframes matching on date and time
-ACI_HF <- merge(ACI_HF_32, ACI_HF_35, by = c('Date', 'Time'))
-ACI_HF <- merge(ACI_HF, ACI_HF_40, by = c('Date', 'Time'))
-ACI_HF <- merge(ACI_HF, ACI_HF_8, by = c('Date', 'Time'))
-ACI_HF <- merge(ACI_HF, ACI_HF_5, by = c('Date', 'Time'))
+ACI_HF.18 <- merge(ACI_HF_32.18, ACI_HF_35.18, by = c('Date', 'Time'))
+ACI_HF.18 <- merge(ACI_HF.18, ACI_HF_40.18, by = c('Date', 'Time'))
+ACI_HF.18 <- merge(ACI_HF.18, ACI_HF_8.18, by = c('Date', 'Time'))
+ACI_HF.18 <- merge(ACI_HF.18, ACI_HF_5.18, by = c('Date', 'Time'))
 
 #renaming columns
-names(ACI_HF) <- c("Date", "Time", "32", "35", "40", "8", "5")
+names(ACI_HF.18) <- c("Date", "Time", "32", "35", "40", "8", "5")
 
-ACI_HF18 <- ACI_HF
+ACI_HF18 <- ACI_HF.18
+
+#Creating new site column in each dataframe befoer rbind
+ACI_HF_32.18$Site <- 32
+ACI_HF_35.18$Site <- 35
+ACI_HF_40.18$Site <- 40
+ACI_HF_5.18$Site <- 5
+ACI_HF_8.18$Site <- 8
+
+#rbinding dataframes together
+ACI_HF18_long <- rbind(ACI_HF_32.18, ACI_HF_35.18, ACI_HF_40.18, ACI_HF_5.18, ACI_HF_8.18)
+
+#adding year
+ACI_HF18_long$Year <- 2018
+
+#Rbinding 2017 and 2018
+ACI_HF_long <- rbind(ACI_HF17_long, ACI_HF18_long)
+
+#creating datetime column that I can match with Snap.HF
+
+#combining year and date
+ACI_HF_long$Date <- paste(ACI_HF_long$Date, ACI_HF_long$Year, sep = "-")
+
+#creating datetime column
+ACI_HF_long$datetime <- as.POSIXct(paste(ACI_HF_long$Date, ACI_HF_long$Time), format = "%d-%m-%Y %H:%M")
+
+#making a ds.id column to create a date/time/site id for every ACI value
+ACI_HF_long$ds.id <- paste(ACI_HF_long$datetime, ACI_HF_long$Site, sep = "_")
+
+#saving this dataframe
+save(ACI_HF_long, file = "Raw_Data/ACI_HF_long.Rdata")
+
 
 ## MF ACI ####
 #pulling columns before merge

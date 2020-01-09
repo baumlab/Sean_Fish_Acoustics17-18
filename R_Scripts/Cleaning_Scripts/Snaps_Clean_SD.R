@@ -240,9 +240,10 @@ AC.DF1 <- merge(AC.DF, snaps, by = "st.id")
 #
 #write.csv(missing.snaps, "Raw_Data/MissingFiles.csv")
 #
-#### Merge snaps long and High Frequency SPL ####
+#### Merge snaps long and High Frequency SPL **and high frequency ACI ####
 load("Raw_Data/SPLHF17long.Rdata")
 load("Raw_Data/SPLHF18long.Rdata")
+load("Raw_Data/ACI_HF_long.Rdata")
 
 #creating new column in each dataframe that includes date/time and site together to match with
 snap.171$ds.id <- paste(snap.171$datetime, snap.171$Site, sep = "_")
@@ -280,6 +281,15 @@ Snap.HF18 <- Snap.HF18[,c("datetime.x", "Site.x", "Date.x", "Time.x", "Year", "d
 names(Snap.HF17) <- c("datetime", "Site", "Date", "Time", "Year", "ds.id", "Snaps", "SPL_HF")
 names(Snap.HF18) <- c("datetime", "Site", "Date", "Time", "Year", "ds.id", "Snaps", "SPL_HF")
 
+#making time only 4 digits long in 2018 to match with 2017
+Snap.HF18 <- Snap.HF18 %>% separate(Time, into = c("Hour", "Minute", "Seconds"), sep = ":")
+
+Snap.HF18$Time <- paste(Snap.HF18$Hour, Snap.HF18$Minute, sep = ":")
+
+#removing extra columns
+drop3 <- c("Hour", "Minute", "Seconds")
+Snap.HF18 <- Snap.HF18[,!names(Snap.HF18)%in%drop3]
+
 #rbinding these together
 Snap.HF <- rbind(Snap.HF17, Snap.HF18)
 
@@ -293,6 +303,9 @@ Snap.HF$Time2 <- sub(":", "", Snap.HF$Time)
 Snap.HF <- Snap.HF %>% separate(Time, into = c("Hour", "Minutes"), sep = ":")
 
 Snap.HF$Hour <- as.numeric(Snap.HF$Hour)
+
+#making time2 a numeric
+Snap.HF$Time2 <- as.numeric(Snap.HF$Time2)
 
 
 
@@ -339,7 +352,14 @@ Snap.HF$ns[Snap.HF$Hour %in% split2] <- "3AM-9AM"
 Snap.HF$ns[Snap.HF$Hour %in% split3] <- "9AM-3PM"
 Snap.HF$ns[Snap.HF$Hour %in% split4] <- "9PM-3AM"
 
+#matching ACI dataframe to Snap.HF 
+Snap.HF <- merge(Snap.HF, ACI_HF_long, by = c("ds.id", "ds.id"))
+#removing extra columns
+drop2 <- c("Date.y", "Time", "Site.y", "Year.y", "datetime.y")
+Snap.HF <- Snap.HF[,!names(Snap.HF)%in%drop2]
 
+#renaming columns
+names(Snap.HF) <- c("ds.id", "datetime", "Site", "Date", "Hour", "Minutes", "Year", "Snaps", "SPL_HF", "Time2", "t12", "tg", "dn", "ns", "ACI_HF")
 
 save(Snap.HF, file="Raw_Data/Snap.HF.Rdata")
 
