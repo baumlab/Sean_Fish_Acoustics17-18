@@ -52,6 +52,7 @@ snap.18$st.id <- paste(snap.18$st.id, snap.18$Hour, sep= "-")
 
 snap.18$st.id <- paste(snap.18$st.id, snap.18$Site, sep= "_")
 
+snap.181 <- snap.18
 #removing all rows with minutes = not 0
 attach(snap.18)
 snap.18 <- snap.18[which(Minute=="0"),]
@@ -59,9 +60,6 @@ detach(snap.18)
 
 #2018 is now ready to match with the AC.DF dataframe
 
-
-## Prepping 2018 Snap to match with SPLHF long dataframe
-snap.181 <- snap.18
 
 #dropping useless columns
 colnames(snap.181)
@@ -90,7 +88,7 @@ snap.181$Time1 <- paste(snap.181$Hour, snap.181$Minute, sep = ":")
 
 snap.181$datetime <- as.POSIXct(paste(snap.181$Date1, snap.181$Time1), format = "%d-%m-%Y %H:%M")
 
-save(snap.181, file="Raw_Data/snap18long.Rdata")
+#save(snap.181, file="Raw_Data/snap18long.Rdata")
 
 ##### 2017 Data ####
 
@@ -182,12 +180,12 @@ snap.171$Time <- paste(snap.171$Hour, snap.171$Minute, sep = ":")
 
 snap.171$datetime <- as.POSIXct(paste(snap.171$Date1, snap.171$Time), format = "%d-%m-%Y %H:%M")
 
-save(snap.171, file="Raw_Data/snap17long.Rdata")
+#save(snap.171, file="Raw_Data/snap17long.Rdata")
 
 
 ##### Combining 2017 and 2018 Data ####
-snap.17 <- snap.17 %>% select(st.id, Snaps)
-snap.18 <- snap.18 %>% select(st.id, Snaps)
+snap.17 <- snap.17 %>% dplyr::select(st.id, Snaps)
+snap.18 <- snap.18 %>% dplyr::select(st.id, Snaps)
 
 ##### Merge 2017 and 2018 with AC.DF ####
 snaps <- rbind(snap.17, snap.18)
