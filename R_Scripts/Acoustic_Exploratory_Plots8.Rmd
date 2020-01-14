@@ -788,13 +788,24 @@ Distribution looks normal, given what we discussed about the HF SPL distribution
 ###Maximal Model
 
 ```{r hf ACI max models, echo = TRUE}
+#testing time splits for this model to confirm they are the same as SPL HF model
+afit.tg <- lm(ACI_HF ~ Snaps*tg*Site + Year, data = Snap.HFC)
+afit.dn <- lm(ACI_HF ~ Snaps*dn*Site + Year, data = Snap.HFC)
+afit.ns <- lm(ACI_HF ~ Snaps*ns*Site + Year, data = Snap.HFC)
+afit.t12 <- lm(ACI_HF ~Snaps*t12*Site + Year, data = Snap.HFC)
+
+
+
+AICc(afit.tg, afit.dn, afit.ns, afit.t12)
+
 
 fit.hfaci <- lm(ACI_HF ~ Snaps*t12 + Snaps*Site + t12*Site + Year, data = Snap.HFC)
 fit.hfaci2 <- lm(ACI_HF ~ Snaps*t12*Site + Year, data = Snap.HFC)
+fit.hfaci3 <- lm(ACI_HF ~ Snaps*t12 + Snaps*Site + Year, data = Snap.HFC)
 
-AICc(fit.hfaci,fit.hfaci2)
-summary(fit.hfaci)
-stepAIC(fit.hfaci)
+AICc(fit.hfaci,fit.hfaci2, fit.hfaci3)
+summary(fit.hfaci2)
+stepAIC(fit.hfaci2)
 
 IP4 <- interaction.plot(Snap.HFC$t12, Snap.HFC$Site, Snap.HF$ACI_HF)
 
@@ -808,8 +819,8 @@ What does it mean - it means that HF ACI is significantly associated with combin
 
 ```{r high freq ACI, echo = TRUE}
 
-#fit.hfaci <- glm(ACI_HF ~(Snaps*t12*Site) + Year, data = Snap.HF, family = "Gamma")
-#summary(fit.a)
+#fit.hfaci <- lm(ACI_HF ~(Snaps*t12*Site) + Year, data = Snap.HF)
+#summary(fit.hfaci)
 #stepAIC(fit.a)
 
 #AICc(fit.a, ACI.mf.lm)
@@ -848,18 +859,26 @@ AICc(fit.tg, fit.dn, fit.ns, fit.t12, fit.t12t, fit.tgt, fit.dnt, fit.nst)
 ###Best Model
 Best model was the one that split time at 9:20 and 21:40
 
+Confused about my next steps here
+
 ``` {r model 2i, echo = TRUE}
 stepAIC(fit.t12)
+#returned only the three way interaction - so I am going to try some manual selection to see if there is a more parsimonious model
 
+fit.hf1 <- lm(SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site, data = Snap.HFC)
+fit.hf2 <- lm(SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site, data = Snap.HFC)
+fit.hf3 <- lm(SPL_HF ~ Snaps + Site + Snaps:Site, data = Snap.HFC)
+
+AICc(fit.t12,fit.hf1, fit.hf2, fit.hf3)
 #SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site
 
 snap.model <- lm(SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site, data = Snap.HFC)
 
-Anova(snap.model, type = 3)
+Anova(fit.t12, type = 3)
 
-summary(snap.model)
+summary(fit.t12)
 
-plot(snap.model)
+plot(fit.t12)
 
 hist(resid(snap.model))
 
@@ -936,7 +955,7 @@ Here is a plot using only one site (Site 5)
 
 ```{r hf SPL plot2, echo = FALSE}
 #HF SPL and snaps - just site 5
-SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF)) + geom_point(aes(color=t12))
+SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point() + geom_smooth(method = "lm", se=F)
 SP2.hf
 ```
 
@@ -957,7 +976,7 @@ Here is a plot that only uses 9am
 
 ```{r mf SPL plot2, echo = FALSE}
 #Just site 5 at 9 am
-SP.mf9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site))
+SP.mf9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + geom_smooth(method = "lm", se=F)
 SP.mf9
 ```
 
@@ -967,7 +986,7 @@ This shows that the pattern exists at pretty much all sites except for 5. I thin
 ```{r hf diurnal trends, echo = FALSE}
 #High frequency
 hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
-hf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+hf.dplot.F <- hf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
 
 ```
 
@@ -975,21 +994,28 @@ That looks nice!
 
 ```{r mf diurnal trends, echo = FALSE}
 mf.dplot <- ggplot(SPLMF.long518, aes(x=Time, y=SPL_MF)) + geom_point() + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
-mf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+mf.dplot.F <- mf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
 
 ```
 
 Hey! So does that! Is it not OK for us to use site 5 here because it was the one site that didn't seem to have a strong relationship at 9 AM?
 
+##Combination Plot
+```{r combination plot, echo = FALSE}
+pdf("Figures/4plot.pdf")
+grid.arrange(mf.dplot.F, SP.mf9, hf.dplot.F, SP2.hf, nrow=2)
+dev.off()
+```
+
 ##HF ACI Plots
 
 ```{r hf ACI plot, echo = FALSE}
 #putting time in order
-attach(Snap.HF)
-Snap.HF <- Snap.HF[order(Time2),]
-detach(Snap.HF)
+Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
 
-hfa.dplot <- ggplot(Snap.HFT, aes(x=Time2, y =ACI_HF)) + geom_point(aes(color = t12)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
-hfa.dplot + scale_x_discrete(breaks = c("0:00", "3:00", "6:00", "9:00", "12:00", "15:00", "18:00", "21:00"))
+unique(Snap.HF$Time)
+#assign manual x axis to this graph
+hfa.dplot <- ggplot(Snap.HF, aes(x=Time2, y =ACI_HF)) + geom_point(aes(color = t12)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+hfa.dplot + scale_x_discrete(breaks = c(0, 300, 900, 1200, 1500, 2100))
 ```
 
