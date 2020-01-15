@@ -1,5 +1,5 @@
 ---
-title: "Acoustic_2019_Explore8"
+title: "Acoustic_2019_FinalPlots1"
 author: "Sean Dimoff"
 date: "'r format(Sys.time(), '%d %B, %Y')'"
 output: 
@@ -27,6 +27,7 @@ library(goft)
 library(magick)
 library(MuMIn)
 library(car)
+library(gridExtra)
 
 #loading in SPL data
 
@@ -87,6 +88,12 @@ AC.DF1C$Num_L_calls <- center_scale(AC.DF1C$Num_L_calls)
 #creating centered Snap.HF17 and 18 dataframes
 Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
 Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
+
+
+#removing outliers from Snap.HF dataframe
+low.snap <- Snap.HF[Snap.HF$Snaps <1000, ]
+# Remove anything with fewer than 2 observers 
+Snap.HF <- Snap.HF[!(Snap.HF$ds.id %in% low.snap$ds.id),]
 
 #making a snap.hf dataframe to center
 Snap.HFC <- Snap.HF
@@ -946,7 +953,7 @@ This first plot uses ALL data (2017 & 2018) and all sites
 ```{r hf SPL plot, echo = FALSE}
 #Plot of High frequency SPL and snaps
 SP.hf <- ggplot(Snap.HF, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site, shape=t12))
-SP.hf
+#SP.hf
 ```
 
 It seems super crowded, so maybe we only need to display a piece of it?
@@ -955,7 +962,7 @@ Here is a plot using only one site (Site 5)
 
 ```{r hf SPL plot2, echo = FALSE}
 #HF SPL and snaps - just site 5
-SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point() + geom_smooth(method = "lm", se=F)
+SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point() + geom_smooth(method = "lm", se=F) + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + theme_classic() + labs(y = "High Frequency SPL")
 SP2.hf
 ```
 
@@ -966,7 +973,7 @@ This plot uses ALL data (2017 & 2018) and all sites/hours
 ```{r mf SPL plot, echo = FALSE}
 #Plot of Mid frequency SPL and knocks - ALL SITES
 SP.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site, shape = Hour))
-SP.mf
+#SP.mf
 
 ```
 
@@ -976,7 +983,7 @@ Here is a plot that only uses 9am
 
 ```{r mf SPL plot2, echo = FALSE}
 #Just site 5 at 9 am
-SP.mf9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + geom_smooth(method = "lm", se=F)
+SP.mf9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + geom_smooth(method = "lm", se=F) + theme_classic() + labs(y = "Low Frequency SPL", x = "Number of Knocks")
 SP.mf9
 ```
 
@@ -985,9 +992,9 @@ This shows that the pattern exists at pretty much all sites except for 5. I thin
 ##Diurnal trends Plots
 ```{r hf diurnal trends, echo = FALSE}
 #High frequency
-hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
-hf.dplot.F <- hf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme( legend.position = "none") + theme(axis.title.x = element_blank(), axis.text.x = element_blank()) + labs(y = "High Frequency SPL")
 
+hf.dplot
 ```
 
 That looks nice!
@@ -996,18 +1003,20 @@ That looks nice!
 mf.dplot <- ggplot(SPLMF.long518, aes(x=Time, y=SPL_MF)) + geom_point() + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
 mf.dplot.F <- mf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
 
+mf.dplot + theme_classic() 
+
 ```
 
 Hey! So does that! Is it not OK for us to use site 5 here because it was the one site that didn't seem to have a strong relationship at 9 AM?
 
 ##Combination Plot
 ```{r combination plot, echo = FALSE}
-pdf("Figures/4plot.pdf")
-grid.arrange(mf.dplot.F, SP.mf9, hf.dplot.F, SP2.hf, nrow=2)
-dev.off()
+grid.arrange(hf.dplot, SP2.hf, mf.dplot.F, SP.mf9, nrow=2)
 ```
 
 ##HF ACI Plots
+
+###Diurnal Plot
 
 ```{r hf ACI plot, echo = FALSE}
 #putting time in order
@@ -1015,7 +1024,40 @@ Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
 
 unique(Snap.HF$Time)
 #assign manual x axis to this graph
-hfa.dplot <- ggplot(Snap.HF, aes(x=Time2, y =ACI_HF)) + geom_point(aes(color = t12)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
-hfa.dplot + scale_x_discrete(breaks = c(0, 300, 900, 1200, 1500, 2100))
+hfa.dplot <- ggplot(Snap.HF, aes(x=Time2, y =ACI_HF)) + geom_point(aes(color = t12)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
+hfa.dplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day"))
 ```
 
+### Point Plot
+
+```{r hf ACI pointplot, echo = FALSE}
+#putting time in order
+Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
+
+unique(Snap.HF$Time)
+#assign manual x axis to this graph
+hfa.bplot <- ggplot(Snap.HF, aes(x=Snaps, y =ACI_HF, color = t12)) + geom_point(size = .5) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
+hfa.bplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + geom_smooth(method="lm", se=F)
+```
+
+##HF SPL Plots
+
+###Diurnal Plot
+
+```{r hf SPL plot3, echo = FALSE}
+hfs.dplot <- ggplot(Snap.HF, aes(x=Time2, y = SPL_HF)) + geom_point(aes(color = t12)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle=90))
+
+hfs.dplot +labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day"))
+```
+
+### Point Plot
+
+```{r hf SPL pointplot, echo = FALSE}
+#putting time in order
+Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
+
+unique(Snap.HF$Time)
+#assign manual x axis to this graph
+hfs.bplot <- ggplot(Snap.HF, aes(x=Snaps, y =SPL_HF, color = t12)) + geom_point(size = .5) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
+hfs.bplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + geom_smooth(method = lm, se=F)
+```
