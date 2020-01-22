@@ -915,6 +915,137 @@ IP3
 
 
 
+
+#Models with Random Effect
+
+##Mid-Frequency SPL Model
+
+
+###Best MF-SPL Model
+Next is the best model from AIC stepwise model selection
+
+```{r model fit, echo = TRUE}
+
+#SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Site + Hour + Year + Tot_Knocks:Site + Tot_Knocks:Hour + Num_Herbivory:Site + Num_L_calls:Site + Num_L_calls:Hour
+
+fit.m2 <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Site + Hour + Year + Tot_Knocks:Site + Tot_Knocks:Hour + Num_Herbivory:Site + Num_L_calls:Site + Num_L_calls:Hour, data = AC.DF1Co)
+
+Anova(fit.m2, type=3)
+summary(fit.m2)
+plot(fit.m2)
+
+```
+
+##Mid-Frequency ACI Model
+
+
+
+###Best Model
+Most parsimonious and best model from the AIC stepwise model selection
+
+```{r model fit2, echo = TRUE}
+
+#ACI_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Site + Hour + Year + Num_Herbivory:Site
+fit.a2 <- glm(ACI_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Site + Hour + Num_Herbivory:Site, data = AC.DF1Co, family = "Gamma")
+summary(fit.a2)
+  
+
+```
+
+
+##High Frequency ACI Model
+
+###Distribution
+```{r hf ACI distribution, echo = TRUE}
+
+ggplot(data =Snap.HF, aes(Snap.HF$ACI_HF)) + geom_histogram() + ggtitle("HF ACI distribution") + geom_vline(aes(xintercept = mean(ACI_HF)), color = "red", linetype ="dashed", size = 1) + geom_vline(aes(xintercept = median(ACI_HF)), color = "blue", linetype = "dotted", size = 1)
+
+```
+
+Distribution looks normal, given what we discussed about the HF SPL distribution
+
+###Maximal Model
+
+```{r hf ACI max models2, echo = TRUE}
+#testing time splits for this model to confirm they are the same as SPL HF model
+afit.tg1 <- lmer(ACI_HF ~ Snaps*tg + (1|Site) + Year, data = Snap.HFC)
+afit.dn1 <- lmer(ACI_HF ~ Snaps*dn + (1|Site) + Year, data = Snap.HFC)
+afit.ns1 <- lmer(ACI_HF ~ Snaps*ns + (1|Site) + Year, data = Snap.HFC)
+afit.t121 <- lmer(ACI_HF ~ Snaps*t12 + (1|Site) + Year, data = Snap.HFC)
+
+
+
+AICc(afit.tg1, afit.dn1, afit.ns1, afit.t121)
+
+
+summary(afit.ns1)
+
+
+```
+
+So it looks like ACI has a significant 3 way interaction at site 5... WHAT DOES THIS MEAN AND HOW DO I SHOW IT
+
+Show it - I think I can make a 2 frame plot, facet_wrap by time, showing the effect between Snaps and ACI in each plot
+
+What does it mean - it means that HF ACI is significantly associated with combined changes of Snaps and Time and Site (but only at site 5?)
+
+```{r high freq ACI, echo = TRUE}
+
+fit.hfaci1 <- lmer(ACI_HF ~ Snaps*t12 + (1|Site) + Year, data = Snap.HF)
+summary(fit.hfaci1)
+
+
+#AICc(fit.a, ACI.mf.lm)
+
+
+
+```
+##High Frequency SPL Model
+
+###Manual Model Selection
+
+Determining which is the best way to group the snaps by time
+
+tg = quarters (00-05, 06-11, 12-17, 18-23)
+dn = day night (18-05, 6-17)
+ns = nine cycle (22-03, 04-09, 10-15, 16-21)
+t12 = my half and half cycle (2140 - 920, 920 - 2140)
+
+```{r model snaps, echo = TRUE}
+fit.tg <- lmer(SPL_HF ~ Snaps*tg + (1|Site) + Year, data = Snap.HFC)
+fit.dn <- lmer(SPL_HF ~ Snaps*dn + (1|Site) + Year, data = Snap.HFC)
+fit.ns <- lmer(SPL_HF ~ Snaps*ns + (1|Site) + Year, data = Snap.HFC)
+fit.t12 <- lmer(SPL_HF ~Snaps*t12 + (1|Site) + Year, data = Snap.HFC)
+
+#models that have a 2 way interaction and time seperately as a factor
+
+
+AICc(fit.tg, fit.dn, fit.ns, fit.t12)
+
+```
+
+
+###Best Model
+Best model was the one that split time at 9:20 and 21:40
+
+Confused about my next steps here
+
+``` {r model 2i, echo = TRUE}
+stepAIC(fit.t12)
+#returned only the three way interaction - so I am going to try some manual selection to see if there is a more parsimonious model
+
+#SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site
+
+
+Anova(fit.t12, type = 3)
+
+summary(fit.t12)
+
+plot(fit.t12)
+
+````
+
+
 #Plots_for_Publishing
 
 Plots for use in paper
@@ -972,8 +1103,8 @@ This plot uses ALL data (2017 & 2018) and all sites/hours
 
 ```{r mf SPL plot, echo = FALSE}
 #Plot of Mid frequency SPL and knocks - ALL SITES
-SP.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site, shape = Hour))
-#SP.mf
+SP.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange, color = Hour)) + geom_point() + geom_smooth(method = "lm", se = F)
+SP.mf
 
 ```
 
@@ -983,6 +1114,16 @@ Here is a plot that only uses 9am
 
 ```{r mf SPL plot2, echo = FALSE}
 #Just site 5 at 9 am
+
+lm_eqn <- function(df){
+    m <- lm(y ~ x, df);
+    eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+         list(a = format(unname(coef(m)[1]), digits = 2),
+              b = format(unname(coef(m)[2]), digits = 2),
+             r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));
+}
+
 SP.mf9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + geom_smooth(method = "lm", se=F) + theme_classic() + labs(y = "Low Frequency SPL", x = "Number of Knocks")
 SP.mf9
 ```
@@ -1060,4 +1201,17 @@ unique(Snap.HF$Time)
 #assign manual x axis to this graph
 hfs.bplot <- ggplot(Snap.HF, aes(x=Snaps, y =SPL_HF, color = t12)) + geom_point(size = .5) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
 hfs.bplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + geom_smooth(method = lm, se=F)
+```
+
+
+#Plots to help me understand
+
+##Sites and SPL Plot 
+
+```{r help plot 1, echo = FALSE}
+
+site.plot <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange, color = Site)) + geom_point() + geom_smooth(method = "lm", se=F) + theme_classic() + labs(y = "Low Frequency SPL", x = "Number of Knocks")
+site.plot <- ggplot(AC.DF1, aes(Site, SPL_Midrange)) + geom_boxplot()
+site.plot
+
 ```
