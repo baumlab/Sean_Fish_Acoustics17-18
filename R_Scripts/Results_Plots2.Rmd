@@ -120,6 +120,47 @@ h9 <- filter(AC.DF1, Hour == "9")
 h15 <- filter(AC.DF1, Hour == "15")
 h21 <- filter(AC.DF1, Hour == "21")
 
+#loading in algae data
+
+tot.algae <- read.csv("../Raw_Data/Algae.Total.csv")
+
+#rewriting year.site for site 40
+tot.algae$Year.site[tot.algae$Year.site == "2017.4"] <- "2017.40"
+
+
+#combining algae with the the other dataframes
+str(Snap.HF)
+str(tot.algae)
+tot.algae$Year.site <- as.character(tot.algae$Year.site)
+
+#making copy dataframe
+Snap.HFa <- Snap.HF
+
+AC.DF1Coa <- AC.DF1Co
+#pasting year and site together
+Snap.HFa$Year.site <- paste(Snap.HFa$Year, Snap.HF$Site, sep=".")
+
+#creating new year column with 4 digit year
+AC.DF1Coa$Year2 <- ifelse(AC.DF1Coa$Year == 17, 2017, 2018)
+AC.DF1Coa$Year.site <- paste(AC.DF1Coa$Year2, AC.DF1Coa$Site, sep=".")
+
+unique(Snap.HFa$Year.site)
+unique(AC.DF1Coa$Year.site)
+
+#combining dataframes
+Snap.HFa <- merge(Snap.HFa, tot.algae, by = "Year.site")
+AC.DF1Coa <- merge(AC.DF1Coa, tot.algae, by = "Year.site")
+
+#removing useless columns
+Snap.HFa <- dplyr::select(Snap.HFa, -c("Field.Season", "Site.y", "Year.y"))
+names(Snap.HFa) <- c("Year.site", "ds.id", "datetime", "Site", "Date", "Hour", "Minutes", "Year", "Snaps", "SPL_HF", "Time2", "t12", "tg", "dn", "ns", "ACI_HF", "MeanPercentCover", "SE.Percent.Cover")
+Snap.HFa$Year <- as.character(Snap.HFa$Year)
+
+colnames(AC.DF1Coa)
+AC.DF1Coa <- dplyr::select(AC.DF1Coa, -c("Field.Season", "Site.y", "Year.y"))
+names(AC.DF1Coa) <- c("Year.site", "SPL_Midrange", "ACI_Midrange", "Tot_Knocks", "Num_L_calls", "Num_Herbivory", "Site", "Hour", "Year", "Year2", "MeanPercentCover", "SE.Percent.Cover")
+AC.DF1Coa$Year2 <- as.character(AC.DF1Coa$Year2)
+
 ```
 
 **Exploratory Plots for 2017-2018 Acoustic/Fish Data**
@@ -675,11 +716,12 @@ plot(fit.rt12)
 
 
 
-# SPL HF Model Interpretation
+#Stepwise Models
+## SPL HF Model Interpretation
 
 Here I am going to build my models one step at a time, interpretting their results each time before I take the next step and make them more complex.
 
-##Effect of Snaps
+###Effect of Snaps
 
 ```{r simple model, echo = FALSE}
 Snap.HF$Year <- as.character(Snap.HF$Year)
@@ -694,7 +736,7 @@ ggplot(Snap.HF, aes(Snaps, SPL_HF, color = Year)) + geom_point() + geom_smooth(m
 
 Right now what this means is that for each snap produced HF SPL increases by .01325. However, this only explains 5% of the variation in HF SPL 
 
-##Addition of Day/Night
+###Addition of Day/Night
 
 ```{r simple model2, echo = FALSE}
 
@@ -711,7 +753,7 @@ ggplot(Snap.HF, aes(dn, SPL_HF)) + geom_boxplot()
 Here we can see that the relationship between snaps and SPL was actually a part of the day/night cycle in SPL. Therefore, adding sunrise/sunset times into the model decreases the effect size of snaps to 0.01114.  We also see that night time is on average 1.89 dB louder than daytime.  
 
 
-##Addition of Site and year as Random
+###Addition of Site and year as Random
 
 ```{r simple model3, echo = FALSE}
 
@@ -723,7 +765,7 @@ summary(simple.model3)
 When we add site and year as random effects back into the model, we find that the effect size of snaps grows to .01849, meaning some of the effect was being obscured by variation caused by site and year.  The effect size of night is only diminished minutely, reduced to 1.79 dB louder during the night.
 
 
-##Addition of 2 way interaction
+###Addition of 2 way interaction
 
 ```{r simple model4, echo = FALSE}
 
@@ -734,7 +776,7 @@ summary(simple.model4)
 
 Now when we add a two way interaction between Snaps and time of day, we are looking to see if time of day changes the relationship between snaps and HF SPL. It is significant, and what it says is that at night the relationship between snaps and SPL is increased to 0.0213 SPL per snap.  This means that at night, snaps have a larger effect on SPL than during the day.
 
-##Model Selection
+###Model Selection
 
 ```{r hf spl selection, echo = FALSE}
 
@@ -756,9 +798,9 @@ AICc(simple.model, simple.model2, simple.model3, simple.model4, simple.model5, s
 
 Here I test all 8 models that I have come up with and the most parsimonious above is the saturated model. This model makes biological sense and is also the most logical to me as it included the interaction between snaps and time of day as well as the random effect of site and year.
 
-# ACI HF Model Interpretation
+## ACI HF Model Interpretation
 
-##Step 1 Snaps
+###Step 1 Snaps
 
 ```{r hf aci step, echo = FALSE}
 aci.hf <- lm(ACI_HF ~ Snaps, data = Snap.HF)
@@ -769,7 +811,7 @@ summary(aci.hf)
 
 Here we are looking at the direct effect of snaps on HF ACI. We see that right now, the number of snaps is actually negatively associated with ACI, with a really high effect size of -14.55. This seems like a ridiculous relationship so the variation is probably due to something else. Also, this relationship is only responsible for 2% of the variation in ACI.
 
-##Step 2 Day/Night
+###Step 2 Day/Night
 
 
 ```{r hf aci step2, echo = FALSE}
@@ -782,7 +824,7 @@ afit.dn1 <- lmer(ACI_HF ~ Snaps*dn + (1|Site) + Year, data = Snap.HFC)
 
 So when we add day night, we see that it is significant. Night time haS ACI values that are on average 197 "ACI's" higher than during the day. The addition of this new variable doesn't explain any more of the Snaps effect though and actually takes some of the variation that was obscuring a bigger negative effect of snaps on ACI.
 
-##Step 3 Site and Year as random effect
+###Step 3 Site and Year as random effect
 
 
 ```{r hf aci step3, echo = FALSE}
@@ -795,7 +837,7 @@ summary(aci.hf3)
 When we add in site and year as random effects we find that day/night is no longer significant. This means that variation previously attributed to day/night is now actually attributed to variation in Site and Year. The addition of these variables also shrunk the effect size of snaps (-5.15), meaning that variation previously attributed to snaps is now actually explained by differences in site/year.  
 
 
-##Step 4 Interaction between Snaps and day/night
+###Step 4 Interaction between Snaps and day/night
 
 
 ```{r hf aci step4, echo = FALSE}
@@ -807,7 +849,7 @@ summary(aci.hf4)
 
 In adding this interaction, we really find nothing new. The interaction is not significant and neither is day/night.  This interaction is probably superfluous and doesn't describe the system any better. I think this result just supports Boehnenstiehl et al. (2018) which found that ACI reached a saturation point in snap dominated ecosystems between 100 and 3500 snaps/min. Our ecosystem has clearly reached that saturation point as this result makes no logical sense considering the purpose of ACI.
 
-##Reduced Model
+###Reduced Model
 
 ```{r hf aci reduced, echo = FALSE}
 aci.hfreduce <- lmer(ACI_HF ~ Snaps + (1|Site/Year), data = Snap.HF)
@@ -817,7 +859,7 @@ summary(aci.hfreduce)
 
 This model uses only what I believe is biologically relevant in the system for HF ACI which is Snaps and then Site and Year as random nested effects. The effect size of snaps here is actually almost the same (-5.14) as the model that included day/night as a main effect, meaning that day/night really didn't seem to affect the effect of Snaps on ACI at all.
 
-##Model Selection
+###Model Selection
 
 ```{r hf model selection, echo = FALSE}
 AICc(aci.hf, aci.hf2, aci.hf3, aci.hf4, aci.hfreduce)
@@ -828,10 +870,10 @@ AICc(aci.hf, aci.hf2, aci.hf3, aci.hf4, aci.hfreduce)
 When I compare all of these using AICc I find that the most parsimonious model is aci.hf3 which included Snaps + day/night + site and year as a nested random effect. So day/night must contribute to the model even if it is not significant.
 
 
-# MF SPL Model Interpretation
+## MF SPL Model Interpretation
 
 
-##Just Knocks
+###Just Knocks
 ```{r simple mf model, echo = FALSE}
 
 simplemf <- lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1Co)
@@ -843,7 +885,7 @@ summary(simplemf)
 
 Right now this means that each knock increases SPL by 0.018.
 
-##Adding Herbivory and Long Calls
+###Adding Herbivory and Long Calls
 
 ```{r simple2 mf model, echo = FALSE}
 
@@ -855,98 +897,116 @@ summary(simple2mf)
 
 The addition of Herbivory and Long calls did little as they were insignificant, however, you can see their addition had a tiny effect by shrinking the effect size of knocks to 0.0179.
 
-##Adding Hour and Year
+###Adding Hour
 
 ```{r simple3 mf model, echo = FALSE}
 
-simple3mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Year, data = AC.DF1Co)
+simple3mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour, data = AC.DF1Co)
 
 summary(simple3mf)
 ```
 
-The addition of year and hour took care of variation in total knocks, herbivory and long calls. With this variation accounted for, the effect size of knocks increased to 0.01. The effect size of herbivory also increased dramatically (it was obscured by hour and/or year) to 0.05. The only hour that was significantly different was 9AM and it was 1.56 dB louder than 3PM (our baseline).  Year was also significant, 2018 was 3.64 dB louder than 2017.
+The addition of year and hour took care of variation in total knocks, herbivory and long calls. With this variation accounted for, the effect size of knocks increased to 0.01. Here, only knocks significantly influence MF SPL. This model only explains 13.6% of the variation in MF SPL.
 
-##Adding 1 interaction term
+###Adding 1 interaction term
 
 ```{r simple4 mf model, echo = FALSE}
 
-simple4mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Year + Tot_Knocks:Hour, data = AC.DF1Co)
+simple4mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour, data = AC.DF1Co)
 
 summary(simple4mf)
 
 ```
 
-So with the addition of the interaction term, we see that total knocks itself is no longer significant, this means that its original significance is actually more/better explained by the interaction between knocks and hour.  In the interaction we see that the only significant level is between knocks and hour at 9 AM.  The effect of this is -0.0149 + 0.0643 = 0.0494, meaning that for every 20 knocks at 9 AM you get an increase of 1 SPL.
+So with the addition of the interaction term, we see that total knocks itself is no longer significant, this means that its original significance is actually more/better explained by the interaction between knocks and hour.  In the interaction we see that the only significant level is between knocks and hour at 9 AM.  The effect of this is 0.05192, meaning that for every 20 knocks at 9 AM you get an increase of 1 SPL.
 
-The addition of this interaction term also apparently takes care of some variation around 9PM, now allowing us to see that 9PM is 1.4 dB louder than 3PM.  Herbivory also now has a larger effect size of 0.079.
+The addition of this interaction term also apparently takes care of some variation around 9AM, now allowing us to see that 9AM is 2 dB louder than 3PM (our baseline).  Herbivory is now significant, it was previously obscured by variation in the interaction between total knocks and hour. It has a relatively small effect size though considering its low abundance. This model only explains about 28% of the variation in MF SPL however.
 
-
-
-##Adding 2nd interaction term
+###Adding Site and year as random effect
 
 
 ```{r simple5 mf model, echo = FALSE}
 
-simple5mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Year + Tot_Knocks:Hour + Num_Herbivory:Hour, data = AC.DF1Co)
+simple5mf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + (1|Site/Year) + Tot_Knocks:Hour, data = AC.DF1Co)
 
 summary(simple5mf)
 ```
 
-When we add our second interaction effect (Herbivory*Hour), we are saying that the relationship between Herbivory sounds and SPL changes depending on the hour. 
+When I add in site and year as random effects here, the effect of total knocks shrinks to 0.0296. So every 40 knocks results in increased SPL at 9 AM.  Also, the difference between hours has increased, with 9 AM being 2.4 dB louder than 3PM.  Herbivory is still significant although with a very small effect size.  Effect size of knocks at 3 AM and 9 PM is effectively nullified by the main effect of knocks being negative as well.
 
-We see that the actual effect size of herbivory increases (I don't know why yet), however, none of the levels of the interaction here are significant. This indicates that hour does not actually change the effect of herbivory on SPL.
+###Adding 2nd interaction term
 
-In doing this, however, we remove variation between total knocks and hour, and increase effect size. Now we see that the interaction between knocks and hour is significant at all levels.  Although, the additive effects are still very small at 9PM (0.0073) and at 3AM (0.00578), effectively making them null.
-
-Finally, we lose 9AM as a significantly different time from 3PM. This is because its differences must be associated with the Herbivory and Hour interaction.
-
-##Adding 3rd interaction term
 
 ```{r simple6 mf model, echo = FALSE}
 
-simple6mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Year + Tot_Knocks:Hour + Num_Herbivory:Hour + Num_L_calls:Hour, data = AC.DF1Co)
+simple6mf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + (1|Site/Year) + Tot_Knocks:Hour + Num_Herbivory:Hour, data = AC.DF1Co)
 
 summary(simple6mf)
 ```
 
-Now we add our final interaction between long calls and hour.  This means that we also believe that the relationship between long calls and SPL changes based on the hour we sampled.
+When we add our second interaction effect (Herbivory*Hour), we are saying that the relationship between Herbivory sounds and SPL changes depending on the hour. 
 
-We find that this does not seem to be the case, however, in doing this, we have removed some variation that obscured the relationship between herbivory and hour at 9PM.  (I worry here that at this step/possibly the last step we are overfitting?) We find that at 9PM, the effect size of Herbivory is actually negative (which doesn't make logical sense) (-0.0641).
+We see that very little actually changes with the addition of this interaction. None of the interaction terms are significant and the effect sizes of knocks and herbivory are also roughly the same.  
 
-##Adding random effect
+
+###Adding 3rd interaction term
 
 ```{r simple7 mf model, echo = FALSE}
 
-simple7mf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Year + Tot_Knocks:Hour + Num_Herbivory:Hour + Num_L_calls:Hour + (1|Site), data = AC.DF1Co)
+simple7mf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + (1|Site/Year) + Tot_Knocks:Hour + Num_Herbivory:Hour + Num_L_calls:Hour, data = AC.DF1Co)
 
 summary(simple7mf)
 ```
 
-In adding site as a random effect, we now hope to remove any variation that exists between sites which hasn't previously been accounted for.
+Now we add our final interaction between long calls and hour.  This means that we also believe that the relationship between long calls and SPL changes based on the hour we sampled.
 
-When we do this, we see that variation now reveals changed effect sizes for the interaction between knocks and hour. At 9AM the effect is reduced to 0.039 while at 3AM and 9PM the effect sizes get even closer to zero.  
+When we add in this interaction the only time that it is significant is at 9AM but it has a negative effect size, meaning that with increased long calls we get decreased SPL (probably because long calls mean an absence of knocks)
 
-9PM is still significantly different from 3PM (our baseline), 1.3 dB louder than it.  
+The effect sizes of knocks don't seem to be changed by this addition however.
 
-Lastly, we now see a significant interaction between long calls and 9AM, however it is negative (-0.2546), which doesn't really make sense.
 
-##Reduced Model
+###Reduced Model
 
 ```{r simple reduced mf model, echo = FALSE}
 
-reducemf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Year + Tot_Knocks:Hour + (1|Site), data = AC.DF1Co)
+reducemf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + (1|Site/Year), data = AC.DF1Co)
 
-summary(reducemf)
+
+reducemf2 <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + Num_L_calls:Hour + (1|Site/Year), data = AC.DF1Co)
+
+
+reducemf3 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + (1|Site/Year), data = AC.DF1Co)
+
+
+reducemf4 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + (1|Site/Year), data = AC.DF1Co)
+
+
+reducemf5 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_L_calls + (1|Site/Year), data = AC.DF1Co)
+
+
+reducemf6 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + (1|Site/Year), data = AC.DF1Co)
+
+AICc(simplemf, simple2mf, simple3mf, simple4mf, simple5mf, simple6mf, simple7mf, reducemf, reducemf2, reducemf3, reducemf4, reducemf5, reducemf6)
+
+
 ```
 
+Here I am reducing our model to a few options that make biological sense but don't include all of the interactions in the saturated model.
 
-Here I am reducing our model to only include interactions I think are biologically relevant (knocks*hour) and our random effect. Part of me thinks that this is the most effective model for explaining our system and that the previous model might be overfitting with all of the interaction terms.
+Finally I tested all models against eachother using AIC scores
+
+right now the most parsimonious model is reducemf4 (703.0731) then reducemf6 (703.9655) then reducemf3 (706.4080)
+
+reducemf4 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + (1|Site/Year), data = AC.DF1Co)
+
+reducemf6 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + (1|Site/Year), data = AC.DF1Co)
+
+**reducemf4 is the simpler model so it is the most parsimonious model.**
 
 
+## MF ACI Model Interpretation
 
-# MF ACI Model Interpretation
-
-##Step 1 
+###Step 1 
 
 ```{r mf aci1, echo = FALSE}
 
@@ -957,7 +1017,7 @@ summary(mf.aci1)
 
 Here we see only 2.6% of the variation in MF ACI is explained solely by knocks. Knocks have a large effect size here (30.89), but this will be reduced when we add more variables into the equation.
 
-##Step 2, Herbivory
+###Step 2, Herbivory
 
 ```{r mf aci2, echo = FALSE}
 
@@ -968,7 +1028,7 @@ summary(mf.aci2)
 
 In adding in Herbivory, we see that it doesn't account for any significant amount of the changes that we see in ACI. This model only explains 2.9% of the variation in MF ACI. The effect size of knocks only marginally shrinks with the addition of herbivory here.
 
-##Step 3, Long Calls
+###Step 3, Long Calls
 
 ```{r mf aci3, echo = FALSE}
 
@@ -980,7 +1040,7 @@ summary(mf.aci3)
 
 In adding in long calls, we see that they don't account for any significant amount of changes we see in ACI either. This model explains even less than the previous and is not even significant in and of itself. 
 
-##Step 4, reduce and add hour
+###Step 4, reduce and add hour
 
 ```{r mf aci4, echo = FALSE}
 
@@ -991,7 +1051,7 @@ summary(mf.aci4)
 
 So here I removed long calls and herbivory as they seemed to do nothing to help the model explain MF ACI. I replaced them with hour to see if that could explain the variation, aaand it doesn't.  Here we can see that hour is not significantly different at any level and this model explains less than any other so far. It is also not significant.
 
-##Adding site/year as random
+###Adding site/year as random
 
 ```{r mf aci5, echo = FALSE}
 
@@ -1002,7 +1062,7 @@ summary(mf.aci5)
 
 With this model, we see that total knocks is still significant although some of its effect size is actually now attributed to site and year. Hour is still not significant. When we test AIC we will see how this model actually lines up against the others, I feel like the inclusion of site and year as random effects will probably make this one of the most descriptive models.
 
-##Main Effects Model
+###Main Effects Model
 
 ```{r mf aci6, echo = FALSE}
 
@@ -1012,26 +1072,293 @@ summary(fit.mfaci6)
 
 ```
 
-##Saturation Model
+###Saturation Model
 
 In the main effects model we still see that only knocks is significant and its effect size really hasn't changed compared to the previous model that only took into account knocks and hour.
 
 ```{r mf aci7, echo = FALSE}
 
 fit.mfaci7 <- lmer(ACI_Midrange ~ Tot_Knocks*Hour + Num_Herbivory + Num_L_calls + (1|Site/Year), data = AC.DF1Co)
-fit.mfaci7
+summary(fit.mfaci7)
 
 ```
 
 Here we see that the effect size of Total knocks is exceptionally low at all times except for at 9AM when it grows to 60 "ACI's" per knock. However, we will see how this stacks up against other models.
 
-##Model Selection
+###Model Selection
 
 ```{r mf aci model selection, echo = FALSE}
 
 AICc(mf.aci1, mf.aci2, mf.aci3, mf.aci4, mf.aci5, fit.mfaci6, fit.mfaci7)
 
 ```
+
+The most parsimonious model is fit.mfaci7
+
+fit.mfaci7 <- lmer(ACI_Midrange ~ Tot_Knocks*Hour + Num_Herbivory + Num_L_calls + (1|Site/Year), data = AC.DF1Co)
+
+However, in this model none of the effects are significant.
+
+
+
+# Algae Models
+
+So... I only have algal data at site 40 from 2017 - Checked with Dom and she can't find it either so it is unavailable at the moment. 
+
+Therefore, all models below are run using all data except site 40 2018 so that comparisons are made using the same data.
+
+##Algae plots
+
+```{r algae plot, echo = FALSE}
+
+Snap.HFa$LSE <- Snap.HFa$MeanPercentCover - Snap.HFa$SE.Percent.Cover 
+Snap.HFa$HSE <- Snap.HFa$MeanPercentCover + Snap.HFa$SE.Percent.Cover
+
+ggplot(Snap.HFa, aes(Site, MeanPercentCover)) + geom_errorbar(aes(ymin = LSE, ymax = HSE), color = "black", width = 0) + geom_point(aes(fill = Year), color = "black", pch = 21, size = 6) + labs(x = "Year", y = "Percent Macro-algal Cover", title = "Macro Algal Cover")
+
+
+
+```
+
+## SPL HF Model
+
+###Step 1 Snaps and day/night interaction
+
+```{r algae SPL HF, echo = FALSE}
+
+algae.1 <- lm(SPL_HF ~ Snaps*dn, data = Snap.HFa)
+summary(algae.1)
+
+```
+
+Snaps at night increases the effect size of snaps from 0.005781 to 0.015143. However, this model only explains about 10.8% of the variation in SPL_HF.
+
+###Step 2 Macroalgae
+
+First model has nothing in for site/year
+
+```{r algae SPL HF2.1, echo = FALSE}
+algae.2a <- lm(SPL_HF ~ Snaps*dn, data = Snap.HFa)
+
+summary(algae.2a)
+```
+
+With no variable in for site/year or algal cover, snaps have a small but positive effect on SPL and their interaction at night only increases that effect. Night is significantly 10.5 dB quieter than during the day however, which is odd and opposite of what we typically observe (due to variation obscuring it that should be attributed to yearly and site variation).
+
+```{r algae SPL HF2, echo = FALSE}
+
+algae.2 <- lm(SPL_HF ~ Snaps*dn + MeanPercentCover, data = Snap.HFa)
+summary(algae.2)
+```
+
+With the addition of algae percent cover, each increase in 1 percent cover results in a loss of .047 dB.  The addition of algae also increases the effect size of snaps at night to 0.014087. Night now has a larger effect size, with SPL at night being 15 dB lower than during the day. This model only explains about 14.9% of the variation in HF SPL.
+
+```{r algae SPL HF3, echo = FALSE}
+algae.3 <- lmer(SPL_HF ~ Snaps*dn + (1|Site/Year), data = Snap.HFa)
+summary(algae.3)
+```
+
+When I replace macroalgae with site and year as a nested random effect, the effect size of snaps at night is comparable. Here it is 0.0197, compared to 0.014087 in the macroalgae model. The effect size of night is a third of what it was in the algae model, meaning that the effect is actually due to site and year, but above is being attributed to the effect of night. 
+
+###Step 3 Macroalgae and site/year
+
+```{r algae SPL HF4, echo = FALSE}
+algae.4 <- lmer(SPL_HF ~ Snaps*dn + MeanPercentCover + (1|Site/Year), data = Snap.HFa)
+```
+
+Model failed to converge...
+
+###AIC selection
+```{r algae SPL HF selection, echo = FALSE}
+AICc(algae.1, algae.2, algae.3)
+
+```
+
+Site and Year is the better model than macroalgae here.
+
+
+
+## ACI HF Model
+
+###Step 1 Snaps and day/night interaction
+
+```{r algae ACI HF, echo = FALSE}
+
+algae.a1 <- lm(ACI_HF ~ Snaps*dn, data = Snap.HFa)
+summary(algae.a1)
+
+```
+
+This model only explains about 3.3% of the variation in HF ACI and the effect of snaps is strongly negative, which goes against what ACI should do with increased snaps. (ACI is known to not respond "logically" to very freqeuent sounds like snaps) so this result makes sense. Also it seems that ACI is lower at night, probably because of increased snaps.
+
+
+
+###Step 2 Macroalgae
+
+First model has no variable in for site/year 
+
+```{r algae ACI HF2.1, echo = FALSE}
+algae.a <- lm(ACI_HF ~ Snaps*dn, data = Snap.HFa)
+summary(algae.a)
+```
+
+With nothing in for sitel/year or macroalgae we get that snaps have a large negative impact on ACI, at night ACI is significantly lower and that the interaction between snaps and night makes snaps less negatively impactful at night.
+
+```{r algae ACI HF2, echo = FALSE}
+
+algae.a2 <- lm(ACI_HF ~ Snaps*dn + MeanPercentCover, data = Snap.HFa)
+summary(algae.a2)
+```
+
+When we add in mean percent cover here, the effect of snaps decreases sharply to only ~ -7 (ACI's) for each snap. Oddly, percent cover of algae leads to an increase in ACI, which doesn't necessarily make sense.  This model only explains about 10% of variation in HF ACI as well.
+
+```{r algae ACI HF3, echo = FALSE}
+algae.a3 <- lmer(ACI_HF ~ Snaps*dn + (1|Site/Year), data = Snap.HFa)
+summary(algae.a3)
+```
+
+When I replace macroalgae with site and year as a nested random effect, only snaps is considered a significant effect. This means that all variation previously attributed to day/night and snaps:day/night was actually due to site and year. 
+
+###Step 3 Macroalgae and site/year
+
+```{r algae both ACI HF3, echo = FALSE}
+algae.a4 <- lmer(ACI_HF ~ Snaps*dn + MeanPercentCover + (1|Site/Year), data = Snap.HFa)
+summary(algae.a4)
+```
+
+When I include site and year as random effects and algae, algae is no longer significant but snaps is significantly negatively associated still. This means that variation previously explained by algal cover is now explained by site and year.
+
+###AIC selection
+```{r algae ACI HF selection, echo = FALSE}
+AICc(algae.a1, algae.a2, algae.a3)
+
+```
+
+Site and Year again is the better model here. I could include the site/year and macroalgae model but I don't think it biologically make sense. When included, it is the best model, however.
+
+
+
+
+## SPL MF Model 
+###Just Knocks
+```{r simple spl mf model, echo = FALSE}
+
+simplemf <- lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1Coa)
+
+summary(simplemf)
+
+```
+
+
+Right now this means that each knock increases SPL by 0.018.
+
+###Best LMM Model
+
+
+```{r simple5.1 mf model, echo = FALSE}
+
+regmodel <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + (1|Site/Year) + Tot_Knocks:Hour, data = AC.DF1Coa)
+
+summary(regmodel)
+```
+
+When I add in site and year as random effects here, the effect of total knocks shrinks to 0.0296. So every 40 knocks results in increased SPL at 9 AM.  Also, the difference between hours has increased, with 9 AM being 2.4 dB louder than 3PM.  Herbivory is still significant although with a very small effect size.  Effect size of knocks at 3 AM and 9 PM is effectively nullified by the main effect of knocks being negative as well.
+
+
+###Introducing Algae
+
+First model has neither site/year or Macroalgae
+```{r simple mfna model, echo = FALSE}
+
+regmodelna <- lm(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Tot_Knocks:Hour, data = AC.DF1Coa)
+
+summary(regmodelna)
+
+```
+
+Well, without any variable for year and site, the only signficant is the interaction between knocks and hour. This model does explain 26% of the variation in MF SPL though.
+
+
+```{r simple mfa model, echo = FALSE}
+
+regmodela <- lm(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + MeanPercentCover + Tot_Knocks:Hour, data = AC.DF1Coa)
+
+summary(regmodela)
+
+```
+
+So when I include macroalgae here, I get a boost in the effect size of Total_Knocks to ~ 0.05 (Up from 0.03). The interaction between total knocks and 9pm also seems to have disappeared. This model only explains 32.3% of the variation around MF SPL (although this isn't comparable to the model with random variables). Alot of the effect of hour @ 9 am is also attributed now to percent cover, dropping from 1.7 to 1.08. All hours now lose their significance as well as the interaction between knocks and time at all times except 9.  This means that variation previously attributed to those interactions is now better explained by algal cover.
+
+
+
+### Algae and Random Model
+
+```{r simple reduced spl mf model, echo = FALSE}
+
+regmodela2 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + MeanPercentCover + Tot_Knocks:Hour + (1|Site/Year), data = AC.DF1Coa)
+
+summary(regmodela2)
+
+```
+
+when I include both site and year as a random effect and algal cover , mean percent cover loses its significance althought its effect size hasn't changed greatly (-.67 -> -.64). This is an indication that they are describing the same thing. The interaction between knocks & 9AM is back to what it is with only the random effect (~0.03).  Other interactions are significant similar to the random only model, however, again their additions are nullified due to low effect sizes. Hour also shows a similar effect size, back up to what it would be with the random only model. 
+
+###AIC Model Selection
+
+```{r mf model selection, echo = FALSE}
+
+AICc(regmodela, regmodelna, regmodel)
+
+
+```
+
+
+Go figure, the random effect model is the most parsimonious here too.
+
+
+## ACI MF Model
+
+###Best Model
+
+Here is the best model chosen using model selection above
+
+```{r mf aci71, echo = FALSE}
+
+fit.mfaci7 <- lmer(ACI_Midrange ~ Tot_Knocks*Hour + Num_Herbivory + Num_L_calls + (1|Site/Year), data = AC.DF1Coa)
+summary(fit.mfaci7)
+
+```
+
+Model failed to converge with this smaller dataset.
+
+###Algae Alternative
+
+```{r mf aci 72n, echo = FALSE}
+
+fit.mfacina <- lm(ACI_Midrange ~ Tot_Knocks*Hour + Num_Herbivory + Num_L_calls, data = AC.DF1Coa)
+summary(fit.mfacina)
+
+```
+
+When I have no year/site or algal cover I have no significance of any effects.
+
+```{r mf aci72, echo = FALSE}
+
+fit.mfacia <- lm(ACI_Midrange ~ Tot_Knocks*Hour + Num_Herbivory + Num_L_calls + MeanPercentCover, data = AC.DF1Coa)
+summary(fit.mfacia)
+
+```
+
+Ok... Interesting?  So when we replace the random only model with algal cover, we see that now we have significance... Apparently each percent cover results in an increase of ACI by 2700. Which is just odd. Oddly enough, Total knocks and its interaction at 9 am are still insignicant which makes me think that this model really is missing what is creating changes in ACI.
+
+```{r mf aic, echo = FALSE}
+
+AICc(fit.mfacia, fit.mfacina, fit.mfaci7)
+
+
+```
+
+Yet again, the random site and year effect is the best model.
 
 #Plots_for_Publishing
 
