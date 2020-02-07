@@ -1,0 +1,1349 @@
+---
+title: "Results Plots Final3"
+author: "Sean Dimoff"
+date: 30/1/2020
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(cowplot)
+library(rmarkdown)
+library(knitr)
+library(RColorBrewer)
+library(GGally)
+library(mctest)
+library(usdm)
+library(hms)
+library(dplyr)
+library(lme4)
+library(MASS)
+library(lmerTest)
+library(goft)
+library(magick)
+library(MuMIn)
+library(car)
+library(gridExtra)
+
+#loading in SPL data
+
+load("../Raw_Data/SPLHF17long.Rdata")
+load("../Raw_Data/SPLHF18long.Rdata")
+
+
+load("../Raw_Data/SPLMF17long.Rdata")
+load("../Raw_Data/SPLMF18long.Rdata")
+
+
+load("../Raw_Data/SPLHFlong.Rdata")
+load("../Raw_Data/SPLMFlong.Rdata")
+
+load("../Raw_Data/SPLMF.long.wind.Rdata")
+
+#combined SPL and HF dataframes
+load("../Raw_Data/Snap.HF17.Rdata")
+load("../Raw_Data/Snap.HF18.Rdata")
+#changing site to a character
+Snap.HF17$Site.x <- as.character(Snap.HF17$Site.x)
+Snap.HF18$Site.x <- as.character(Snap.HF18$Site.x)
+
+load("../Raw_Data/Snap.HF.Rdata")
+
+##loading in the full dataframe with all data
+#load("../Raw_Data/AC.DF.Rdata")
+load("../Raw_Data/AC.DF1.Rdata")
+
+#loading in boat.list
+load("../Raw_Data/boatlist.Rdata")
+
+#removing site/date id's from AC.DF1 that have boat noise in the files
+AC.DF1 <- AC.DF1[!(AC.DF1$st.id %in% boat.list),]
+
+#removes 4 from 40, 2 from 32, 1 from 35, and one from 5
+
+#making site a character
+AC.DF1$Site <- as.character(AC.DF1$Site)
+
+#writing scale funciton
+center_scale <- function(x) {
+  scale(x, scale = FALSE)
+}
+
+#making duplicate dataframes
+AC.DF1C <- AC.DF1
+
+Snap.HF17C <- Snap.HF17
+Snap.HF18C <- Snap.HF18
+
+#Creating centered AC.DF1 dataframe
+AC.DF1C$Snaps <- center_scale(AC.DF1C$Snaps)
+AC.DF1C$Tot_Knocks <- center_scale(AC.DF1C$Tot_Knocks)
+AC.DF1C$Num_Herbivory <- center_scale(AC.DF1C$Num_Herbivory)
+AC.DF1C$Num_L_calls <- center_scale(AC.DF1C$Num_L_calls)
+
+#creating centered Snap.HF17 and 18 dataframes
+Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
+Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
+
+
+#removing outliers from Snap.HF dataframe
+low.snap <- Snap.HF[Snap.HF$Snaps <1000, ]
+# Remove anything with fewer than 2 observers 
+Snap.HF <- Snap.HF[!(Snap.HF$ds.id %in% low.snap$ds.id),]
+
+#making a snap.hf dataframe to center
+Snap.HFC <- Snap.HF
+
+Snap.HFC$Snaps <- center_scale(Snap.HFC$Snaps)
+
+#subsetting only lm variables
+AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, ACI_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour, Year))
+
+#making Hour ordinal
+#AC.DF1Co$Hour_factor <- factor (AC.DF1$Hour, order = TRUE, levels = c("3", "9", "15", "21"))
+
+
+#splitting dataframe by site
+s5 <- filter(AC.DF1, Site == "5")
+s32 <- filter(AC.DF1, Site == "32")
+s35 <- filter(AC.DF1, Site == "35")
+s40 <- filter(AC.DF1, Site == "40")
+s8 <- filter(AC.DF1, Site == "8")
+
+#splitting dataframe by hour
+h3 <- filter(AC.DF1, Hour == "3")
+h9 <- filter(AC.DF1, Hour == "9")
+h15 <- filter(AC.DF1, Hour == "15")
+h21 <- filter(AC.DF1, Hour == "21")
+
+```
+
+**Exploratory Plots for 2017-2018 Acoustic/Fish Data**
+
+**Purpose** To explore the Acoustic data gathered in 2017 and 2018 to expose important trends between sites, diurnal patterns, fish abundance, lunar phase, and coral reef acoustics.
+
+#Validations
+
+**Combined Model** All variables are matched to the files that were used for Fish call counts (3:00, 9:00, 15:00, 21:00)
+
+##Confidence Intervals
+```{r CI, echo = FALSE}
+
+##Knocks
+
+#taking average and calculating confidence intervals for sites
+knock.av <- aggregate(Tot_Knocks ~ Site, AC.DF1, mean)
+knock.se <- aggregate(Tot_Knocks ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+knock.av$SE <- knock.se$Tot_Knocks
+knock.av$U.SE <- knock.av$Tot_Knocks + knock.av$SE
+knock.av$L.SE <- knock.av$Tot_Knocks - knock.av$SE
+
+
+#making site a character
+knock.av$Site <- as.character(knock.av$Site)
+
+knock.CI <- ggplot(knock.av, aes(Site, Tot_Knocks)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Tot_Knocks", title = "Total Knocks")
+knock.CI
+
+#calculating confidence intervals for Hours
+knock.hav <- aggregate(Tot_Knocks ~ Hour, AC.DF1, mean)
+knock.hse <- aggregate(Tot_Knocks ~ Hour, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+knock.hav$SE <- knock.hse$Tot_Knocks
+knock.hav$U.SE <- knock.hav$Tot_Knocks + knock.hav$SE
+knock.hav$L.SE <- knock.hav$Tot_Knocks - knock.hav$SE
+
+#making site a character
+knock.hav$Hour <- as.character(knock.hav$Hour)
+
+hknock.CI <- ggplot(knock.hav, aes(Hour, Tot_Knocks)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Hour), color = "black", pch = 21, size = 6) +
+  labs(x = "Hour", y = "Tot_Knocks", title = "Total Knocks")
+hknock.CI
+
+##Snaps
+
+#snaps by site
+snap.av <- aggregate(Snaps ~ Site, AC.DF1, mean)
+snap.se <- aggregate(Snaps ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+snap.av$SE <- snap.se$Snaps
+snap.av$U.SE <- snap.av$Snaps + snap.av$SE
+snap.av$L.SE <- snap.av$Snaps - snap.av$SE
+
+#making site a character
+snap.av$Site <- as.character(snap.av$Site)
+
+snap.CI <- ggplot(snap.av, aes(Site, Snaps)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Snaps", title = "Snaps per site")
+snap.CI
+
+
+##Long Calls
+
+#LC by site
+LC.av <- aggregate(Num_L_calls ~ Site, AC.DF1, mean)
+LC.se <- aggregate(Num_L_calls ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+LC.av$SE <- LC.se$Num_L_calls
+LC.av$U.SE <- LC.av$Num_L_calls + LC.av$SE
+LC.av$L.SE <- LC.av$Num_L_calls - LC.av$SE
+
+#making site a character
+LC.av$Site <- as.character(LC.av$Site)
+
+LC.CI <- ggplot(LC.av, aes(Site, Num_L_calls)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Long Calls", title = "Long Calls per site")
+LC.CI
+
+##Herbivory
+
+#LC by site
+H.av <- aggregate(Num_Herbivory ~ Site, AC.DF1, mean)
+H.se <- aggregate(Num_Herbivory ~ Site, AC.DF1, function(x) sd(x)/sqrt(length(x)))
+H.av$SE <- H.se$Num_Herbivory
+H.av$U.SE <- H.av$Num_Herbivory + H.av$SE
+H.av$L.SE <- H.av$Num_Herbivory - H.av$SE
+
+#making site a character
+H.av$Site <- as.character(H.av$Site)
+
+H.CI <- ggplot(H.av, aes(Site, Num_Herbivory)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0) +
+  geom_point(aes(fill = Site), color = "black", pch = 21, size = 6) +
+  labs(x = "Site", y = "Herbivory", title = "Herbivory per site")
+H.CI
+
+
+
+
+```
+
+##Distributions
+
+Red is the Mean Line
+
+Blue is the Median Line
+
+```{r histogram, echo = FALSE}
+#plotting count histogram
+
+#plotting distributions of SPL response variables
+MF.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_Midrange)) + geom_histogram() + ggtitle("MF SPL distribution") + geom_vline(aes(xintercept = mean(SPL_Midrange)), color = "red", linetype ="dashed", size = 1) + geom_vline(aes(xintercept = median(SPL_Midrange)), color = "blue", linetype = "dotted", size = 1)
+#BB.hist <- ggplot(data = AC.DF1, aes(AC.DF1$SPL_BB)) + geom_histogram() + ggtitle("BB distribution")
+HF.hist <- ggplot(data = SPLHF.long, aes(SPLHF.long$SPL_HF)) + geom_histogram() + ggtitle("HF SPL distribution") + geom_vline(aes(xintercept = mean(SPL_HF)), color = "red", linetype ="dashed", size = 1) + geom_vline(aes(xintercept = median(SPL_HF)), color = "blue", linetype = "dotted", size = 1)
+
+hist1.p <- plot_grid(MF.hist, HF.hist, nrow = 1, ncol = 2)
+hist1.p
+
+```
+
+Stats for Mid Frequency SPL
+
+```{r descriptive stats, echo = FALSE}
+summary(AC.DF1$SPL_Midrange)
+```
+
+Variance of MF
+
+```{r variance, echo = FALSE}
+var(AC.DF1$SPL_Midrange)
+```
+
+Stats for High Frequency SPL
+
+```{r descriptive stats 2, echo = FALSE}
+summary(SPLHF.long$SPL_HF)
+```
+
+Variance of HF
+
+```{r variance 2, echo = FALSE}
+var(SPLHF.long$SPL_HF)
+
+```
+
+ACI histogram
+
+```{r aci histogram, echo = FALSE}
+
+ACI.mf.hist <- ggplot(data = AC.DF1, aes(AC.DF1$ACI_Midrange)) + geom_histogram() + ggtitle("MF ACI distribution") + geom_vline(aes(xintercept = mean(ACI_Midrange)), color = 
+                     "red", linetype = "dashed", size = 1) + geom_vline(aes(xintercept = median(ACI_Midrange)), color = "blue", linetype = "dotted", size = 1)
+
+ACI.mf.hist
+```
+
+
+##Regressions
+Running basic regressions linking the explanatory to the response at their lowest levels and combined to see how different sites/ hours change the regression - SPL
+
+**Linear Model outputs below each**
+
+```{r regressions3, echo = FALSE}
+
+SP.hf2 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on HF SPL, 2017, split by site")
+
+#pdf(file="../Figures/Snap_SPL_Regression2017.pdf", width = 11, height = 7)
+SP.hf2 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
+#dev.off()
+
+shf.lm17 = lm(SPL_HF ~ Snaps, data = Snap.HF17)
+summary(shf.lm17)
+
+#pdf(file="../Figures/Snap_SPL_Regression.pdf", width = 11, height = 7)
+#SP.hf3 <- ggplot(Snap.HF, aes(Snaps, SPL_HF)) + geom_point() + geom_smooth(method = "lm")
+#SP.hf3
+#dev.off()
+
+SP.hf2.1 <- ggplot(Snap.HF17, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on HF SPL, 2017, split by site") + facet_wrap(~Site.x)
+SP.hf2.1 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2017")
+```
+
+2017 Snap data, snaps significant.
+
+When you break it down by site, site 32 has the opposite relationship with high frequency and snaps.
+
+###High Frequency
+
+**2017 Snap/HF SPL Site Breakdown **
+
+```{r regressions5snap, echo = FALSE}
+#splitting dataframe by site
+s17s5 <-  filter(Snap.HF17, Site.x == "5")
+s17s32 <- filter(Snap.HF17, Site.x == "32")
+s17s35 <- filter(Snap.HF17, Site.x == "35")
+s17s40 <- filter(Snap.HF17, Site.x == "40")
+s17s8 <-  filter(Snap.HF17, Site.x == "8")
+
+SP.17hf5 <- ggplot(s17s5, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 5, 2017") + geom_smooth(method = "lm")
+SP.17hf5
+sp5lm17 = lm(SPL_HF ~Snaps, data = s17s5)
+summary(sp5lm17)
+```
+
+```{r regression8snap, echo = FALSE}
+SP.17hf8 <- ggplot(s17s8, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 8, 2017") + geom_smooth(method = "lm")
+SP.17hf8
+sp8lm17 = lm(SPL_HF ~Snaps, data = s17s8)
+summary(sp8lm17)
+```
+
+```{r regression35snap, echo = FALSE}
+SP.17hf35 <- ggplot(s17s35, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 35, 2017") + geom_smooth(method = "lm")
+SP.17hf35
+sp35lm17 = lm(SPL_HF ~Snaps, data = s17s35)
+summary(sp35lm17)
+```
+
+```{r regression40snap, echo = FALSE}
+SP.17hf40 <- ggplot(s17s40, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 40, 2017") + geom_smooth(method = "lm")
+SP.17hf40
+sp40lm17 = lm(SPL_HF ~Snaps, data = s17s40)
+summary(sp40lm17)
+```
+
+```{r regression32snap, echo = FALSE}
+SP.17hf32 <- ggplot(s17s32, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 32, 2017") + geom_smooth(method = "lm")
+SP.17hf32
+sp32lm17 = lm(SPL_HF ~Snaps, data = s17s32)
+summary(sp32lm17)
+```
+
+**2018 Snap/HF SPL**
+```{r regressions18, echo = FALSE}
+
+SP.hf4 <- ggplot(Snap.HF18, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2018, split by site")
+SP.hf4
+```
+
+Removing outliers
+
+```{r regressions4, echo = FALSE}
+#extreme outliers in 2018 - snap counts in the hundreds rather than thousands, going to find and remove them and run again
+## Check that 2 divers were at all sites
+low.snap <- Snap.HF18[Snap.HF18$Snaps <1000, ]
+# Remove anything with fewer than 2 observers 
+
+Snap.HF18E <- Snap.HF18[!(Snap.HF18$ds.id %in% low.snap$ds.id),]
+#now rerunning without the 3 outliers
+
+SP.hf4E <- ggplot(Snap.HF18E, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2018, split by site, outliers removed")
+
+SP.hf4E + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2018")
+shf.lm18E = lm(SPL_HF ~ Snaps, data = Snap.HF18)
+summary(shf.lm18E)
+
+SP.hf4E.1 <- ggplot(Snap.HF18E, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site.x)) + ggtitle("Effect of snaps on SPL HF, 2018, split by site, outliers removed") + facet_wrap(~Site.x)
+
+SP.hf4E.1 + geom_smooth(method = "lm") + ggtitle("Total Snaps and SPL HF, 2018")
+```
+
+2018 Snap data with outliers removed. Snaps significant.
+
+When split by sight, site 32 has a flat relationship.
+
+**2018 Snap/HF SPL Site Breakdown **
+
+```{r regressions5snap18, echo = FALSE}
+#splitting dataframe by site
+s18s5 <-  filter(Snap.HF18E, Site.x == "5")
+s18s32 <- filter(Snap.HF18E, Site.x == "32")
+s18s35 <- filter(Snap.HF18E, Site.x == "35")
+s18s40 <- filter(Snap.HF18E, Site.x == "40")
+s18s8 <-  filter(Snap.HF18E, Site.x == "8")
+
+SP.18hf5 <- ggplot(s18s5, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 5, 2018") + geom_smooth(method = "lm")
+SP.18hf5
+sp5lm18 = lm(SPL_HF ~Snaps, data = s18s5)
+summary(sp5lm18)
+```
+
+```{r regression8snap18, echo = FALSE}
+SP.18hf8 <- ggplot(s18s8, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 8, 2018") + geom_smooth(method = "lm")
+SP.18hf8
+sp8lm18 = lm(SPL_HF ~Snaps, data = s18s8)
+summary(sp8lm18)
+```
+
+```{r regression35snap18, echo = FALSE}
+SP.18hf35 <- ggplot(s18s35, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 35, 2018") + geom_smooth(method = "lm")
+SP.18hf35
+sp35lm18 = lm(SPL_HF ~Snaps, data = s18s35)
+summary(sp35lm18)
+```
+
+```{r regression40snap18, echo = FALSE}
+SP.18hf40 <- ggplot(s18s40, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 40, 2018") + geom_smooth(method = "lm")
+SP.18hf40
+sp40lm18 = lm(SPL_HF ~Snaps, data = s18s40)
+summary(sp40lm18)
+```
+
+```{r regression32snap18, echo = FALSE}
+SP.18hf32 <- ggplot(s18s32, aes(Snaps, SPL_HF)) + geom_point() + ggtitle("Effect of snaps on HF SPL, Site 32, 2018") + geom_smooth(method = "lm")
+SP.18hf32
+sp32lm18 = lm(SPL_HF ~Snaps, data = s18s32)
+summary(sp32lm18)
+```
+
+###Mid Frequency
+
+**Mid Frequency - SPL **
+
+```{r regressions, echo = FALSE}
+#equation for r^2 value
+#SP.mf1.3 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point()
+SP.mf1.1 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, split by site")
+SP.mf1.2 <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + ggtitle("Effect of knocks on SPL MF, split by hour")
+
+SP.mf1.1 + ggtitle("Total Knocks effect on SPL MF, split by site") + stat_smooth(method = "lm") 
+SP.mf1.2 + ggtitle("Total Knocks effect on SPL MF, split by hour") + geom_smooth(method = "lm")
+kmf.lm = lm(SPL_Midrange ~ Tot_Knocks, data = AC.DF1)
+summary(kmf.lm)
+
+#pdf(file="../Figures/Knocks_MF_Regression.pdf", width = 11, height = 7)
+#SP.mf1.3 + stat_smooth(method = "lm")
+#dev.off()
+```
+
+**Mid Frequency - ACI**
+
+```{r aci regressions, echo = FALSE}
+ACI.mf1.1 <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point(aes(color = Site)) + ggtitle("Effect of knocks on SPL MF, colored by site")
+ACI.mf.lm = glm(ACI_Midrange ~ Tot_Knocks + Year, data = AC.DF1, family = "Gamma")
+ACI.mf.lm1 = glm(ACI_Midrange ~ Num_L_calls + Year, data = AC.DF1, family = "Gamma")
+ACI.mf.lm2 = glm(ACI_Midrange ~ Num_Herbivory + Year, data = AC.DF1, family = "Gamma")
+summary(ACI.mf.lm)
+summary(ACI.mf.lm1)
+summary(ACI.mf.lm2)
+
+ACI.mf.lmALL = glm(ACI_Midrange ~ Tot_Knocks+ Site + Year + Hour, data = AC.DF1, family = "Gamma")
+summary(ACI.mf.lmALL)
+```
+
+
+**Breakdown by Site - SPL**
+
+```{r site spl breakdown, echo = FALSE}
+#creating equations to put on facet_grid
+site.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Site)) + stat_smooth(method = "lm") + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + ggtitle("Effect of knocks on SPL MF") + theme(legend.position = "none")
+site.mf
+
+```
+
+**Breakdown by Site - ACI**
+
+```{r site aci breakdown, echo = FALSE}
+#creating equations to put on facet_grid
+site.aci.mf <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point(aes(color = Site)) + stat_smooth(method = "lm") + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + ggtitle("Effect of knocks on ACI MF") + theme(legend.position = "none")
+site.aci.mf
+
+```
+
+### Mid Frequency - Hourly Breakdown
+**Breakdown by Hour - SPL**
+
+```{r hour spl breakdown, echo = FALSE}
+#creating equations to put on facet_grid
+hour.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange)) + geom_point(aes(color = Hour)) + stat_smooth(method = "lm") + facet_grid(rows = vars(Hour), cols = vars(Year), scales = "fixed") + ggtitle("Effect of knocks on SPL MF") + theme(legend.position = "none")
+hour.mf
+
+```
+
+**Breakdown by Hour - ACI**
+
+```{r hour aci breakdown, echo = FALSE}
+#creating equations to put on facet_grid
+hour.aci.mf <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange)) + geom_point(aes(color = Hour)) + stat_smooth(method = "lm") + facet_grid(rows = vars(Hour), cols = vars(Year), scales = "fixed") + ggtitle("Effect of knocks on ACI MF") + theme(legend.position = "none")
+hour.aci.mf
+
+```
+
+###Mid Frequency Hourly Breakdown (Long Calls)
+
+```{r regressions LC 3 AM, echo = FALSE}
+SPlc.h3 <- ggplot(h3, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM")
+SPlc.h3 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+
+SPlc.h3.1 <- ggplot(h3, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM") + facet_wrap(~Site)
+SPlc.h3.1 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+
+```
+
+3 AM, long calls don't seem to explain a great deal of the relationship at any site
+
+```{r regressions LC 9 AM, echo = FALSE}
+SPlc.h9 <- ggplot(h9, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM")
+SPlc.h9 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+SPlc.h9.1 <- ggplot(h9, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM") + facet_wrap(~Site)
+SPlc.h9.1 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+```
+
+9 AM, long calls don't seem to explain the relationship at any site
+
+```{r regressions LC 15 PM, echo = FALSE}
+SPlc.h15 <- ggplot(h15, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM")
+SPlc.h15 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+SPlc.h15.1 <- ggplot(h15, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM") + facet_wrap(~Site)
+SPlc.h15.1 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+```
+
+3 PM, long calls don't seem to explain the relationship
+
+```{r regressions LC 21 PM, echo = FALSE}
+SPlc.h21 <- ggplot(h21, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM")
+SPlc.h21 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+SPlc.h21.1 <- ggplot(h21, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM") + facet_wrap(~Site)
+SPlc.h21.1 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+```
+
+9 PM, long calls don't seem to explain the relationship
+
+###Mid Frequency Hourly Breakdown (Herbivory)
+
+```{r regressions Herb 3 AM, echo = FALSE}
+SPherb.h3 <- ggplot(h3, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM")
+SPherb.h3 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+
+SPherb.h3.1 <- ggplot(h3, aes(Num_L_calls, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 AM") + facet_wrap(~Site)
+SPherb.h3.1 + geom_smooth(method = "lm") + ggtitle("3 AM, MF SPL")
+
+```
+
+3 AM, Extremely low herbivory at all sites.  No relationship
+
+```{r regressions Herb 9 AM, echo = FALSE}
+SPherb.h9 <- ggplot(h9, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM")
+SPherb.h9 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+SPherb.h9.1 <- ggplot(h9, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 AM") + facet_wrap(~Site)
+SPherb.h9.1 + geom_smooth(method = "lm") + ggtitle("9 AM, MF SPL")
+
+```
+
+Again, extremely low herbivory, no relationship.
+
+```{r regressions Herb 15 PM, echo = FALSE}
+SPherb.h15 <- ggplot(h15, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM")
+SPherb.h15 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+SPherb.h15.1 <- ggplot(h15, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("3 PM") + facet_wrap(~Site)
+SPherb.h15.1 + geom_smooth(method = "lm") + ggtitle("3 PM, MF SPL")
+
+```
+
+Higher herbivory.  Seems like there is a relationship at site 40, 8, and 35.
+
+```{r regressions Herb 21 PM, echo = FALSE}
+SPherb.h21 <- ggplot(h21, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM")
+SPherb.h21 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+SPherb.h21.1 <- ggplot(h21, aes(Num_Herbivory, SPL_Midrange)) + geom_point(aes(color = Site)) + ggtitle("9 PM") + facet_wrap(~Site)
+SPherb.h21.1 + geom_smooth(method = "lm") + ggtitle("9 PM, MF SPL")
+
+```
+
+Higher herbivory here as well, although there is no positive relationship at any site.
+
+**Summary**
+Knocks significantly explained SPLMF at sites 35 and 32 and at 9AM.
+
+
+##High Frequency ACI Model
+
+Distribution looks normal, given what we discussed about the HF SPL distribution
+
+###Maximal Model
+
+```{r hf ACI max models2, echo = TRUE}
+#testing time splits for this model to confirm they are the same as SPL HF model
+afit.tg1 <- lmer(ACI_HF ~ Snaps*tg + (1|Site) + Year, data = Snap.HFC)
+afit.dn1 <- lmer(ACI_HF ~ Snaps*dn + (1|Site) + Year, data = Snap.HFC)
+afit.ns1 <- lmer(ACI_HF ~ Snaps*ns + (1|Site) + Year, data = Snap.HFC)
+afit.t121 <- lmer(ACI_HF ~ Snaps*t12 + (1|Site) + Year, data = Snap.HFC)
+
+
+
+AICc(afit.tg1, afit.dn1, afit.ns1, afit.t121)
+
+
+summary(afit.ns1)
+
+
+```
+
+
+##High Frequency SPL Model
+
+###Manual Model Selection
+
+Determining which is the best way to group the snaps by time
+
+tg = quarters (00-05, 06-11, 12-17, 18-23)
+dn = day night (18-05, 6-17)
+ns = nine cycle (22-03, 04-09, 10-15, 16-21)
+t12 = my half and half cycle (2140 - 920, 920 - 2140)
+
+```{r random model snaps, echo = TRUE}
+fit.rtg <- lmer(SPL_HF ~ Snaps*tg + (1|Site) + Year, data = Snap.HFC)
+fit.rdn <- lmer(SPL_HF ~ Snaps*dn + (1|Site) + Year, data = Snap.HFC)
+fit.rns <- lmer(SPL_HF ~ Snaps*ns + (1|Site) + Year, data = Snap.HFC)
+fit.rt12 <- lmer(SPL_HF ~Snaps*t12 + (1|Site) + Year, data = Snap.HFC)
+
+#models that have a 2 way interaction and time seperately as a factor
+
+
+AICc(fit.rtg, fit.rdn, fit.rns, fit.rt12)
+
+```
+
+
+###Best Model
+Best model was the one that split time at 9:20 and 21:40
+
+Confused about my next steps here
+
+``` {r random model 2i, echo = TRUE}
+#returned only the three way interaction - so I am going to try some manual selection to see if there is a more parsimonious model
+
+#SPL_HF ~ Snaps + t12 + Site + Snaps:t12 + Snaps:Site + t12:Site
+
+
+Anova(fit.rt12, type = 3)
+
+summary(fit.rt12)
+
+plot(fit.rt12)
+
+````
+
+
+
+
+#Stepwise Models
+## SPL HF Model Interpretation
+
+Here I am going to build my models one step at a time, interpretting their results each time before I take the next step and make them more complex.
+
+###Effect of Snaps
+
+```{r simple model, echo = FALSE}
+Snap.HF$Year <- as.character(Snap.HF$Year)
+simple.model <- lmer(SPL_HF ~ Snaps + (1|Site) + Year, data = Snap.HF)
+
+summary(simple.model)
+
+ggplot(Snap.HF, aes(Snaps, SPL_HF, color = Year)) + geom_point() + geom_smooth(method = lm)
+
+
+```
+
+With only snaps, they have an effect size of .02097.  Snaps are significant.
+
+###Effect of Day/Night
+
+```{r simple model 1.2, echo= FALSE}
+simple.model1 <- lmer(SPL_HF ~ dn + (1|Site) + Year, data = Snap.HF)
+
+summary(simple.model1)
+
+
+```
+
+With only daynight, we see it is significant and nights are 2 dB louder than days.
+
+###Day/Night and Snaps
+
+```{r simple model2, echo = FALSE}
+
+simple.model2 <- lmer(SPL_HF ~ Snaps + dn + (1|Site) + Year, data = Snap.HF)
+
+summary(simple.model2)
+
+ggplot(Snap.HF, aes(dn, SPL_HF)) + geom_boxplot()
+
+
+
+```
+
+When both snaps and day/night are includede both are significant. Snaps now have a slightly smaller effect size of 0.01849 and nights are still a little louder at 1.789 dB louder.
+
+###Day/Night * Snaps
+
+```{r simple model4, echo = FALSE}
+
+simple.model4 <- lmer(SPL_HF ~ Snaps*dn + (1|Site) + Year, data = Snap.HF)
+
+summary(simple.model4)
+```
+
+With the interaction of day and night we see a crazy change in the day night... Now we see that night is 5 dB quieter than day?? We also see that at night snaps have a larger effect on HF SPL. 
+
+###Model Selection
+
+```{r hf spl selection, echo = FALSE}
+
+#coming up with several variations on the models presented above
+
+#testing each of the models
+
+AICc(simple.model, simple.model1, simple.model2, simple.model4)
+
+summary(simple.model4)
+
+```
+
+Simple model 4 is the most parsimonious model. This is also my most saturated model which includes the snaps*day/night and the site/year random effect
+
+
+## ACI HF Model Interpretation
+
+###Step 1 Snaps
+
+```{r hf aci step, echo = FALSE}
+aci.hf <- lmer(ACI_HF ~ Snaps + (1|Site) + Year, data = Snap.HF)
+
+summary(aci.hf)
+
+```
+
+With just snaps, each snap reduces ACI by 5.
+
+###Step 1a Day/Night
+
+```{r hf aci day/night, echo = FALSE}
+aci.hf1a <- lmer(ACI_HF ~ dn + (1|Site) + (1|Year), data = Snap.HF)
+
+summary(aci.hf1a)
+
+```
+
+Even on its own day/night isn't significant.
+
+###Step 2 Snaps + Day/Night
+
+
+```{r hf aci step2, echo = FALSE}
+aci.hf2 <- lmer(ACI_HF ~ Snaps + dn + (1|Site) + Year , data = Snap.HF)
+
+summary(aci.hf2)
+
+```
+
+When I include snaps and day/night, the effect size of snaps is relatively the same. Day/night is not significant.
+
+###Step 3 Snaps * Day/Night
+
+
+```{r hf aci step4, echo = FALSE}
+aci.hf4 <- lmer(ACI_HF ~ Snaps*dn + (1|Site) + Year , data = Snap.HF)
+
+summary(aci.hf4)
+
+```
+
+When we introduce the interaction, nothing changes and the interaction isn't significant nor is day/night. Go figure.
+
+This means that the relationship between snaps and HF ACI doesn't change between day and night.
+
+###Reduced Model
+
+```{r model selection aci hf, echo = FALSE}
+
+AICc(aci.hf, aci.hf2, aci.hf4)
+
+```
+
+The most parsimonious model here is aci.hf2, because it is the simplest model.
+
+aci.hf2 includes: Snaps + dn + (1|Site) + Year
+
+aci.hf4 includes: Snaps*dn + (1|Site) + Year
+
+###Model Selection
+
+```{r hf model selection, echo = FALSE}
+AICc(aci.hf, aci.hf2, aci.hf4)
+
+summary(aci.hf4)
+```
+
+When I compare all of these using AICc I find that the most parsimonious model is aci.hf4 which included Snaps + day/night + site and year as a nested random effect. So day/night must contribute to the model even if it is not significant.
+
+
+## MF SPL Model Interpretation
+
+
+###Just One Call Type
+```{r simple1a mf model, echo = FALSE}
+
+simple1amf <- lmer(SPL_Midrange ~ Tot_Knocks + (1|Site)+ Year, data = AC.DF1Co)
+
+summary(simple1amf)
+
+```
+Model failed to converge?
+
+Might be due to the random effects...
+
+
+Total knocks are significant
+
+
+```{r simple1b mf model, echo = FALSE}
+
+simple1bmf <- lmer(SPL_Midrange ~ Num_L_calls + (1|Site)+(1|Year) , data = AC.DF1Co)
+
+summary(simple1bmf)
+
+```
+
+Long calls are not significant.
+
+```{r simple1c mf model, echo = FALSE}
+
+simple1cmf <- lmer(SPL_Midrange ~ Num_Herbivory + (1|Site)+(1|Year), data = AC.DF1Co)
+
+summary(simple1cmf)
+```
+
+Model failed to converge.
+
+Herbivory is not significant.
+
+###Additive Models
+
+```{r simple2a mf model, echo = FALSE}
+
+simple2amf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + (1|Site)+Year, data = AC.DF1Co)
+
+summary(simple2amf)
+
+```
+
+Knocks is significant here, knocks has a tiny effect on MF SPL. Herbivory not significant.
+
+
+```{r simple2b mf model, echo = FALSE}
+
+simple2bmf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_L_calls + (1|Site)+ Year, data = AC.DF1Co)
+
+summary(simple2bmf)
+
+```
+
+Total knocks is significant here too with a tiny effect size. Long calls not significant.
+
+```{r simple2c mf model, echo = FALSE}
+
+simple2cmf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + (1|Site) + Year, data = AC.DF1Co)
+
+summary(simple2cmf)
+
+```
+
+
+###Adding Hour
+
+```{r simple3 mf model, echo = FALSE}
+
+simple3mf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + (1|Site) +Year, data = AC.DF1Co)
+
+summary(simple3mf)
+```
+
+
+Knocks and hour at 9 are significant.  Knocks has a slightly larger effect size than above and 9AM is 1.5 dB louder than 3PM.
+
+###Adding 1 interaction term
+
+```{r simple4 mf model, echo = FALSE}
+
+simple4mf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + (1|Site)+ Year, data = AC.DF1Co)
+
+summary(simple4mf)
+
+```
+
+With the interaction here we see that knocks at 9AM is the only time with a significant positive growth. At 9AM each snap increases SPL by 0.031 dB.  Now 9AM is 2.3 dB louder than 3PM.  9PM is 1.25 dB louder than 3PM. Herbivory is also now significant although it has a very small effect size considering its low frequency.
+
+###Adding 2nd interaction term
+
+
+```{r simple6a mf model, echo = FALSE}
+
+simple6amf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + (1|Site)+ Year + Tot_Knocks:Hour + Num_Herbivory:Hour, data = AC.DF1Co)
+
+summary(simple6amf)
+```
+
+Adding this new interaction, really nothing changes. None of the levels of the interaction are significant. 
+
+
+```{r simple6b mf model, echo = FALSE}
+
+simple6bmf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + (1|Site) + Year + Tot_Knocks:Hour + Num_L_calls:Hour, data = AC.DF1Co)
+
+summary(simple6bmf)
+```
+
+Here the effect size of total knocks at 9 AM is slightly smaller.  This is probably because the effect of long calls at 9 AM is significant, although long calls has a negative effect at 9 AM. 9AM is 1.7 dB louder than 3PM (the baseline) and 9PM is 1.12 dB higher than 3pm.  Total knocks at 3AM and 9PM are both significant but have effect sizes near zero.
+
+
+###Adding 3rd interaction term
+
+```{r simple7 mf model, echo = FALSE}
+
+simple7mf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + (1|Site)+ Year + Tot_Knocks:Hour + Num_Herbivory:Hour + Num_L_calls:Hour, data = AC.DF1Co)
+
+summary(simple7mf)
+```
+
+
+Model failed to converge.
+
+We don't see anything terribly new here. Now herbivory is significant and negative at 9 PM. Knocks and long calls are significant. Long calls at 9AM are still significant and negative and Knocksat 9AM are also stsill positive, back at around .03ish.
+
+###Reduced Model
+
+```{r simple reduced mf models, echo = FALSE}
+
+reducemf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + (1|Site)+ Year, data = AC.DF1Co)
+
+
+reducemf2 <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + Num_L_calls:Hour + (1|Site)+Year, data = AC.DF1Co)
+
+
+reducemf3 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + (1|Site)+ Year, data = AC.DF1Co)
+
+
+reducemf4 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + (1|Site)+ Year, data = AC.DF1Co)
+
+
+#reducemf5 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_L_calls + (1|Site)+(1|Year), data = AC.DF1Co)
+#model fails to converge
+
+reducemf6 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + (1|Site)+ Year, data = AC.DF1Co)
+
+```
+
+
+
+###Model Selection
+
+
+```{r model selection mf spl, echo = FALSE}
+
+AICc(simple1amf, simple1bmf, simple1cmf, simple2amf, simple2bmf, simple2cmf, simple3mf, simple4mf, simple6amf, simple6bmf, simple7mf, reducemf, reducemf2, reducemf3, reducemf4, reducemf6)
+
+summary(reducemf6)
+```
+
+reducemf6 is the best model.
+
+reducemf6 includes: Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + (1 | Site) + Year
+
+
+
+
+
+
+## MF ACI Model Interpretation
+
+###Step 1 
+
+```{r mf aci1, echo = FALSE}
+
+mf.aci1 <- lmer(ACI_Midrange ~ Tot_Knocks + (1|Site) + Year, data = AC.DF1Co)
+summary(mf.aci1)
+
+```
+
+Total knocks are significant and have a large effect size here...
+
+
+###Step 2, Herbivory or Long Calls
+
+```{r mf aci2a, echo = FALSE}
+
+mf.aci2a <- lmer(ACI_Midrange ~ Tot_Knocks + Num_Herbivory + (1|Site) + Year, data = AC.DF1Co)
+summary(mf.aci2a)
+
+```
+
+The addition of herbivory does nothing major, the effect size of knocks is even slightly higher.
+
+```{r mf aci2b or Lon, echo = FALSE}
+
+mf.aci2b <- lmer(ACI_Midrange ~ Tot_Knocks + Num_L_calls + (1|Site) + Year, data = AC.DF1Co)
+summary(mf.aci2b)
+
+```
+
+The addition of long calls also does nothing here.
+
+###Step 3, Herbivory and Long Calls
+
+```{r mf aci3, echo = FALSE}
+
+mf.aci3 <- lmer(ACI_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + (1|Site) + Year, data = AC.DF1Co)
+summary(mf.aci3)
+
+```
+
+
+With both long calls and herbivory, neither are significant and knocks has roughly the same effect size.
+###Step 4, reduced model
+
+```{r mf aci4, echo = FALSE}
+
+mf.aci4 <- lmer(ACI_Midrange ~ Tot_Knocks + Hour + (1|Site) + Year, data = AC.DF1Co)
+summary(mf.aci4)
+
+#maximal model
+mf.maxaci <- lmer(ACI_Midrange ~ (Tot_Knocks + Num_L_calls + Num_Herbivory)*Hour + (1|Site) + Year, data = AC.DF1Co)
+
+#reduced models
+mf.acil <- lmer(ACI_Midrange ~ Num_L_calls + (1|Site) + Year, data = AC.DF1Co)
+
+mf.acih <- lmer(ACI_Midrange ~Num_Herbivory + (1|Site) + Year, data = AC.DF1Co)
+
+mf.acilh <- lmer(ACI_Midrange ~ Num_L_calls*Hour + (1|Site) + Year, data = AC.DF1Co)
+
+mf.acihh <- lmer(ACI_Midrange ~ Num_Herbivory*Hour + (1|Site) + Year, data = AC.DF1Co)
+
+
+
+```
+
+Hour increases knock effect size but is not significant on its own.
+
+###Main Effects Model
+
+```{r mf aci6, echo = FALSE}
+
+fit.mfaci6 <- lmer(ACI_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + (1|Site) + Year, data = AC.DF1Co)
+summary(fit.mfaci6)
+
+
+```
+
+With all main effects, only knocks is significant still and has a high effect size.
+
+###Saturation Model
+
+In the main effects model we still see that only knocks is significant and its effect size really hasn't changed compared to the previous model that only took into account knocks and hour.
+
+```{r mf aci7, echo = FALSE}
+
+fit.mfaci7 <- lmer(ACI_Midrange ~ Tot_Knocks*Hour + Num_Herbivory + Num_L_calls + (1|Site) + Year, data = AC.DF1Co)
+summary(fit.mfaci7)
+
+```
+
+When we add in the interaction between knocks and hour, nothing is significant.
+
+###Model Selection
+
+```{r mf aci model selection, echo = FALSE}
+AICc(mf.aci1, mf.aci2a, mf.aci2b, mf.aci3, mf.aci4, fit.mfaci6, fit.mfaci7, mf.maxaci, mf.acil, mf.acih, mf.acilh, mf.acihh)
+
+summary(mf.acihh)
+```
+
+mf.acihh is the best model.
+
+mf.acihh includes Num_Herbivory*Hour + (1|Site) + Year
+
+
+
+
+
+
+#Plots_for_Publishing
+
+Plots for use in paper
+
+```{r plot prep, echo = FALSE}
+#subsetting site 5 from HF
+Snap.HF5 <- Snap.HF[Snap.HF$Site==5,]
+
+#subsetting 9 AM from MF
+h9 <- AC.DF1[AC.DF1$Hour==9,]
+
+#subsetting site 5 at 9
+h9s5 <- h9[h9$Site==5,]
+
+#subsetting hf diurnal plots data
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+SPLHF.long5 <- SPLHF.long[SPLHF.long$Site==5,]
+
+SPLHF.long518 <- SPLHF.long5[SPLHF.long5$Year==2018,]
+
+#subsetting mf diurnal plots data
+SPLMF.long5 <- SPLMF.long[SPLMF.long$Site==5,]
+SPLMF.long518 <- SPLMF.long5[SPLMF.long5$Year==2018,]
+
+#recreating time column in Snap.HF
+Snap.HF$Time <- paste(Snap.HF$Hour, Snap.HF$Minutes, sep = ":")
+
+```
+
+
+##High Frequency Plots
+
+This first plot uses ALL data (2017 & 2018) and all sites
+
+```{r hf SPL plot, echo = FALSE}
+#Plot of High frequency SPL and snaps
+SP.hf <- ggplot(Snap.HF, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site, shape=t12))
+#SP.hf
+```
+
+It seems super crowded, so maybe we only need to display a piece of it?
+
+Here is a plot using only one site (Site 5)
+
+```{r hf SPL plot2, echo = FALSE}
+#HF SPL and snaps - just site 5
+SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point() + geom_smooth(method = "lm", se=F) + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + theme_classic() + labs(y = "High Frequency SPL")
+SP2.hf
+```
+
+##Mid Frequency Plots
+
+This plot uses ALL data (2017 & 2018) and all sites/hours
+
+```{r mf SPL plot, echo = FALSE}
+#Plot of Mid frequency SPL and knocks - ALL SITES
+SP.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange, color = Hour)) + geom_point() + geom_smooth(method = "lm", se = F)
+SP.mf
+
+```
+
+Way too much going on.
+
+Here is a plot that only uses 9am
+
+```{r mf SPL plot2, echo = FALSE}
+#Just site 5 at 9 am
+
+lm_eqn <- function(df){
+    m <- lm(y ~ x, df);
+    eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+         list(a = format(unname(coef(m)[1]), digits = 2),
+              b = format(unname(coef(m)[2]), digits = 2),
+             r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));
+}
+
+SP.mf9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + geom_smooth(method = "lm", se=F) + theme_classic() + labs(y = "Low Frequency SPL", x = "Number of Knocks")
+SP.mf9
+```
+
+This shows that the pattern exists at pretty much all sites except for 5. I think this is the plot to go with.
+
+##Diurnal trends Plots
+```{r hf diurnal trends, echo = FALSE}
+#High frequency
+hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme( legend.position = "none") + theme(axis.title.x = element_blank(), axis.text.x = element_blank()) + labs(y = "High Frequency SPL")
+
+hf.dplot
+```
+
+That looks nice!
+
+```{r mf diurnal trends, echo = FALSE}
+mf.dplot <- ggplot(SPLMF.long518, aes(x=Time, y=SPL_MF)) + geom_point() + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+mf.dplot.F <- mf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+mf.dplot + theme_classic() 
+
+```
+
+Hey! So does that! Is it not OK for us to use site 5 here because it was the one site that didn't seem to have a strong relationship at 9 AM?
+
+##Combination Plot
+```{r combination plot, echo = FALSE}
+grid.arrange(hf.dplot, SP2.hf, mf.dplot.F, SP.mf9, nrow=2)
+```
+
+##HF ACI Plots
+
+###Diurnal Plot
+
+```{r hf ACI plot, echo = FALSE}
+#putting time in order
+Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
+
+unique(Snap.HF$Time)
+#assign manual x axis to this graph
+hfa.dplot <- ggplot(Snap.HF, aes(x=Time2, y =ACI_HF)) + geom_point(aes(color = t12)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
+hfa.dplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day"))
+```
+
+### Point Plot
+
+```{r hf ACI pointplot, echo = FALSE}
+#putting time in order
+Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
+
+unique(Snap.HF$Time)
+#assign manual x axis to this graph
+hfa.bplot <- ggplot(Snap.HF, aes(x=Snaps, y =ACI_HF, color = t12)) + geom_point(size = .5) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
+hfa.bplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + geom_smooth(method="lm", se=F)
+```
+
+##HF SPL Plots
+
+###Diurnal Plot
+
+```{r hf SPL plot3, echo = FALSE}
+hfs.dplot <- ggplot(Snap.HF, aes(x=Time2, y = SPL_HF)) + geom_point(aes(color = t12)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle=90))
+
+hfs.dplot +labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day"))
+```
+
+### Point Plot
+
+```{r hf SPL pointplot, echo = FALSE}
+#putting time in order
+Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
+
+unique(Snap.HF$Time)
+#assign manual x axis to this graph
+hfs.bplot <- ggplot(Snap.HF, aes(x=Snaps, y =SPL_HF, color = t12)) + geom_point(size = .5) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
+hfs.bplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + geom_smooth(method = lm, se=F)
+```
+
+
+#Supplementary Diurnal Plots
+**Acoustics Breakdown** All acoustic metrics (SPL and ACI) are broken down into 2 frequency bands: High Frequency (Frequencies between 1 kHz - 22 kHz) and Mid Frequency (Frequencies between 160 Hz and 1 kHz)
+
+*Note* 2017 had a 10 minute duty cycle with 5 minutes recording while 2018 had a 15 minute duty cycle with 5 minutes recording, so the number of files averages differs between years
+
+## Diurnal Deployment Plots - Supplementary
+
+```{r supp diurnal plots, echo = FALSE, fig.width = 10, fig.length = 24}
+#High frequency
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+#removing outliers from site 35 in 2018
+low.hf <- SPLHF.long[SPLHF.long$SPL_HF <105, ]
+# Remove anything with fewer than 2 observers 
+
+SPLHF.long <- SPLHF.long[!(SPLHF.long$SPL_HF %in% low.hf$SPL_HF),]
+#now rerunning without the 3 outliers
+
+hfsupp <- ggplot(SPLHF.long, aes(x=Time, y=SPL_HF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+hfsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+
+# Mid frequency
+mfsupp <- ggplot(SPLMF.long, aes(x=Time, y=SPL_MF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+mfsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+# Combo Plots
+#creating combined dataframe
+SPL.both17 <- cbind(SPLMF17.long, SPLHF17.long$SPL_HF)
+SPL.both17$Year <- 2017
+SPL.both18 <- cbind(SPLMF18.long, SPLHF18.long$SPL_HF)
+SPL.both18$Year <- 2018
+#renaming columns
+names(SPL.both17) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF", "Year")
+names(SPL.both18) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF", "Year")
+
+SPL.both <- rbind(SPL.both17, SPL.both18)
+
+comsupp <- ggplot(SPL.both, aes(x=Time)) + geom_point(aes(y = SPL_HF, color = Site)) + geom_point(aes(y = SPL_MF, color = Site))+ facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+comsupp + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+```
+
+**Total Deployment Plots**
+
+```{r supp tot plots, echo = FALSE, fig.width = 10, fig.length = 24}
+#High frequency
+SPLHF.long$Site <- as.character(SPLHF.long$Site)
+
+hfsupp.t <- ggplot(SPLHF.long, aes(x=datetime, y=SPL_HF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "free") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+hfsupp.t + scale_x_datetime(date_breaks = "1 day")
+
+# Mid frequency
+mfsupp.t <- ggplot(SPLMF.long, aes(x=datetime, y=SPL_MF)) + geom_point(aes(color = Site)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "free") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+mfsupp.t + scale_x_datetime(date_breaks = "1 day")
+
+# Combo Plots
+#creating combined dataframe
+SPL.both17 <- cbind(SPLMF17.long, SPLHF17.long$SPL_HF)
+SPL.both17$Year <- 2017
+SPL.both18 <- cbind(SPLMF18.long, SPLHF18.long$SPL_HF)
+SPL.both18$Year <- 2018
+#renaming columns
+names(SPL.both17) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF", "Year")
+names(SPL.both18) <- c("Date", "Time", "SPL_MF", "Site", "datetime", "SPL_HF", "Year")
+
+SPL.both <- rbind(SPL.both17, SPL.both18)
+
+comsupp.t <- ggplot(SPL.both, aes(x=datetime)) + geom_point(aes(y = SPL_HF, color = Site)) + geom_point(aes(y = SPL_MF, color = Site))+ facet_grid(rows = vars(Site), cols = vars(Year), scales = "free") + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+comsupp.t + scale_x_datetime(date_breaks = "1 day")
+
+```
+
+
