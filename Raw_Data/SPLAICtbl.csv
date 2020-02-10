@@ -1,0 +1,10 @@
+Model Name,df,AICc,deltaAIC,AIC Break,Formula,# of Parameters,
+reducemf4,10,855.2410298,0,<2,LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year),6,"Knocks, hour, and their interaction are all significantly associated with changes in SPL"
+reducemf6,11,855.4099004,0.168900419,<2,LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year),7,"Knocks, hour, herbivory and the interaction between knocks and hour are all significant"
+reducemf3,7,858.9739505,3.732950538,<4,LF SPL ~ Knocks + Hour + (1|site_year),3,Only knocks and hour are significantly associated with changes in SPL
+simple4mf,12,860.20404,4.963040026,<6,LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year),9,"Knocks, herbivory, long calls, hour, and the interaction between knocks and hour are all significant"
+,,,,,,,
+,,,,,,,
+,,,,,,,
+,,,,,,,
+,,,,,I think that the model selection comes down to my two models in green.  They are my two simplest models and each hold onto only the effects that seem to have any real effect on SPL (hours and knocks). ,,

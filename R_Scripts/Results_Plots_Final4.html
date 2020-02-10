@@ -249,7 +249,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Results Plots Final4</h1>
 <h4 class="author">Sean Dimoff</h4>
-<h4 class="date">06/2/2020</h4>
+<h4 class="date">10/2/2020</h4>
 
 </div>
 
@@ -978,12 +978,17 @@ Anova(fit.rt12, type = 3)</code></pre>
 
 #testing each of the models
 
-AICc(simple.model, simple.model1, simple.model2, simple.model4)</code></pre>
-<pre><code>##               df     AICc
-## simple.model   4 71893.04
-## simple.model1  4 72568.03
-## simple.model2  5 69299.64
-## simple.model4  6 69237.49</code></pre>
+splhftbl &lt;- AICc(simple.model, simple.model1, simple.model2, simple.model4)
+
+splhftbl$minAIC &lt;- 69237.49
+splhftbl$deltaAIC &lt;- splhftbl$AICc - splhftbl$minAIC
+
+splhftbl</code></pre>
+<pre><code>##               df     AICc   minAIC      deltaAIC
+## simple.model   4 71893.04 69237.49  2.655554e+03
+## simple.model1  4 72568.03 69237.49  3.330540e+03
+## simple.model2  5 69299.64 69237.49  6.215042e+01
+## simple.model4  6 69237.49 69237.49 -1.762785e-03</code></pre>
 <pre class="r"><code>summary(simple.model4)</code></pre>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 ## lmerModLmerTest]
@@ -1154,12 +1159,49 @@ AICc(simple.model, simple.model1, simple.model2, simple.model4)</code></pre>
 </div>
 <div id="model-selection-1" class="section level3">
 <h3>Model Selection</h3>
-<pre class="r"><code>AICc(aci.hf, aci.hf1a, aci.hf2, aci.hf4)</code></pre>
-<pre><code>##          df     AICc
-## aci.hf    4 317823.5
-## aci.hf1a  4 317863.7
-## aci.hf2   5 317814.6
-## aci.hf4   6 317813.9</code></pre>
+<pre class="r"><code>acihftbl &lt;- AICc(aci.hf, aci.hf1a, aci.hf2, aci.hf4)
+
+acihftbl$minAIC &lt;- 317813.9
+acihftbl$deltaAIC &lt;- acihftbl$AICc - acihftbl$minAIC
+
+acihftbl</code></pre>
+<pre><code>##          df     AICc   minAIC    deltaAIC
+## aci.hf    4 317823.5 317813.9  9.60669324
+## aci.hf1a  4 317863.7 317813.9 49.78344373
+## aci.hf2   5 317814.6 317813.9  0.74885796
+## aci.hf4   6 317813.9 317813.9  0.01273108</code></pre>
+<pre class="r"><code>summary(simple.model4)</code></pre>
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: SPL_HF ~ Snaps * dn + (1 | site_year)
+##    Data: Snap.HF
+## 
+## REML criterion at convergence: 69225.5
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.3798 -0.7076  0.0001  0.6835  5.9171 
+## 
+## Random effects:
+##  Groups    Name        Variance Std.Dev.
+##  site_year (Intercept) 7.563    2.750   
+##  Residual              4.418    2.102   
+## Number of obs: 15987, groups:  site_year, 10
+## 
+## Fixed effects:
+##                 Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)    9.294e+01  1.039e+00  1.835e+01  89.421  &lt; 2e-16 ***
+## Snaps          1.632e-02  3.921e-04  1.598e+04  41.621  &lt; 2e-16 ***
+## dnNight       -5.574e+00  8.385e-01  1.597e+04  -6.648 3.08e-11 ***
+## Snaps:dnNight  5.045e-03  5.733e-04  1.597e+04   8.799  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Snaps  dnNght
+## Snaps       -0.547              
+## dnNight     -0.341  0.622       
+## Snps:dnNght  0.343 -0.627 -0.999</code></pre>
 <pre class="r"><code>summary(aci.hf2)</code></pre>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 ## lmerModLmerTest]
@@ -1226,69 +1268,61 @@ AICc(simple.model, simple.model1, simple.model2, simple.model4)</code></pre>
 ##            (Intr)
 ## Tot_Knocks 0.002</code></pre>
 <p>Total knocks are significant but have a tiny effect size.</p>
-<pre><code>## Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl =
-## control$checkConv, : Model failed to converge with max|grad| = 0.0156152
-## (tol = 0.002, component 1)</code></pre>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 ## lmerModLmerTest]
-## Formula: SPL_Midrange ~ Num_L_calls + (1 | Site) + (1 | Year)
+## Formula: SPL_Midrange ~ Num_L_calls + (1 | site_year)
 ##    Data: AC.DF1Co
 ## 
-## REML criterion at convergence: 932.3
+## REML criterion at convergence: 871.8
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -1.9763 -0.7343 -0.0446  0.5019  3.8560 
+## -1.8514 -0.5876 -0.1202  0.3428  3.8843 
 ## 
 ## Random effects:
-##  Groups   Name        Variance Std.Dev.
-##  Site     (Intercept) 2.139    1.463   
-##  Year     (Intercept) 7.186    2.681   
-##  Residual             6.966    2.639   
-## Number of obs: 191, groups:  Site, 5; Year, 2
+##  Groups    Name        Variance Std.Dev.
+##  site_year (Intercept) 7.915    2.813   
+##  Residual              4.628    2.151   
+## Number of obs: 191, groups:  site_year, 10
 ## 
 ## Fixed effects:
-##              Estimate Std. Error        df t value Pr(&gt;|t|)   
-## (Intercept) 105.67472    2.01433   1.21556  52.462  0.00547 **
-## Num_L_calls   0.06500    0.02896 186.65590   2.244  0.02598 * 
+##              Estimate Std. Error        df t value Pr(&gt;|t|)    
+## (Intercept) 105.69682    0.90321   9.00839 117.024  1.2e-15 ***
+## Num_L_calls   0.03672    0.02420 181.88441   1.517    0.131    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr)
-## Num_L_calls -0.001
-## convergence code: 0
-## Model failed to converge with max|grad| = 0.0156152 (tol = 0.002, component 1)</code></pre>
+## Num_L_calls -0.003</code></pre>
 <p>Long calls are not significant.</p>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 ## lmerModLmerTest]
-## Formula: SPL_Midrange ~ Num_Herbivory + (1 | Site) + (1 | Year)
+## Formula: SPL_Midrange ~ Num_Herbivory + (1 | site_year)
 ##    Data: AC.DF1Co
 ## 
-## REML criterion at convergence: 934.9
+## REML criterion at convergence: 873.8
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -1.8991 -0.7518 -0.0637  0.5360  3.8445 
+## -1.8423 -0.5612 -0.0832  0.3242  3.4362 
 ## 
 ## Random effects:
-##  Groups   Name        Variance Std.Dev.
-##  Site     (Intercept) 1.563    1.250   
-##  Year     (Intercept) 6.854    2.618   
-##  Residual             7.095    2.664   
-## Number of obs: 191, groups:  Site, 5; Year, 2
+##  Groups    Name        Variance Std.Dev.
+##  site_year (Intercept) 7.651    2.766   
+##  Residual              4.676    2.162   
+## Number of obs: 191, groups:  site_year, 10
 ## 
 ## Fixed effects:
-##                Estimate Std. Error        df t value Pr(&gt;|t|)   
-## (Intercept)   105.68173    1.94343   1.18565  54.379  0.00584 **
-## Num_Herbivory   0.03821    0.02349 185.37861   1.627  0.10548   
+##                Estimate Std. Error        df t value Pr(&gt;|t|)    
+## (Intercept)   105.70180    0.88862   9.01107 118.950 1.03e-15 ***
+## Num_Herbivory   0.01660    0.01942 180.83420   0.855    0.394    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr)
-## Num_Herbvry 0.000</code></pre>
-<p>Model failed to converge.</p>
+## Num_Herbvry 0.001</code></pre>
 <p>Herbivory is not significant.</p>
 </div>
 <div id="additive-models" class="section level3">
@@ -1612,24 +1646,52 @@ AICc(simple.model, simple.model1, simple.model2, simple.model4)</code></pre>
 </div>
 <div id="model-selection-2" class="section level3">
 <h3>Model Selection</h3>
-<pre class="r"><code>AICc(simple1amf, simple1bmf, simple1cmf, simple2amf, simple2bmf, simple2cmf, simple3mf, simple4mf, simple6amf, simple6bmf, simple7mf, reducemf, reducemf2, reducemf3, reducemf4, reducemf6)</code></pre>
-<pre><code>##            df     AICc
-## simple1amf  4 878.2502
-## simple1bmf  5 942.5764
-## simple1cmf  5 945.2335
-## simple2amf  5 885.1066
-## simple2bmf  5 883.7191
-## simple2cmf  6 890.9117
-## simple3mf   9 869.2421
-## simple4mf  12 860.2040
-## simple6amf 15 864.0277
-## simple6bmf 15 863.4286
-## simple7mf  18 867.0593
-## reducemf   12 860.2040
-## reducemf2  15 863.4286
-## reducemf3   7 858.9740
-## reducemf4  10 855.2410
-## reducemf6  11 855.4099</code></pre>
+<pre class="r"><code>splmftbl &lt;- AICc(simple1amf, simple1bmf, simple1cmf, simple2amf, simple2bmf, simple2cmf, simple3mf, simple4mf, simple6amf, simple6bmf, simple7mf, reducemf, reducemf2, reducemf3, reducemf4, reducemf6)
+
+splmftbl$minAIC &lt;- 855.2410
+splmftbl$deltaAIC &lt;- splmftbl$AICc - splmftbl$minAIC
+
+splmftbl</code></pre>
+<pre><code>##            df     AICc  minAIC     deltaAIC
+## simple1amf  4 878.2502 855.241 2.300922e+01
+## simple1bmf  4 879.9999 855.241 2.475889e+01
+## simple1cmf  4 882.0041 855.241 2.676309e+01
+## simple2amf  5 885.1066 855.241 2.986563e+01
+## simple2bmf  5 883.7191 855.241 2.847811e+01
+## simple2cmf  6 890.9117 855.241 3.567065e+01
+## simple3mf   9 869.2421 855.241 1.400113e+01
+## simple4mf  12 860.2040 855.241 4.963040e+00
+## simple6amf 15 864.0277 855.241 8.786731e+00
+## simple6bmf 15 863.4286 855.241 8.187624e+00
+## simple7mf  18 867.0593 855.241 1.181826e+01
+## reducemf   12 860.2040 855.241 4.963040e+00
+## reducemf2  15 863.4286 855.241 8.187624e+00
+## reducemf3   7 858.9740 855.241 3.732951e+00
+## reducemf4  10 855.2410 855.241 2.979064e-05
+## reducemf6  11 855.4099 855.241 1.689004e-01</code></pre>
+<pre class="r"><code>splmftbl.short &lt;- subset(splmftbl, deltaAIC &lt; 6)
+
+splmftbl.short$formula &lt;- 0
+
+splmftbl.short[1,6] &lt;- &quot;LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)&quot;
+splmftbl.short[2,6] &lt;- &quot;LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)&quot;
+splmftbl.short[3,6] &lt;- &quot;LF SPL ~ Knocks + Hour + (1|site_year)&quot;
+splmftbl.short[4,6] &lt;- &quot;LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year)&quot;
+splmftbl.short[5,6] &lt;- &quot;LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year)&quot;
+
+splmftbl.short</code></pre>
+<pre><code>##           df     AICc  minAIC     deltaAIC formula
+## simple4mf 12 860.2040 855.241 4.963040e+00       0
+## reducemf  12 860.2040 855.241 4.963040e+00       0
+## reducemf3  7 858.9740 855.241 3.732951e+00       0
+## reducemf4 10 855.2410 855.241 2.979064e-05       0
+## reducemf6 11 855.4099 855.241 1.689004e-01       0
+##                                                                                      V6
+## simple4mf LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)
+## reducemf  LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)
+## reducemf3                                        LF SPL ~ Knocks + Hour + (1|site_year)
+## reducemf4                          LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year)
+## reducemf6              LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year)</code></pre>
 <pre class="r"><code>summary(reducemf3)</code></pre>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 ## lmerModLmerTest]
@@ -1952,20 +2014,30 @@ mf.acihh &lt;- lmer(ACI_Midrange ~ Num_Herbivory*Hour + (1|site_year), data = AC
 </div>
 <div id="model-selection-3" class="section level3">
 <h3>Model Selection</h3>
-<pre class="r"><code>AICc(mf.aci1, mf.aci2a, mf.aci2b, mf.aci3, mf.aci4, fit.mfaci6, fit.mfaci7, mf.maxaci, mf.acil, mf.acih, mf.acilh, mf.acihh)</code></pre>
-<pre><code>##            df     AICc
-## mf.aci1     4 3885.522
-## mf.aci2a    5 3877.260
-## mf.aci2b    5 3876.861
-## mf.aci3     6 3868.705
-## mf.aci4     7 3839.718
-## fit.mfaci6  9 3822.162
-## fit.mfaci7 12 3796.031
-## mf.maxaci  18 3720.309
-## mf.acil     4 3885.293
-## mf.acih     4 3885.982
-## mf.acilh   10 3805.114
-## mf.acihh   10 3800.600</code></pre>
+<pre class="r"><code>acimftbl &lt;-AICc(mf.aci1, mf.aci2a, mf.aci2b, mf.aci3, mf.aci4, fit.mfaci6, fit.mfaci7, mf.maxaci, mf.acil, mf.acih, mf.acilh, mf.acihh)
+
+acimftbl$minAIC &lt;- 3720.309
+acimftbl$deltaAIC &lt;- acimftbl$AICc - acimftbl$minAIC
+
+acimftbl</code></pre>
+<pre><code>##            df     AICc   minAIC      deltaAIC
+## mf.aci1     4 3885.522 3720.309  1.652131e+02
+## mf.aci2a    5 3877.260 3720.309  1.569514e+02
+## mf.aci2b    5 3876.861 3720.309  1.565517e+02
+## mf.aci3     6 3868.705 3720.309  1.483960e+02
+## mf.aci4     7 3839.718 3720.309  1.194085e+02
+## fit.mfaci6  9 3822.162 3720.309  1.018526e+02
+## fit.mfaci7 12 3796.031 3720.309  7.572176e+01
+## mf.maxaci  18 3720.309 3720.309 -1.182289e-04
+## mf.acil     4 3885.293 3720.309  1.649839e+02
+## mf.acih     4 3885.982 3720.309  1.656727e+02
+## mf.acilh   10 3805.114 3720.309  8.480455e+01
+## mf.acihh   10 3800.600 3720.309  8.029054e+01</code></pre>
+<pre class="r"><code>acimftbl.short &lt;- subset(acimftbl, deltaAIC &lt; 6)
+
+acimftbl.short</code></pre>
+<pre><code>##           df     AICc   minAIC      deltaAIC
+## mf.maxaci 18 3720.309 3720.309 -0.0001182289</code></pre>
 <pre class="r"><code>summary(mf.maxaci)</code></pre>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 ## lmerModLmerTest]

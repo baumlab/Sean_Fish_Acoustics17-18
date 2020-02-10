@@ -1,7 +1,7 @@
 ---
 title: "Results Plots Final4"
 author: "Sean Dimoff"
-date: 06/2/2020
+date: 10/2/2020
 output: 
   html_document:
     toc: true
@@ -757,9 +757,14 @@ Now you might think that if the effect is strong it will be at least in the same
 
 #testing each of the models
 
-AICc(simple.model, simple.model1, simple.model2, simple.model4)
+splhftbl <- AICc(simple.model, simple.model1, simple.model2, simple.model4)
 
+splhftbl$minAIC <- 69237.49
+splhftbl$deltaAIC <- splhftbl$AICc - splhftbl$minAIC
+
+splhftbl
 summary(simple.model4)
+r.squaredGLMM(simple.model4)
 
 ```
 
@@ -820,9 +825,16 @@ This means that the relationship between snaps and HF ACI doesn't change between
 
 ```{r model selection aci hf, echo = TRUE}
 
-AICc(aci.hf, aci.hf1a, aci.hf2, aci.hf4)
+acihftbl <- AICc(aci.hf, aci.hf1a, aci.hf2, aci.hf4)
 
-summary(aci.hf2)
+acihftbl$minAIC <- 317813.9
+acihftbl$deltaAIC <- acihftbl$AICc - acihftbl$minAIC
+
+acihftbl
+summary(simple.model4)
+
+summary(aci.hf4)
+r.squaredGLMM(aci.hf4)
 ```
 
 The most parsimonious model here is aci.hf2.
@@ -847,7 +859,7 @@ Total knocks are significant but have a tiny effect size.
 
 ```{r simple1b mf model, echo = FALSE}
 
-simple1bmf <- lmer(SPL_Midrange ~ Num_L_calls + (1|Site)+(1|Year) , data = AC.DF1Co)
+simple1bmf <- lmer(SPL_Midrange ~ Num_L_calls + (1|site_year) , data = AC.DF1Co)
 
 summary(simple1bmf)
 
@@ -857,12 +869,10 @@ Long calls are not significant.
 
 ```{r simple1c mf model, echo = FALSE}
 
-simple1cmf <- lmer(SPL_Midrange ~ Num_Herbivory + (1|Site)+(1|Year), data = AC.DF1Co)
+simple1cmf <- lmer(SPL_Midrange ~ Num_Herbivory + (1|site_year), data = AC.DF1Co)
 
 summary(simple1cmf)
 ```
-
-Model failed to converge.
 
 Herbivory is not significant.
 
@@ -960,7 +970,7 @@ This is just the saturated model but nothing new is shown here.
 
 ###Reduced Model
 
-```{r simple reduced mf models, echo = FALSE}
+```{r simple reduced mf models, echo = TRUE}
 
 reducemf <- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + (1|site_year), data = AC.DF1Co)
 
@@ -978,7 +988,8 @@ reducemf4 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + (1|site_y
 #model fails to converge
 
 reducemf6 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + (1|site_year), data = AC.DF1Co)
-
+summary(reducemf6)
+summary(reducemf4)
 ```
 
 
@@ -988,9 +999,52 @@ reducemf6 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbi
 
 ```{r model selection mf spl, echo = TRUE}
 
-AICc(simple1amf, simple1bmf, simple1cmf, simple2amf, simple2bmf, simple2cmf, simple3mf, simple4mf, simple6amf, simple6bmf, simple7mf, reducemf, reducemf2, reducemf3, reducemf4, reducemf6)
+splmftbl <- AICc(simple1amf, simple1bmf, simple1cmf, simple2amf, simple2bmf, simple2cmf, simple3mf, simple4mf, simple6amf, simple6bmf, simple7mf, reducemf, reducemf2, reducemf3, reducemf4, reducemf6)
 
+splmftbl$minAIC <- 855.2410
+splmftbl$deltaAIC <- splmftbl$AICc - splmftbl$minAIC
+
+splmftbl
+
+splmftbl.short <- subset(splmftbl, deltaAIC < 6)
+
+splmftbl.short$formula <- 0
+
+splmftbl.short[1,5] <- "LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)"
+splmftbl.short[2,5] <- "LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)"
+splmftbl.short[3,5] <- "LF SPL ~ Knocks + Hour + (1|site_year)"
+splmftbl.short[4,5] <- "LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year)"
+splmftbl.short[5,5] <- "LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year)"
+
+splmftbl.short
+
+
+
+#write.csv(splmftbl.short, file = "../Raw_Data/SPLAICtbl.csv")
 summary(reducemf3)
+reducemf3
+
+ctbl <- coef(summary(reducemf4))[,"Estimate"]
+ctbl2 <- coef(summary(reducemf6))[,"Estimate"]
+ctbl3 <- coef(summary(reducemf3))[, "Estimate"]
+ctbl4 <- coef(summary(simple4mf))[, "Estimate"]
+
+suptbl1 <- bind_rows(ctbl, ctbl2, ctbl3, ctbl4)
+
+#write.csv(suptbl1, file = "../Raw_Data/suptbl1.csv")
+
+r1 <- data.frame(r.squaredGLMM(reducemf6))
+r2 <- data.frame(r.squaredGLMM(reducemf4))
+r3 <- data.frame(r.squaredGLMM(reducemf3))
+r4 <- data.frame(r.squaredGLMM(simple4mf))
+
+rtbl1 <- bind_rows(r1, r2, r3, r4)
+
+
+
+
+
+
 ```
 
 I actually think that reduce mf3 is the best model here because we effectively add 3 more df to get reducemf4 but we only get a difference of 3 AIC and we should get a difference of atleast 6 AIC if it actually were the better model.
@@ -1105,9 +1159,19 @@ When we add in the interaction between knocks and hour, nothing is significant.
 ###Model Selection
 
 ```{r mf aci model selection, echo = TRUE}
-AICc(mf.aci1, mf.aci2a, mf.aci2b, mf.aci3, mf.aci4, fit.mfaci6, fit.mfaci7, mf.maxaci, mf.acil, mf.acih, mf.acilh, mf.acihh)
+acimftbl <-AICc(mf.aci1, mf.aci2a, mf.aci2b, mf.aci3, mf.aci4, fit.mfaci6, fit.mfaci7, mf.maxaci, mf.acil, mf.acih, mf.acilh, mf.acihh)
+
+acimftbl$minAIC <- 3720.309
+acimftbl$deltaAIC <- acimftbl$AICc - acimftbl$minAIC
+
+acimftbl
+
+acimftbl.short <- subset(acimftbl, deltaAIC < 6)
+
+acimftbl.short
 
 summary(mf.maxaci)
+r.squaredGLMM(mf.maxaci)
 ```
 
 mf.maxaci is the "best model" but I think it is just overfit as hell and really doesn't describe what is going on with ACI at all.
@@ -1347,5 +1411,6 @@ comsupp.t <- ggplot(SPL.both, aes(x=datetime)) + geom_point(aes(y = SPL_HF, colo
 comsupp.t + scale_x_datetime(date_breaks = "1 day")
 
 ```
+
 
 
