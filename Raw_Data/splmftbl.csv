@@ -1,0 +1,5 @@
+Model #,Model,df,AICc,deltaAIC,R2m,R2c
+1,LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year),10,855.2410298,2.98E-05,0.137135359,0.70658719
+2,LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year),11,855.4099004,0.168900419,0.156618455,0.714542546
+3,LF SPL ~ Knocks + Hour + (1|site_year),7,858.9739505,3.732950538,0.07111687,0.668409009
+4,LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year),12,860.20404,4.963040026,0.156277602,0.721730095

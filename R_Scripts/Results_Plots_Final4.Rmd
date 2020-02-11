@@ -1018,32 +1018,44 @@ splmftbl.short[5,5] <- "LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|si
 
 splmftbl.short
 
-
+#removing one of the duplicate models
+splmftbl.short <- splmftbl.short[-c(1),]
+splmftbl.short
 
 #write.csv(splmftbl.short, file = "../Raw_Data/SPLAICtbl.csv")
-summary(reducemf3)
-reducemf3
 
-ctbl <- coef(summary(reducemf4))[,"Estimate"]
-ctbl2 <- coef(summary(reducemf6))[,"Estimate"]
-ctbl3 <- coef(summary(reducemf3))[, "Estimate"]
-ctbl4 <- coef(summary(simple4mf))[, "Estimate"]
+ctbl <- coef(summary(reducemf))[,"Estimate"]
+ctbl2 <- coef(summary(reducemf3))[,"Estimate"]
+ctbl3 <- coef(summary(reducemf4))[, "Estimate"]
+ctbl4 <- coef(summary(reducemf6))[, "Estimate"]
 
 suptbl1 <- bind_rows(ctbl, ctbl2, ctbl3, ctbl4)
+suptbl1
+
+#adding formula to this dataframe
+suptbl1 <- cbind(suptbl1, splmftbl.short[,5, drop = FALSE])
+suptbl1 <- cbind(suptbl1, splmftbl.short[,4, drop = FALSE])
+suptbl1 <- suptbl1 %>% arrange(deltaAIC)
 
 #write.csv(suptbl1, file = "../Raw_Data/suptbl1.csv")
 
-r1 <- data.frame(r.squaredGLMM(reducemf6))
-r2 <- data.frame(r.squaredGLMM(reducemf4))
-r3 <- data.frame(r.squaredGLMM(reducemf3))
-r4 <- data.frame(r.squaredGLMM(simple4mf))
+r1 <- data.frame(r.squaredGLMM(reducemf))
+r2 <- data.frame(r.squaredGLMM(reducemf3))
+r3 <- data.frame(r.squaredGLMM(reducemf4))
+r4 <- data.frame(r.squaredGLMM(reducemf6))
 
 rtbl1 <- bind_rows(r1, r2, r3, r4)
 
 
+#binding tables together
+splmftbl.short <- cbind(splmftbl.short, rtbl1)
 
+splmftbl.short <- splmftbl.short %>% arrange(deltaAIC)
 
+splmftbl.short1 <- splmftbl.short[, c(5, 1, 2, 4, 6, 7)]
+splmftbl.short1
 
+#write.csv(splmftbl.short1, file = "../Raw_Data/suptbl2.csv")
 
 ```
 
@@ -1056,6 +1068,7 @@ Reducemf4 = SPL MF ~ Knocks + Hour + Knocks:Hour + (1|site_year)
 ```{r summary reducemf4, echo = TRUE}
 
 summary(reducemf4)
+summary(reducemf6)
 
 ```
 

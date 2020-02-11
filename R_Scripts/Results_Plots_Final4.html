@@ -1021,6 +1021,11 @@ splhftbl</code></pre>
 ## Snaps       -0.547              
 ## dnNight     -0.341  0.622       
 ## Snps:dnNght  0.343 -0.627 -0.999</code></pre>
+<pre class="r"><code>r.squaredGLMM(simple.model4)</code></pre>
+<pre><code>## Warning: 'r.squaredGLMM' now calculates a revised statistic. See the help
+## page.</code></pre>
+<pre><code>##            R2m       R2c
+## [1,] 0.1657788 0.6923804</code></pre>
 <p>Simple model 4 is the most parsimonious model. This is also my most saturated model which includes the snaps*day/night and the site/year random effect.</p>
 </div>
 </div>
@@ -1202,36 +1207,41 @@ acihftbl</code></pre>
 ## Snaps       -0.547              
 ## dnNight     -0.341  0.622       
 ## Snps:dnNght  0.343 -0.627 -0.999</code></pre>
-<pre class="r"><code>summary(aci.hf2)</code></pre>
+<pre class="r"><code>summary(aci.hf4)</code></pre>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 ## lmerModLmerTest]
-## Formula: ACI_HF ~ Snaps + dn + (1 | site_year)
+## Formula: ACI_HF ~ Snaps * dn + (1 | site_year)
 ##    Data: Snap.HF
 ## 
-## REML criterion at convergence: 317804.6
+## REML criterion at convergence: 317801.9
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -2.3925 -0.7287 -0.1941  0.5336  4.5276 
+## -2.3866 -0.7279 -0.1937  0.5325  4.5280 
 ## 
 ## Random effects:
 ##  Groups    Name        Variance Std.Dev.
-##  site_year (Intercept)  5186817 2277    
-##  Residual              25123744 5012    
+##  site_year (Intercept)  5173414 2275    
+##  Residual              25124921 5012    
 ## Number of obs: 15987, groups:  site_year, 10
 ## 
 ## Fixed effects:
-##               Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept) 71774.2109  1279.6325    88.6494  56.090  &lt; 2e-16 ***
-## Snaps          -5.1441     0.7281 15983.7875  -7.066 1.67e-12 ***
-## dnNight        39.8143    80.5052 15975.4826   0.495    0.621    
+##                 Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)   72219.9754  1536.1689   184.0543  47.013  &lt; 2e-16 ***
+## Snaps            -5.4515     0.9350 15982.9651  -5.831 5.62e-09 ***
+## dnNight       -1006.8810  1999.5379 15979.0140  -0.504    0.615    
+## Snaps:dnNight     0.7162     1.3671 15979.0347   0.524    0.600    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Correlation of Fixed Effects:
-##         (Intr) Snaps 
-## Snaps   -0.825       
-## dnNight  0.098 -0.153</code></pre>
+##             (Intr) Snaps  dnNght
+## Snaps       -0.883              
+## dnNight     -0.550  0.622       
+## Snps:dnNght  0.554 -0.627 -0.999</code></pre>
+<pre class="r"><code>r.squaredGLMM(aci.hf4)</code></pre>
+<pre><code>##              R2m       R2c
+## [1,] 0.003263815 0.1734556</code></pre>
 <p>The most parsimonious model here is aci.hf2.</p>
 <p>aci.hf2 includes: Snaps + dn + (1|site_year)</p>
 </div>
@@ -1643,6 +1653,107 @@ acihftbl</code></pre>
 </div>
 <div id="reduced-model" class="section level3">
 <h3>Reduced Model</h3>
+<pre class="r"><code>reducemf &lt;- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + (1|site_year), data = AC.DF1Co)
+
+
+reducemf2 &lt;- lmer(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + Num_L_calls:Hour + (1|site_year), data = AC.DF1Co)
+
+
+reducemf3 &lt;- lmer(SPL_Midrange ~ Tot_Knocks + Hour + (1|site_year), data = AC.DF1Co)
+
+
+reducemf4 &lt;- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + (1|site_year), data = AC.DF1Co)
+
+
+#reducemf5 &lt;- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_L_calls + (1|Site)+(1|Year), data = AC.DF1Co)
+#model fails to converge
+
+reducemf6 &lt;- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + (1|site_year), data = AC.DF1Co)
+summary(reducemf6)</code></pre>
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: 
+## SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory +  
+##     (1 | site_year)
+##    Data: AC.DF1Co
+## 
+## REML criterion at convergence: 831.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -1.8296 -0.5272 -0.1242  0.3248  3.3870 
+## 
+## Random effects:
+##  Groups    Name        Variance Std.Dev.
+##  site_year (Intercept) 6.246    2.499   
+##  Residual              3.196    1.788   
+## Number of obs: 191, groups:  site_year, 10
+## 
+## Fixed effects:
+##                     Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)       104.499892   0.863257  12.067267 121.053  &lt; 2e-16 ***
+## Tot_Knocks         -0.021765   0.007638 174.897512  -2.849  0.00491 ** 
+## Hour21              1.452399   0.439246 173.467484   3.307  0.00115 ** 
+## Hour3               0.379490   0.451652 173.373438   0.840  0.40194    
+## Hour9               2.284281   0.453850 173.342091   5.033 1.20e-06 ***
+## Num_Herbivory       0.053158   0.018355 173.795102   2.896  0.00426 ** 
+## Tot_Knocks:Hour21   0.021084   0.008455 173.239773   2.494  0.01358 *  
+## Tot_Knocks:Hour3    0.024528   0.008466 173.741272   2.897  0.00425 ** 
+## Tot_Knocks:Hour9    0.053003   0.008711 174.030129   6.085 7.23e-09 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Tt_Knc Hour21 Hour3  Hour9  Nm_Hrb T_K:H2 T_K:H3
+## Tot_Knocks   0.230                                                 
+## Hour21      -0.321 -0.462                                          
+## Hour3       -0.330 -0.467  0.654                                   
+## Hour9       -0.327 -0.463  0.648  0.677                            
+## Num_Herbvry -0.164 -0.183  0.326  0.429  0.425                     
+## Tt_Knck:H21 -0.181 -0.804  0.306  0.362  0.362  0.118              
+## Tt_Kncks:H3 -0.200 -0.855  0.403  0.376  0.405  0.183  0.712       
+## Tt_Kncks:H9 -0.198 -0.835  0.398  0.405  0.367  0.199  0.695  0.729</code></pre>
+<pre class="r"><code>summary(reducemf4)</code></pre>
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: 
+## SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + (1 | site_year)
+##    Data: AC.DF1Co
+## 
+## REML criterion at convergence: 834
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -1.8984 -0.5254 -0.0938  0.3330  4.5392 
+## 
+## Random effects:
+##  Groups    Name        Variance Std.Dev.
+##  site_year (Intercept) 6.455    2.541   
+##  Residual              3.326    1.824   
+## Number of obs: 191, groups:  site_year, 10
+## 
+## Fixed effects:
+##                     Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)       104.909369   0.866140  11.453346 121.123  &lt; 2e-16 ***
+## Tot_Knocks         -0.017715   0.007661 176.083454  -2.313   0.0219 *  
+## Hour21              1.038130   0.423681 174.529831   2.450   0.0153 *  
+## Hour3              -0.182293   0.416109 174.480238  -0.438   0.6619    
+## Hour9               1.725697   0.419124 174.451439   4.117 5.90e-05 ***
+## Tot_Knocks:Hour21   0.018189   0.008564 174.277632   2.124   0.0351 *  
+## Tot_Knocks:Hour3    0.020043   0.008490 174.786783   2.361   0.0193 *  
+## Tot_Knocks:Hour9    0.047986   0.008709 175.010744   5.510 1.27e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Tt_Knc Hour21 Hour3  Hour9  T_K:H2 T_K:H3
+## Tot_Knocks   0.207                                          
+## Hour21      -0.288 -0.433                                   
+## Hour3       -0.292 -0.437  0.602                            
+## Hour9       -0.289 -0.433  0.595  0.605                     
+## Tt_Knck:H21 -0.166 -0.802  0.285  0.348  0.347              
+## Tt_Kncks:H3 -0.176 -0.850  0.369  0.335  0.368  0.707       
+## Tt_Kncks:H9 -0.172 -0.829  0.359  0.361  0.318  0.690  0.719</code></pre>
 </div>
 <div id="model-selection-2" class="section level3">
 <h3>Model Selection</h3>
@@ -1673,59 +1784,89 @@ splmftbl</code></pre>
 
 splmftbl.short$formula &lt;- 0
 
-splmftbl.short[1,6] &lt;- &quot;LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)&quot;
-splmftbl.short[2,6] &lt;- &quot;LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)&quot;
-splmftbl.short[3,6] &lt;- &quot;LF SPL ~ Knocks + Hour + (1|site_year)&quot;
-splmftbl.short[4,6] &lt;- &quot;LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year)&quot;
-splmftbl.short[5,6] &lt;- &quot;LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year)&quot;
+splmftbl.short[1,5] &lt;- &quot;LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)&quot;
+splmftbl.short[2,5] &lt;- &quot;LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)&quot;
+splmftbl.short[3,5] &lt;- &quot;LF SPL ~ Knocks + Hour + (1|site_year)&quot;
+splmftbl.short[4,5] &lt;- &quot;LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year)&quot;
+splmftbl.short[5,5] &lt;- &quot;LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year)&quot;
 
 splmftbl.short</code></pre>
-<pre><code>##           df     AICc  minAIC     deltaAIC formula
-## simple4mf 12 860.2040 855.241 4.963040e+00       0
-## reducemf  12 860.2040 855.241 4.963040e+00       0
-## reducemf3  7 858.9740 855.241 3.732951e+00       0
-## reducemf4 10 855.2410 855.241 2.979064e-05       0
-## reducemf6 11 855.4099 855.241 1.689004e-01       0
-##                                                                                      V6
+<pre><code>##           df     AICc  minAIC     deltaAIC
+## simple4mf 12 860.2040 855.241 4.963040e+00
+## reducemf  12 860.2040 855.241 4.963040e+00
+## reducemf3  7 858.9740 855.241 3.732951e+00
+## reducemf4 10 855.2410 855.241 2.979064e-05
+## reducemf6 11 855.4099 855.241 1.689004e-01
+##                                                                                 formula
 ## simple4mf LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)
 ## reducemf  LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)
 ## reducemf3                                        LF SPL ~ Knocks + Hour + (1|site_year)
 ## reducemf4                          LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year)
 ## reducemf6              LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year)</code></pre>
-<pre class="r"><code>summary(reducemf3)</code></pre>
-<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
-## Formula: SPL_Midrange ~ Tot_Knocks + Hour + (1 | site_year)
-##    Data: AC.DF1Co
-## 
-## REML criterion at convergence: 844.4
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -1.8250 -0.5542 -0.1649  0.3596  4.3211 
-## 
-## Random effects:
-##  Groups    Name        Variance Std.Dev.
-##  site_year (Intercept) 7.138    2.672   
-##  Residual              3.963    1.991   
-## Number of obs: 191, groups:  site_year, 10
-## 
-## Fixed effects:
-##               Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept) 105.529616   0.897686  10.805325 117.557  &lt; 2e-16 ***
-## Tot_Knocks    0.008804   0.003195 181.201775   2.755  0.00646 ** 
-## Hour21        0.342893   0.425189 177.237738   0.806  0.42107    
-## Hour3        -0.845834   0.418200 177.272053  -2.023  0.04462 *  
-## Hour9         1.248001   0.421344 177.216648   2.962  0.00348 ** 
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Correlation of Fixed Effects:
-##            (Intr) Tt_Knc Hour21 Hour3 
-## Tot_Knocks  0.082                     
-## Hour21     -0.246 -0.228              
-## Hour3      -0.249 -0.227  0.540       
-## Hour9      -0.246 -0.221  0.532  0.540</code></pre>
+<pre class="r"><code>#removing one of the duplicate models
+splmftbl.short &lt;- splmftbl.short[-c(1),]
+splmftbl.short</code></pre>
+<pre><code>##           df     AICc  minAIC     deltaAIC
+## reducemf  12 860.2040 855.241 4.963040e+00
+## reducemf3  7 858.9740 855.241 3.732951e+00
+## reducemf4 10 855.2410 855.241 2.979064e-05
+## reducemf6 11 855.4099 855.241 1.689004e-01
+##                                                                                 formula
+## reducemf  LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)
+## reducemf3                                        LF SPL ~ Knocks + Hour + (1|site_year)
+## reducemf4                          LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year)
+## reducemf6              LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year)</code></pre>
+<pre class="r"><code>#write.csv(splmftbl.short, file = &quot;../Raw_Data/SPLAICtbl.csv&quot;)
+
+ctbl &lt;- coef(summary(reducemf))[,&quot;Estimate&quot;]
+ctbl2 &lt;- coef(summary(reducemf3))[,&quot;Estimate&quot;]
+ctbl3 &lt;- coef(summary(reducemf4))[, &quot;Estimate&quot;]
+ctbl4 &lt;- coef(summary(reducemf6))[, &quot;Estimate&quot;]
+
+suptbl1 &lt;- bind_rows(ctbl, ctbl2, ctbl3, ctbl4)
+suptbl1</code></pre>
+<pre><code>## # A tibble: 4 x 10
+##   `(Intercept)` Tot_Knocks Num_Herbivory Num_L_calls Hour21  Hour3 Hour9
+##           &lt;dbl&gt;      &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1          105.   -0.0219         0.0499      0.0391  1.26   0.351  2.31
+## 2          106.    0.00880       NA          NA       0.343 -0.846  1.25
+## 3          105.   -0.0177        NA          NA       1.04  -0.182  1.73
+## 4          104.   -0.0218         0.0532     NA       1.45   0.379  2.28
+## # ... with 3 more variables: `Tot_Knocks:Hour21` &lt;dbl&gt;,
+## #   `Tot_Knocks:Hour3` &lt;dbl&gt;, `Tot_Knocks:Hour9` &lt;dbl&gt;</code></pre>
+<pre class="r"><code>#adding formula to this dataframe
+suptbl1 &lt;- cbind(suptbl1, splmftbl.short[,5, drop = FALSE])
+suptbl1 &lt;- cbind(suptbl1, splmftbl.short[,4, drop = FALSE])
+suptbl1 &lt;- suptbl1 %&gt;% arrange(deltaAIC)
+
+#write.csv(suptbl1, file = &quot;../Raw_Data/suptbl1.csv&quot;)
+
+r1 &lt;- data.frame(r.squaredGLMM(reducemf))
+r2 &lt;- data.frame(r.squaredGLMM(reducemf3))
+r3 &lt;- data.frame(r.squaredGLMM(reducemf4))
+r4 &lt;- data.frame(r.squaredGLMM(reducemf6))
+
+rtbl1 &lt;- bind_rows(r1, r2, r3, r4)
+
+
+#binding tables together
+splmftbl.short &lt;- cbind(splmftbl.short, rtbl1)
+
+splmftbl.short &lt;- splmftbl.short %&gt;% arrange(deltaAIC)
+
+splmftbl.short1 &lt;- splmftbl.short[, c(5, 1, 2, 4, 6, 7)]
+splmftbl.short1</code></pre>
+<pre><code>##                                                                         formula
+## 1                          LF SPL ~ Knocks + Hour + Knocks:Hour + (1|site_year)
+## 2              LF SPL ~ Knocks + Hour + Knocks:Hour + Herbivory + (1|site_year)
+## 3                                        LF SPL ~ Knocks + Hour + (1|site_year)
+## 4 LF SPL ~ Knocks + Herbivory + Long Calls + Hour + Knocks:Hour + (1|site_year)
+##   df     AICc     deltaAIC        R2m       R2c
+## 1 10 855.2410 2.979064e-05 0.13713536 0.7065872
+## 2 11 855.4099 1.689004e-01 0.15661846 0.7145425
+## 3  7 858.9740 3.732951e+00 0.07111687 0.6684090
+## 4 12 860.2040 4.963040e+00 0.15627760 0.7217301</code></pre>
+<pre class="r"><code>#write.csv(splmftbl.short1, file = &quot;../Raw_Data/suptbl2.csv&quot;)</code></pre>
 <p>I actually think that reduce mf3 is the best model here because we effectively add 3 more df to get reducemf4 but we only get a difference of 3 AIC and we should get a difference of atleast 6 AIC if it actually were the better model.</p>
 <p>Reducemf3 = SPL MF ~ Knocks + Hour + (1|site_year)</p>
 <p>Reducemf4 = SPL MF ~ Knocks + Hour + Knocks:Hour + (1|site_year)</p>
@@ -2082,6 +2223,9 @@ acimftbl.short</code></pre>
 ## Correlation matrix not shown by default, as p = 16 &gt; 12.
 ## Use print(x, correlation=TRUE)  or
 ##     vcov(x)        if you need it</code></pre>
+<pre class="r"><code>r.squaredGLMM(mf.maxaci)</code></pre>
+<pre><code>##             R2m       R2c
+## [1,] 0.04634575 0.6741625</code></pre>
 <p>mf.maxaci is the “best model” but I think it is just overfit as hell and really doesn’t describe what is going on with ACI at all.</p>
 </div>
 </div>
