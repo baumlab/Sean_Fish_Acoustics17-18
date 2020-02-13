@@ -1,7 +1,7 @@
 ---
 title: "Results Plots Final4"
 author: "Sean Dimoff"
-date: 10/2/2020
+date: 12/2/2020
 output: 
   html_document:
     toc: true
@@ -831,10 +831,51 @@ acihftbl$minAIC <- 317813.9
 acihftbl$deltaAIC <- acihftbl$AICc - acihftbl$minAIC
 
 acihftbl
-summary(simple.model4)
 
 summary(aci.hf4)
 r.squaredGLMM(aci.hf4)
+
+acihftbl.short <- subset(acihftbl, deltaAIC < 6)
+
+acihftbl.short$formula <- 0
+
+acihftbl.short[1,5] <- "HF ACI ~ Snaps + Day/Night + (1|site_year)"
+acihftbl.short[2,5] <- "HF ACI ~ Snaps + Day/Night + Snaps:Day/Night + (1|site_year)"
+
+acihftbl.short
+
+
+#write.csv(splmftbl.short, file = "../Raw_Data/SPLAICtbl.csv")
+
+actbl <- coef(summary(aci.hf2))[,"Estimate"]
+actbl2 <- coef(summary(aci.hf4))[,"Estimate"]
+
+asuptbl1 <- bind_rows(actbl, actbl2)
+asuptbl1
+
+#adding formula to this dataframe
+asuptbl1 <- cbind(asuptbl1, acihftbl.short[,5, drop = FALSE])
+
+
+#write.csv(asuptbl1, file = "../Raw_Data/asuptbl1.csv")
+
+ar1 <- data.frame(r.squaredGLMM(aci.hf2))
+ar2 <- data.frame(r.squaredGLMM(aci.hf4))
+
+
+artbl1 <- bind_rows(ar1, ar2)
+
+
+#binding tables together
+acihftbl.short <- cbind(acihftbl.short, artbl1)
+
+acihftbl.short <- acihftbl.short %>% arrange(deltaAIC)
+acihftbl.short1 <- acihftbl.short[, c(5, 1, 2, 4, 6, 7)]
+acihftbl.short1
+
+#write.csv(acihftbl.short1, file = "../Raw_Data/asuptbl2.csv")
+
+
 ```
 
 The most parsimonious model here is aci.hf2.
@@ -1231,7 +1272,7 @@ This first plot uses ALL data (2017 & 2018) and all sites
 
 ```{r hf SPL plot, echo = FALSE}
 #Plot of High frequency SPL and snaps
-SP.hf <- ggplot(Snap.HF, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site, shape=t12))
+SP.hf <- ggplot(Snap.HF, aes(Snaps, SPL_HF)) + geom_point(aes(color=Site, shape=dn))
 #SP.hf
 ```
 

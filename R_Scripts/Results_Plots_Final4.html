@@ -249,7 +249,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Results Plots Final4</h1>
 <h4 class="author">Sean Dimoff</h4>
-<h4 class="date">10/2/2020</h4>
+<h4 class="date">12/2/2020</h4>
 
 </div>
 
@@ -1175,38 +1175,6 @@ acihftbl</code></pre>
 ## aci.hf1a  4 317863.7 317813.9 49.78344373
 ## aci.hf2   5 317814.6 317813.9  0.74885796
 ## aci.hf4   6 317813.9 317813.9  0.01273108</code></pre>
-<pre class="r"><code>summary(simple.model4)</code></pre>
-<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
-## Formula: SPL_HF ~ Snaps * dn + (1 | site_year)
-##    Data: Snap.HF
-## 
-## REML criterion at convergence: 69225.5
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -3.3798 -0.7076  0.0001  0.6835  5.9171 
-## 
-## Random effects:
-##  Groups    Name        Variance Std.Dev.
-##  site_year (Intercept) 7.563    2.750   
-##  Residual              4.418    2.102   
-## Number of obs: 15987, groups:  site_year, 10
-## 
-## Fixed effects:
-##                 Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)    9.294e+01  1.039e+00  1.835e+01  89.421  &lt; 2e-16 ***
-## Snaps          1.632e-02  3.921e-04  1.598e+04  41.621  &lt; 2e-16 ***
-## dnNight       -5.574e+00  8.385e-01  1.597e+04  -6.648 3.08e-11 ***
-## Snaps:dnNight  5.045e-03  5.733e-04  1.597e+04   8.799  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) Snaps  dnNght
-## Snaps       -0.547              
-## dnNight     -0.341  0.622       
-## Snps:dnNght  0.343 -0.627 -0.999</code></pre>
 <pre class="r"><code>summary(aci.hf4)</code></pre>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 ## lmerModLmerTest]
@@ -1911,6 +1879,50 @@ splmftbl.short1</code></pre>
 ## Tt_Knck:H21 -0.166 -0.802  0.285  0.348  0.347              
 ## Tt_Kncks:H3 -0.176 -0.850  0.369  0.335  0.368  0.707       
 ## Tt_Kncks:H9 -0.172 -0.829  0.359  0.361  0.318  0.690  0.719</code></pre>
+<pre class="r"><code>summary(reducemf6)</code></pre>
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: 
+## SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory +  
+##     (1 | site_year)
+##    Data: AC.DF1Co
+## 
+## REML criterion at convergence: 831.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -1.8296 -0.5272 -0.1242  0.3248  3.3870 
+## 
+## Random effects:
+##  Groups    Name        Variance Std.Dev.
+##  site_year (Intercept) 6.246    2.499   
+##  Residual              3.196    1.788   
+## Number of obs: 191, groups:  site_year, 10
+## 
+## Fixed effects:
+##                     Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)       104.499892   0.863257  12.067267 121.053  &lt; 2e-16 ***
+## Tot_Knocks         -0.021765   0.007638 174.897512  -2.849  0.00491 ** 
+## Hour21              1.452399   0.439246 173.467484   3.307  0.00115 ** 
+## Hour3               0.379490   0.451652 173.373438   0.840  0.40194    
+## Hour9               2.284281   0.453850 173.342091   5.033 1.20e-06 ***
+## Num_Herbivory       0.053158   0.018355 173.795102   2.896  0.00426 ** 
+## Tot_Knocks:Hour21   0.021084   0.008455 173.239773   2.494  0.01358 *  
+## Tot_Knocks:Hour3    0.024528   0.008466 173.741272   2.897  0.00425 ** 
+## Tot_Knocks:Hour9    0.053003   0.008711 174.030129   6.085 7.23e-09 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Tt_Knc Hour21 Hour3  Hour9  Nm_Hrb T_K:H2 T_K:H3
+## Tot_Knocks   0.230                                                 
+## Hour21      -0.321 -0.462                                          
+## Hour3       -0.330 -0.467  0.654                                   
+## Hour9       -0.327 -0.463  0.648  0.677                            
+## Num_Herbvry -0.164 -0.183  0.326  0.429  0.425                     
+## Tt_Knck:H21 -0.181 -0.804  0.306  0.362  0.362  0.118              
+## Tt_Kncks:H3 -0.200 -0.855  0.403  0.376  0.405  0.183  0.712       
+## Tt_Kncks:H9 -0.198 -0.835  0.398  0.405  0.367  0.199  0.695  0.729</code></pre>
 </div>
 </div>
 <div id="mf-aci-model-interpretation" class="section level2">
