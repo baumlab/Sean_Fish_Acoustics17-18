@@ -1,0 +1,8 @@
+Model Number,Model Effects,,,,,K,AICc,deltaAIC,R2m,R2c
+1,HF ACI ~ Snaps + Day/Night + Snaps:Day/Night + (1|site_year),,,,,6,317813.91,0.01,0,0.17
+2,HF ACI ~ Snaps + Day/Night + (1|site_year),,,,,5,317814.65,0.75,0,0.17
+Parameter,,,Estimate,Std. Error,df,t value,,P value,,
+(Intercept),,,92.94,1.039,18.35,89.421,,< 0.0001,,
+Snaps,,,0.016,3.921*10^-4,15980,41.621,,< 0.0001,,
+Day/Night,,,-5.574,0.8385,15970,-6.648,,< 0.0001,,
+Snaps:Day/Night,,,0.005,5.733*10^04,15970,8.799,,< 0.0001,,

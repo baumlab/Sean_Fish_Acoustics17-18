@@ -28,7 +28,7 @@ library(magick)
 library(MuMIn)
 library(car)
 library(gridExtra)
-library(viridis)
+
 
 #loading in SPL data
 
@@ -60,6 +60,9 @@ load("../Raw_Data/AC.DF1.Rdata")
 
 #loading in boat.list
 load("../Raw_Data/boatlist.Rdata")
+
+#loading in MF ACI data for diurnal plot
+load("../Raw_Data/ACI_MF_tot.Rdata")
 
 #removing site/date id's from AC.DF1 that have boat noise in the files
 AC.DF1 <- AC.DF1[!(AC.DF1$st.id %in% boat.list),]
@@ -766,6 +769,8 @@ splhftbl$deltaAIC <- splhftbl$AICc - splhftbl$minAIC
 splhftbl
 summary(simple.model4)
 r.squaredGLMM(simple.model4)
+r.squaredGLMM(simple.model2)
+r.squaredGLMM(simple.model)
 
 ```
 
@@ -816,6 +821,8 @@ aci.hf4 <- lmer(ACI_HF ~ Snaps*dn + (1|site_year), data = Snap.HF)
 
 summary(aci.hf4)
 
+aci.hf5 <- lmer(ACI_HF ~1 + (1|site_year), data = Snap.HF)
+summary(aci.hf5)
 ```
 
 When we introduce the interaction, nothing changes and the interaction isn't significant nor is day/night. Go figure.
@@ -826,7 +833,7 @@ This means that the relationship between snaps and HF ACI doesn't change between
 
 ```{r model selection aci hf, echo = TRUE}
 
-acihftbl <- AICc(aci.hf, aci.hf1a, aci.hf2, aci.hf4)
+acihftbl <- AICc(aci.hf, aci.hf1a, aci.hf2, aci.hf4, aci.hf5)
 
 acihftbl$minAIC <- 317813.9
 acihftbl$deltaAIC <- acihftbl$AICc - acihftbl$minAIC
@@ -835,6 +842,7 @@ acihftbl
 
 summary(aci.hf4)
 r.squaredGLMM(aci.hf4)
+r.squaredGLMM(aci.hf2)
 
 acihftbl.short <- subset(acihftbl, deltaAIC < 6)
 
@@ -863,7 +871,7 @@ asuptbl1 <- cbind(asuptbl1, acihftbl.short[,5, drop = FALSE])
 ar1 <- data.frame(r.squaredGLMM(aci.hf2))
 ar2 <- data.frame(r.squaredGLMM(aci.hf4))
 
-
+ar2
 artbl1 <- bind_rows(ar1, ar2)
 
 
@@ -1207,6 +1215,10 @@ In the main effects model we still see that only knocks is significant and its e
 fit.mfaci7 <- lmer(ACI_Midrange ~ Tot_Knocks*Hour + Num_Herbivory + Num_L_calls + (1|site_year), data = AC.DF1Co)
 summary(fit.mfaci7)
 
+#intercept model
+
+inter.mfaci <- lmer(ACI_Midrange ~ 1 + (1|site_year), data = AC.DF1Co)
+
 ```
 
 When we add in the interaction between knocks and hour, nothing is significant.
@@ -1214,19 +1226,24 @@ When we add in the interaction between knocks and hour, nothing is significant.
 ###Model Selection
 
 ```{r mf aci model selection, echo = TRUE}
-acimftbl <-AICc(mf.aci1, mf.aci2a, mf.aci2b, mf.aci3, mf.aci4, fit.mfaci6, fit.mfaci7, mf.maxaci, mf.acil, mf.acih, mf.acilh, mf.acihh)
+
+acimftbl <-AICc(mf.aci1, mf.aci2a, mf.aci2b, mf.aci3, mf.aci4, fit.mfaci6, fit.mfaci7, mf.maxaci, mf.acil, mf.acih, mf.acilh, mf.acihh, inter.mfaci)
 
 acimftbl$minAIC <- 3720.309
 acimftbl$deltaAIC <- acimftbl$AICc - acimftbl$minAIC
 
 acimftbl
 
-acimftbl.short <- subset(acimftbl, deltaAIC < 6)
+acimftbl.short <- subset(acimftbl, deltaAIC < 100)
 
 acimftbl.short
 
 summary(mf.maxaci)
+
 r.squaredGLMM(mf.maxaci)
+r.squaredGLMM(fit.mfaci7)
+r.squaredGLMM(mf.acihh)
+r.squaredGLMM(mf.acilh)
 ```
 
 mf.maxaci is the "best model" but I think it is just overfit as hell and really doesn't describe what is going on with ACI at all.
@@ -1286,8 +1303,27 @@ Here is a plot using only one site (Site 5)
 
 ```{r hf SPL plot2, echo = FALSE}
 #HF SPL and snaps - just site 5
-SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point(size = 1.2) + geom_smooth(method = "lm", se=F) + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + theme_classic() + labs(y = "High Frequency SPL")
+SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point(size = 0.5) + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + theme_classic() + labs(y = "High Frequency SPL")+ geom_abline(intercept = 87.37, slope = 0.021, col = "red") + geom_abline(intercept = 92.94, slope = 0.016, col = "blue")
+
 SP2.hf
+
+#ggsave(file = "../Figures/HFSPL.pdf", width = 11, height = 7, SP2.hf)
+
+#ACI and snaps
+
+#removing outliers from ACI plot to make sure that the negative trend remains
+#low.snap <- Snap.HF5[Snap.HF5$Snaps <1200, ]
+# Remove anything with fewer than 1200 snaps
+#Snap.HF5s <- Snap.HF5[!(Snap.HF5$Snaps %in% low.snap$Snaps),]
+
+#ACI and snaps
+#AC2.hf <- ggplot(Snap.HF5s, aes(Snaps, ACI_HF)) + geom_point(size = 1.2) + geom_smooth(method = "lm", se=F) + theme_classic() + labs(y = "High Frequency ACI")
+#AC2.hf
+
+
+#ggsave(file = "../Figures/AC2.hf.pdf", width = 11, height = 7, AC2.hf)
+
+
 ```
 
 ##Mid Frequency Plots
@@ -1297,11 +1333,16 @@ This plot uses ALL data (2017 & 2018) and all sites/hours
 ```{r mf SPL plot, echo = FALSE}
 #Plot of Mid frequency SPL and knocks - ALL SITES
 SP.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange,color = Hour, shape = Hour)) + 
-  geom_point() + geom_smooth(aes(color = Hour),method = "lm", se = F) + 
+  geom_point() + 
   theme_classic() + labs(y = "Low Frequency SPL", x = "Number of Knocks") + 
-  scale_color_manual(values=cbp2) 
+  scale_color_manual(values=cbp2) +
+  geom_abline(intercept = 104.7271, slope = 0.002328, col = "#009E73") + 
+  geom_abline(intercept = 106.6348, slope = 0.030271, col = "#000000") + 
+  geom_abline(intercept = 104.909369, slope = -0.017715, col = "#E69F00") + 
+  geom_abline(intercept = 105.9475, slope = 0.000474, col = "#56B4E9")
 SP.mf
 
+#ggsave(file = "../Figures/LFSPL.pdf", width = 11, height = 7, SP.mf)
 
 #geom_smooth(aes(color = Hour, fill = Hour),method = "lm", se = T)
 #+ scale_fill_manual(values= cbp2)
@@ -1337,16 +1378,20 @@ hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme(
   theme(axis.title.x = element_blank(), axis.text.x = element_blank())
 
 hf.dplot
+
+#ggsave(file = "../Figures/SPLHFDiurnal.pdf", width = 22, height = 7, hf.dplot)
 ```
 
 That looks nice!
 
 ```{r mf diurnal trends, echo = FALSE}
 mf.dplot <- ggplot(SPLMF.long518, aes(x=Time, y=SPL_MF)) + geom_point() + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+
 mf.dplot.F <- mf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
 
-mf.dplot.F <- mf.dplot.F + theme_classic() 
+mf.dplot.F <- mf.dplot.F + theme_classic() + ylab("Low Frequency SPL")
 
+#ggsave(file = "../Figures/SPLLFDiurnal.pdf", width = 22, height = 7, mf.dplot.F)
 ```
 
 Hey! So does that! Is it not OK for us to use site 5 here because it was the one site that didn't seem to have a strong relationship at 9 AM?
@@ -1368,9 +1413,35 @@ four.plot <- arrangeGrob(hf.dplot, SP2.hf, mf.dplot.F, SP.mf, nrow=2)
 Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
 
 unique(Snap.HF$Time)
+
+#subsetting only one site and one year
+Snap.HFT5 <- Snap.HFT[Snap.HFT$Site == 5,]
+Snap.HFT518 <- Snap.HFT5[Snap.HFT5$Year == 2018,]
+
+#fixing time
+
+Snap.HFT518$Time2 <- sprintf("%04d", Snap.HFT518$Time2)
+Snap.HFT518$Time2 <- as.character(Snap.HFT518$Time2)
+Snap.HFT518$Time3 <- strftime(Snap.HFT518$datetime, format = "%H:%M")
+
+
+ACI_MF_tot5 <- ACI_MF_tot[ACI_MF_tot$Site == 5,]
+ACI_MF_tot518 <- ACI_MF_tot5[ACI_MF_tot5$Year == 2018,]
+
 #assign manual x axis to this graph
-hfa.dplot <- ggplot(Snap.HF, aes(x=Time2, y =ACI_HF)) + geom_point(aes(color = t12)) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
-hfa.dplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day"))
+hfa.dplot <- ggplot(Snap.HFT518, aes(x=Time3, y =ACI_HF)) + geom_point() + theme(axis.text.x = element_text(angle = 90)) 
+hfa.dplot <- hfa.dplot + scale_x_discrete(breaks = c("03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) + theme_classic() + labs(y = "High Frequency ACI", x = "Time") +  theme(axis.title.x = element_blank(), axis.text.x = element_blank())
+hfa.dplot
+#ggsave(file = "../Figures/hfa.dplot.pdf", width = 22, height = 7, hfa.dplot)
+
+
+
+mfa.dplot <- ggplot(ACI_MF_tot518, aes(x=Time, y =ACI_Midrange)) + geom_point() 
+mfa.dplot <- mfa.dplot + scale_x_discrete(breaks = c("03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) + theme_classic() + labs(y = "Low Frequency ACI", x = "Time")
+
+mfa.dplot
+
+#ggsave(file = "../Figures/mfa.dplot.pdf", width = 22, height = 7, mfa.dplot)
 ```
 
 ### Point Plot
@@ -1383,6 +1454,8 @@ unique(Snap.HF$Time)
 #assign manual x axis to this graph
 hfa.bplot <- ggplot(Snap.HF, aes(x=Snaps, y =ACI_HF, color = t12)) + geom_point(size = .5) + facet_grid(rows = vars(Site), cols = vars(Year), scales = "fixed") + theme(axis.text.x = element_text(angle = 90)) 
 hfa.bplot + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + geom_smooth(method="lm", se=F)
+
+
 ```
 
 ##HF SPL Plots

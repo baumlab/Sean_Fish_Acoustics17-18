@@ -291,47 +291,62 @@ ACI_HF_long$datetime <- as.POSIXct(paste(ACI_HF_long$Date, ACI_HF_long$Time), fo
 ACI_HF_long$ds.id <- paste(ACI_HF_long$datetime, ACI_HF_long$Site, sep = "_")
 
 #saving this dataframe
-save(ACI_HF_long, file = "Raw_Data/ACI_HF_long.Rdata")
+#save(ACI_HF_long, file = "Raw_Data/ACI_HF_long.Rdata")
 
 
 ## MF ACI ####
 #pulling columns before merge
-ACI_MF_32 <- s32.17 %>% select(ACI_Midrange, Date, Time)
-ACI_MF_35 <- s35.17 %>% select(ACI_Midrange, Date, Time)
-ACI_MF_40 <- s40.17 %>% select(ACI_Midrange, Date, Time)
-ACI_MF_5 <- s5.17 %>% select(ACI_Midrange, Date, Time)
-ACI_MF_8 <- s8.17 %>% select(ACI_Midrange, Date, Time)
+ACI_MF_32 <- s32.17 %>% dplyr::select(ACI_Midrange, Date, Time)
+ACI_MF_35 <- s35.17 %>% dplyr::select(ACI_Midrange, Date, Time)
+ACI_MF_40 <- s40.17 %>% dplyr::select(ACI_Midrange, Date, Time)
+ACI_MF_5 <- s5.17 %>% dplyr::select(ACI_Midrange, Date, Time)
+ACI_MF_8 <- s8.17 %>% dplyr::select(ACI_Midrange, Date, Time)
 
+#Adding site column
+ACI_MF_32$Site <- 32
+ACI_MF_35$Site <- 35
+ACI_MF_40$Site <- 40
+ACI_MF_5$Site <- 5
+ACI_MF_8$Site <- 8
 #Merging dataframes matching on date and time
-ACI_MF <- merge(ACI_MF_32, ACI_MF_35, by = c('Date', 'Time'))
-ACI_MF <- merge(ACI_MF, ACI_MF_40, by = c('Date', 'Time'))
-ACI_MF <- merge(ACI_MF, ACI_MF_8, by = c('Date', 'Time'))
-ACI_MF <- merge(ACI_MF, ACI_MF_5, by = c('Date', 'Time'))
+ACI_MF <- rbind(ACI_MF_32, ACI_MF_35, ACI_MF_40, ACI_MF_5, ACI_MF_8)
 
-#renaming columns
-names(ACI_MF) <- c("Date", "Time", "32", "35", "40", "8", "5")
+#Adding year column
+ACI_MF$Year <- 2017
 
 ACI_MF17 <- ACI_MF
 
+
+
+
 #2018
 #pulling columns before merge
-ACI_MF_32 <- s32.18 %>% select(ACI_Midrange, Date, Time)
-ACI_MF_35 <- s35.18 %>% select(ACI_Midrange, Date, Time)
-ACI_MF_40 <- s40.18 %>% select(ACI_Midrange, Date, Time)
-ACI_MF_5 <- s5.18 %>% select(ACI_Midrange, Date, Time)
-ACI_MF_8 <- s8.18 %>% select(ACI_Midrange, Date, Time)
+ACI_MF_32 <- s32.18 %>% dplyr::select(ACI_Midrange, Date, Time)
+ACI_MF_35 <- s35.18 %>% dplyr::select(ACI_Midrange, Date, Time)
+ACI_MF_40 <- s40.18 %>% dplyr::select(ACI_Midrange, Date, Time)
+ACI_MF_5 <- s5.18 %>% dplyr::select(ACI_Midrange, Date, Time)
+ACI_MF_8 <- s8.18 %>% dplyr::select(ACI_Midrange, Date, Time)
 
+#Adding site column
+ACI_MF_32$Site <- 32
+ACI_MF_35$Site <- 35
+ACI_MF_40$Site <- 40
+ACI_MF_5$Site <- 5
+ACI_MF_8$Site <- 8
 #Merging dataframes matching on date and time
-ACI_MF <- merge(ACI_MF_32, ACI_MF_35, by = c('Date', 'Time'))
-ACI_MF <- merge(ACI_MF, ACI_MF_40, by = c('Date', 'Time'))
-ACI_MF <- merge(ACI_MF, ACI_MF_8, by = c('Date', 'Time'))
-ACI_MF <- merge(ACI_MF, ACI_MF_5, by = c('Date', 'Time'))
+ACI_MF <- rbind(ACI_MF_32, ACI_MF_35, ACI_MF_40, ACI_MF_5, ACI_MF_8)
 
-#renaming columns
-names(ACI_MF) <- c("Date", "Time", "32", "35", "40", "8", "5")
+#Adding year column
+ACI_MF$Year <- 2018
 
 ACI_MF18 <- ACI_MF
 
+#combining 2017 and 2018
+
+ACI_MF_tot <- rbind(ACI_MF17, ACI_MF18)
+
+#saving this dataframe
+#save(ACI_MF_tot, file = "Raw_Data/ACI_MF_tot.Rdata")
 
 ## Broadband SPL #####
 #pulling columns before merge
