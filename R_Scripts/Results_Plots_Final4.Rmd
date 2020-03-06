@@ -1303,7 +1303,7 @@ Here is a plot using only one site (Site 5)
 
 ```{r hf SPL plot2, echo = FALSE}
 #HF SPL and snaps - just site 5
-SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point(size = 0.5) + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + theme_classic() + labs(y = "High Frequency SPL")+ geom_abline(intercept = 87.37, slope = 0.021, col = "red") + geom_abline(intercept = 92.94, slope = 0.016, col = "blue")
+SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point(size = 0.5) + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + theme_classic() + labs(y = "High Frequency SPL")+ geom_abline(intercept = 87.37, slope = 0.021, col = "firebrick2") + geom_abline(intercept = 92.94, slope = 0.016, col = "cyan3")
 
 SP2.hf
 
@@ -1335,7 +1335,7 @@ This plot uses ALL data (2017 & 2018) and all sites/hours
 SP.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange,color = Hour, shape = Hour)) + 
   geom_point() + 
   theme_classic() + labs(y = "Low Frequency SPL", x = "Number of Knocks") + 
-  scale_color_manual(values=cbp2) +
+  scale_color_manual(values=cbp2) + xlim(0, 350) +
   geom_abline(intercept = 104.7271, slope = 0.002328, col = "#009E73") + 
   geom_abline(intercept = 106.6348, slope = 0.030271, col = "#000000") + 
   geom_abline(intercept = 104.909369, slope = -0.017715, col = "#E69F00") + 
