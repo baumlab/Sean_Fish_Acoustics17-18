@@ -1281,9 +1281,11 @@ SPLMF.long518 <- SPLMF.long5[SPLMF.long5$Year==2018,]
 #recreating time column in Snap.HF
 Snap.HF$Time <- paste(Snap.HF$Hour, Snap.HF$Minutes, sep = ":")
 
-cbp2 <- c("#E69F00", "#56B4E9", "#009E73", "#000000",
+cbp2 <- c("#E69F00", "#000000", "#56B4E9", "#009E73",
           "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
+AC.DF1$Hour <- factor(AC.DF1$Hour, levels = c("3", "9", "15", "21"))
+levels(AC.DF1$Hour)
 ```
 
 
@@ -1305,6 +1307,7 @@ Here is a plot using only one site (Site 5)
 #HF SPL and snaps - just site 5
 SP2.hf <- ggplot(Snap.HF5, aes(Snaps, SPL_HF, color = t12)) + geom_point(size = 0.5) + labs(color = "Day/Night") + scale_color_discrete(labels = c("Night", "Day")) + theme_classic() + labs(y = "High Frequency SPL")+ geom_abline(intercept = 87.37, slope = 0.021, col = "firebrick2") + geom_abline(intercept = 92.94, slope = 0.016, col = "cyan3")
 
+SP2.hf <- SP2.hf + annotate("text", x =1200, y = 118, label = "italic(R) ^ 2 == 0.69", parse = TRUE)
 SP2.hf
 
 #ggsave(file = "../Figures/HFSPL.pdf", width = 11, height = 7, SP2.hf)
@@ -1312,14 +1315,14 @@ SP2.hf
 #ACI and snaps
 
 #removing outliers from ACI plot to make sure that the negative trend remains
-#low.snap <- Snap.HF5[Snap.HF5$Snaps <1200, ]
+low.snap <- Snap.HF5[Snap.HF5$Snaps <1200, ]
 # Remove anything with fewer than 1200 snaps
-#Snap.HF5s <- Snap.HF5[!(Snap.HF5$Snaps %in% low.snap$Snaps),]
+Snap.HF5s <- Snap.HF5[!(Snap.HF5$Snaps %in% low.snap$Snaps),]
 
 #ACI and snaps
-#AC2.hf <- ggplot(Snap.HF5s, aes(Snaps, ACI_HF)) + geom_point(size = 1.2) + geom_smooth(method = "lm", se=F) + theme_classic() + labs(y = "High Frequency ACI")
-#AC2.hf
-
+AC2.hf <- ggplot(Snap.HF5s, aes(Snaps, ACI_HF)) + geom_point(size = 1.2) + theme_classic() + labs(y = "High Frequency ACI") + 
+  geom_abline(intercept = 72219.98 , slope = -5.4515, col = "blue")
+AC2.hf
 
 #ggsave(file = "../Figures/AC2.hf.pdf", width = 11, height = 7, AC2.hf)
 
@@ -1338,14 +1341,21 @@ SP.mf <- ggplot(AC.DF1, aes(Tot_Knocks, SPL_Midrange,color = Hour, shape = Hour)
   scale_color_manual(values=cbp2) + xlim(0, 350) +
   geom_abline(intercept = 104.7271, slope = 0.002328, col = "#009E73") + 
   geom_abline(intercept = 106.6348, slope = 0.030271, col = "#000000") + 
-  geom_abline(intercept = 104.909369, slope = -0.017715, col = "#E69F00") + 
-  geom_abline(intercept = 105.9475, slope = 0.000474, col = "#56B4E9")
+  geom_abline(intercept = 104.909369, slope = -0.017715, col = "#56B4E9") + 
+  geom_abline(intercept = 105.9475, slope = 0.000474, col = "#E69F00")
 SP.mf
 
 #ggsave(file = "../Figures/LFSPL.pdf", width = 11, height = 7, SP.mf)
 
 #geom_smooth(aes(color = Hour, fill = Hour),method = "lm", se = T)
 #+ scale_fill_manual(values= cbp2)
+
+AC.mf <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange, color = Hour, shape = Hour)) + geom_point() +
+  theme_classic() + labs (y = "Low Frequency ACI", x = "Number of Knocks") + scale_color_manual(values=cbp2) + geom_smooth(method = lm)
+
+AC.mf
+
+#ggsave(file = "../Figures/LFACI.pdf", width = 11, height = 7, AC.mf)
 ```
 
 Way too much going on.
@@ -1365,7 +1375,7 @@ lm_eqn <- function(df){
 }
 
 SP.mf9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + geom_smooth(method = "lm", se=F) + theme_classic() + labs(y = "Low Frequency SPL", x = "Number of Knocks")
-SP.mf9
+
 ```
 
 This shows that the pattern exists at pretty much all sites except for 5. I think this is the plot to go with.
@@ -1375,7 +1385,9 @@ This shows that the pattern exists at pretty much all sites except for 5. I thin
 #High frequency
 hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme( legend.position = "none") + 
   labs(y = "High Frequency SPL") + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) + theme_classic() + 
-  theme(axis.title.x = element_blank(), axis.text.x = element_blank())
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank()) + 
+  theme(axis.title.y = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12))
 
 hf.dplot
 
@@ -1391,6 +1403,13 @@ mf.dplot.F <- mf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", 
 
 mf.dplot.F <- mf.dplot.F + theme_classic() + ylab("Low Frequency SPL")
 
+mf.dplot.F <- mf.dplot.F + 
+  theme(axis.text.x = element_text(size = 15)) + 
+  theme(axis.title.x = element_text (size = 18)) +
+  theme(axis.title.y = element_text (size = 15)) + 
+  theme(axis.text.y = element_text (size = 12))
+
+mf.dplot.F
 #ggsave(file = "../Figures/SPLLFDiurnal.pdf", width = 22, height = 7, mf.dplot.F)
 ```
 
