@@ -28,6 +28,9 @@ library(magick)
 library(MuMIn)
 library(car)
 library(gridExtra)
+library(sjPlot)
+library(sjlabelled)
+library(sjmisc)
 
 
 #loading in SPL data
@@ -1355,7 +1358,13 @@ AC.mf <- ggplot(AC.DF1, aes(Tot_Knocks, ACI_Midrange, color = Hour, shape = Hour
 
 AC.mf
 
+
 #ggsave(file = "../Figures/LFACI.pdf", width = 11, height = 7, AC.mf)
+
+
+lfsplest <- plot_model(reducemf4)
+
+ggsave(file = "../Figures/LFSPLEstimates.pdf", width = 11, height = 7, lfsplest)
 ```
 
 Way too much going on.
@@ -1378,7 +1387,17 @@ SP.mf9 <- ggplot(h9, aes(Tot_Knocks, SPL_Midrange)) + geom_point() + geom_smooth
 
 ```
 
-This shows that the pattern exists at pretty much all sites except for 5. I think this is the plot to go with.
+This shows that the pattern exists at pretty much all sites except for 5.
+
+
+```{r mf ACI plot, echo = FALSE}
+
+lfaciest <- plot_model(mf.maxaci)
+lfaciest
+
+ggsave(file = "../Figures/LFACIEstimates.pdf", width = 11, height = 7, lfaciest)
+
+```
 
 ##Diurnal trends Plots
 ```{r hf diurnal trends, echo = FALSE}
