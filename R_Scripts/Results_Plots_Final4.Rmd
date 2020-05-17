@@ -28,9 +28,10 @@ library(magick)
 library(MuMIn)
 library(car)
 library(gridExtra)
-library(sjPlot)
-library(sjlabelled)
-library(sjmisc)
+library(patchwork)
+#library(sjPlot)
+#library(sjlabelled)
+#library(sjmisc)
 
 
 #loading in SPL data
@@ -66,6 +67,9 @@ load("../Raw_Data/boatlist.Rdata")
 
 #loading in MF ACI data for diurnal plot
 load("../Raw_Data/ACI_MF_tot.Rdata")
+
+#loading in Selection tables
+sel.tbl <- read.csv("../Raw_Data/Knock_Selections.csv")
 
 #removing site/date id's from AC.DF1 that have boat noise in the files
 AC.DF1 <- AC.DF1[!(AC.DF1$st.id %in% boat.list),]
@@ -1277,9 +1281,31 @@ SPLHF.long5 <- SPLHF.long[SPLHF.long$Site==5,]
 
 SPLHF.long518 <- SPLHF.long5[SPLHF.long5$Year==2018,]
 
+#putting time in order
+Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
+
+#subsetting only one site and one year
+Snap.HFT5 <- Snap.HFT[Snap.HFT$Site == 5,]
+Snap.HFT518 <- Snap.HFT5[Snap.HFT5$Year == 2018,]
+
+#fixing time
+
+Snap.HFT518$Time2 <- sprintf("%04d", Snap.HFT518$Time2)
+Snap.HFT518$Time2 <- as.character(Snap.HFT518$Time2)
+Snap.HFT518$Time3 <- strftime(Snap.HFT518$datetime, format = "%H:%M")
+
+
+
+unique(Snap.HF$Time)
+
+
+
 #subsetting mf diurnal plots data
 SPLMF.long5 <- SPLMF.long[SPLMF.long$Site==5,]
 SPLMF.long518 <- SPLMF.long5[SPLMF.long5$Year==2018,]
+
+ACI_MF_tot5 <- ACI_MF_tot[ACI_MF_tot$Site == 5,]
+ACI_MF_tot518 <- ACI_MF_tot5[ACI_MF_tot5$Year == 2018,]
 
 #recreating time column in Snap.HF
 Snap.HF$Time <- paste(Snap.HF$Hour, Snap.HF$Minutes, sep = ":")
@@ -1291,6 +1317,41 @@ AC.DF1$Hour <- factor(AC.DF1$Hour, levels = c("3", "9", "15", "21"))
 levels(AC.DF1$Hour)
 ```
 
+## Knock Intensity Plot ####
+```{r knock intensity plot, echo = FALSE}
+sel.tbl$Hour <- as.factor(sel.tbl$Hour)
+knocks.bp <- ggplot(sel.tbl, aes(Hour, RL)) + geom_boxplot() + theme_classic() + ylab("Knock Volume (dB)") + 
+  theme(axis.title.x = element_text(size = 17)) + 
+  theme(axis.title.y = element_text(size = 17)) +
+  theme(axis.text.x = element_text(size = 15)) + 
+  theme(axis.text.y = element_text(size = 15))
+
+knocks.bp
+
+#ggsave(file = "../Figures/knocksbp.pdf", width = 11, height = 7, knocks.bp)
+
+#confidence interval plot
+
+#taking average and calculating confidence intervals for sites
+RL.av <- aggregate(RL ~ Hour, sel.tbl, mean)
+RL.se <- aggregate(RL ~ Hour, sel.tbl, function(x) sd(x)/sqrt(length(x)))
+RL.av$SE <- RL.se$RL
+RL.av$U.SE <- RL.av$RL + RL.av$SE
+RL.av$L.SE <- RL.av$RL - RL.av$SE
+
+
+
+knock.ci <- ggplot(RL.av, aes(Hour, RL)) + 
+  geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0.15) +
+  geom_point(aes(fill = Hour), color = "black", pch = 21, size = 6) +
+  labs(x = "Hour", y = "Knock Volume (dB)")
+knock.ci
+
+#ggsave(file = "../Figures/knockci.pdf", width = 11, height = 7, knock.ci)
+
+
+
+```
 
 ##High Frequency Plots
 
@@ -1362,9 +1423,9 @@ AC.mf
 #ggsave(file = "../Figures/LFACI.pdf", width = 11, height = 7, AC.mf)
 
 
-lfsplest <- plot_model(reducemf4)
+#lfsplest <- plot_model(reducemf4)
 
-ggsave(file = "../Figures/LFSPLEstimates.pdf", width = 11, height = 7, lfsplest)
+#ggsave(file = "../Figures/LFSPLEstimates.pdf", width = 11, height = 7, lfsplest)
 ```
 
 Way too much going on.
@@ -1392,23 +1453,40 @@ This shows that the pattern exists at pretty much all sites except for 5.
 
 ```{r mf ACI plot, echo = FALSE}
 
-lfaciest <- plot_model(mf.maxaci)
-lfaciest
+#lfaciest <- plot_model(mf.maxaci)
+#lfaciest
 
-ggsave(file = "../Figures/LFACIEstimates.pdf", width = 11, height = 7, lfaciest)
+#ggsave(file = "../Figures/LFACIEstimates.pdf", width = 11, height = 7, lfaciest)
 
 ```
 
 ##Diurnal trends Plots
 ```{r hf diurnal trends, echo = FALSE}
-#High frequency
+#High frequency SPL
 hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme( legend.position = "none") + 
-  labs(y = "High Frequency SPL") + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) + theme_classic() + 
-  theme(axis.title.x = element_blank(), axis.text.x = element_blank()) + 
+  labs(y = "High Frequency", title = "SPL") + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) +  
+  theme_cowplot() + 
+  theme(axis.title.x = element_blank()) + 
   theme(axis.title.y = element_text(size = 15)) +
-  theme(axis.text.y = element_text(size = 12))
+  theme(axis.text.y = element_text(size = 12)) + 
+  theme(plot.title = element_text(hjust = 0.5, size = 15))+
+  theme(title = element_text(size = 15)) + 
+  geom_text(x=0, y=135, label="A)")
 
 hf.dplot
+
+#ACI
+
+hfa.dplot <- ggplot(Snap.HFT518, aes(x=Time3, y =ACI_HF)) + geom_point() + theme( legend.position = "none") + 
+  scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) + 
+  theme_cowplot() + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank()) + 
+  labs(title = "ACI") +
+  theme(plot.title = element_text(hjust = 0.5, size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(title = element_text(size = 15))
+
+hfa.dplot
 
 #ggsave(file = "../Figures/SPLHFDiurnal.pdf", width = 22, height = 7, hf.dplot)
 ```
@@ -1420,26 +1498,53 @@ mf.dplot <- ggplot(SPLMF.long518, aes(x=Time, y=SPL_MF)) + geom_point() + theme(
 
 mf.dplot.F <- mf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
 
-mf.dplot.F <- mf.dplot.F + theme_classic() + ylab("Low Frequency SPL")
+mf.dplot.F <- mf.dplot.F + theme_cowplot() + labs(y = "Low Frequency")
 
 mf.dplot.F <- mf.dplot.F + 
-  theme(axis.text.x = element_text(size = 15)) + 
-  theme(axis.title.x = element_text (size = 18)) +
+  theme(axis.text.x = element_text(size = 12)) + 
+  theme(axis.title.x = element_text (size = 15)) +
   theme(axis.title.y = element_text (size = 15)) + 
   theme(axis.text.y = element_text (size = 12))
 
 mf.dplot.F
 #ggsave(file = "../Figures/SPLLFDiurnal.pdf", width = 22, height = 7, mf.dplot.F)
+
+#ACI
+
+
+mfa.dplot <- ggplot(ACI_MF_tot518, aes(x=Time, y =ACI_Midrange)) + geom_point() + theme(axis.text.x = element_text(angle = 90), legend.position = "none")
+
+mfa.dplot.F <- mfa.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
+
+mfa.dplot.F <- mfa.dplot.F + theme_cowplot()
+
+mfa.dplot.F <- mfa.dplot.F + 
+  theme(axis.text.x = element_text(size = 12)) + 
+  theme(axis.title.x = element_text (size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(axis.title.y = element_blank())
+
+mfa.dplot.F
+
+
 ```
 
 Hey! So does that! Is it not OK for us to use site 5 here because it was the one site that didn't seem to have a strong relationship at 9 AM?
 
 ##Combination Plot
-```{r combination plot, echo = FALSE}
-four.plot <- arrangeGrob(hf.dplot, SP2.hf, mf.dplot.F, SP.mf, nrow=2)
+```{r combination plot, echo = FALSE, fig.height = 6, fig.width = 10}
 
-#ggsave(file = "../Figures/Fourplot.pdf", width = 11, height = 7, four.plot)
+#adding in A,B,C labels
 
+four.plot<- plot_grid(hf.dplot, hfa.dplot, mf.dplot.F, mfa.dplot.F,
+          nrow = 2, ncol = 2,
+          labels = c("A", "B", "C", "D"),
+          align = "hv")
+
+
+
+#ggsave(file = "../Figures/Fourplot_FINAL.pdf", width = 11, height = 7, four.plot)
+four.plot
 ```
 
 ##HF ACI Plots
@@ -1447,28 +1552,14 @@ four.plot <- arrangeGrob(hf.dplot, SP2.hf, mf.dplot.F, SP.mf, nrow=2)
 ###Diurnal Plot
 
 ```{r hf ACI plot, echo = FALSE}
-#putting time in order
-Snap.HFT <- Snap.HF %>% arrange(Snap.HF$Time2)
-
-unique(Snap.HF$Time)
-
-#subsetting only one site and one year
-Snap.HFT5 <- Snap.HFT[Snap.HFT$Site == 5,]
-Snap.HFT518 <- Snap.HFT5[Snap.HFT5$Year == 2018,]
-
-#fixing time
-
-Snap.HFT518$Time2 <- sprintf("%04d", Snap.HFT518$Time2)
-Snap.HFT518$Time2 <- as.character(Snap.HFT518$Time2)
-Snap.HFT518$Time3 <- strftime(Snap.HFT518$datetime, format = "%H:%M")
 
 
-ACI_MF_tot5 <- ACI_MF_tot[ACI_MF_tot$Site == 5,]
-ACI_MF_tot518 <- ACI_MF_tot5[ACI_MF_tot5$Year == 2018,]
+
+
 
 #assign manual x axis to this graph
 hfa.dplot <- ggplot(Snap.HFT518, aes(x=Time3, y =ACI_HF)) + geom_point() + theme(axis.text.x = element_text(angle = 90)) 
-hfa.dplot <- hfa.dplot + scale_x_discrete(breaks = c("03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) + theme_classic() + labs(y = "High Frequency ACI", x = "Time") +  theme(axis.title.x = element_blank(), axis.text.x = element_blank())
+hfa.dplot <- hfa.dplot + scale_x_discrete(breaks = c("03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) + theme_classic() + labs(y = "High Frequency ACI", x = "Time") +  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank())
 hfa.dplot
 #ggsave(file = "../Figures/hfa.dplot.pdf", width = 22, height = 7, hfa.dplot)
 
