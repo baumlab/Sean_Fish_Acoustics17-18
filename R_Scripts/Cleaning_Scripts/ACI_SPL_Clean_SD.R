@@ -4,6 +4,8 @@
     #each dataframe will contain a different frequency: BB, HF, MF
 library(tidyr)
 library(dplyr)
+library(lunar)
+library(arm)
 
 
 #Reading in all raw data
@@ -1418,27 +1420,100 @@ SPL_MF18$Year <- "2018"
 #2018 - because I found this first (woops)
 #creating vectors for date and lunar phase
 Day <- c(17:29)
-LP <- c("NM", "NM", "NM", "NM", "First Quarter", "FQ", "FQ", "FQ", "FQ", "FQ", "FQ", "Full Moon", "FM")
-Month <- 06
+LP <- c("New", "New", "New", "New", "First Quarter", "First Quarter", "First Quarter",
+        "First Quarter", "First Quarter", "First Quarter", "First Quarter",
+        "Full", "Full")
+Month <- "06"
 #combining into dataframe
 lp2018 <- data.frame(Month, Day, LP)
+
+lp2018a <- lp2018
 #combining month and date columns - so taht I can match these with other dataframes
-lp2018$Date <- paste(lp2018$Day,lp2018$Month, sep= "-0")
+lp2018$Date1 <- paste(lp2018$Month,lp2018$Day, sep= "/")
+lp2018a$Date1 <- paste(lp2018a$Day, lp2018a$Month, sep = "_")
+lp2018a$Date.b <- paste(lp2018a$Month, lp2018a$Day, sep = "/")
+
+#Adding Year column to combine with date column
+lp2018$Year <- 2018
+lp2018a$Year <- 2018
+lp2018a$Year.a <- 18
+
+lp2018$Date <- paste(lp2018$Date, lp2018$Year, sep = "/")
+lp2018a$Date <- paste(lp2018a$Date1, lp2018a$Year, sep = "_")
+lp2018a$Date.a <- paste(lp2018a$Date1, lp2018a$Year.a, sep = "_")
+lp2018a$Date.b <- paste(lp2018a$Date.b, lp2018a$Year, sep = "/")
+
+#removing all columns except lunar phase and date
+lp2018 <- subset(lp2018, select = -c(Day, Month, Year))
+lp2018a <- subset(lp2018a, select = -c(Day, Month, Year, Year.a, Date1))
 
 #2017
 #creating vectors for date and lunar phase
 Day <- c(10:26)
-LP <- c("FM", "FM", "FM", "FM", "FM", "FM", "FM", "Third Quarter", "TQ", "TQ", "TQ", "TQ", "TQ", "New Moon", "NM", 
-      "NM", "NM")
+LP <- c("Full", "Full", "Full", "Full", "Full", "Full", "Full",
+        "Third Quarter", "Third Quarter", "Third Quarter", "Third Quarter", "Third Quarter", "Third Quarter",
+        "New", "New", "New", "New")
 Month <- 07
 
 #combining into dataframe
 lp2017 <- data.frame(Month,Day, LP)
+
+#creating multiple versions with different date formats
+lp2017a <- lp2017
+
 #combining month and date columns - so that I can match these with other dataframes
-lp2017$Date <- paste(lp2017$Day,lp2017$Month, sep= "-0")
+#doing these in different formats to fit with my other data
+lp2017$Date1 <- paste(lp2017$Day,lp2017$Month, sep= "-0")
+
+lp2017a$Date1 <- paste(lp2017a$Day, lp2017a$Month, sep = "_0")
+
+#Adding Year column to combine with date column
+lp2017$Year <- 2017
+lp2017a$Year <- 2017
+lp2017a$Yeara <- 17
+
+lp2017a$Date.b <- paste(lp2017$Date1, lp2017$Year, sep = "-")
+lp2017$Date1 <- paste(lp2017$Date, lp2017$Year, sep = "-")
+lp2017a$Date <- paste(lp2017a$Date1, lp2017a$Year, sep = "_")
+lp2017a$Date.a <- paste(lp2017a$Date1, lp2017a$Yeara, sep = "_")
+
+
+
+
+#removing all columns except lunar phase and date
+lp2017 <- subset(lp2017, select = -c(Day, Month, Year))
+
+lp2017a <- subset(lp2017a, select = -c(Day, Month, Year, Yeara, Date1))
+
+
+#converting lunar phase to continous using Jenn's formula
+## Add lunar phase variable to dataset
+# Convert 'KI.Date' to date format
+lp2017a$lunar.date <- as.Date(lp2017a$Date, "%d_%m_%Y")
+lp2018a$lunar.date <- as.Date(lp2018a$Date, "%d_%m_%Y")
+# Create lunar phase variable
+lp2017a$lunar.phase <- lunar.phase(lp2017a$lunar.date)
+lp2018a$lunar.phase <- lunar.phase(lp2018a$lunar.date)
+# Convert radians to lunar day
+lp2017a$lunar.day <- lp2017a$lunar.phase*((3*pi)/2)
+lp2018a$lunar.day <- lp2018a$lunar.phase*((3*pi)/2)
+# Create sine variable
+lp2017a$lunar.sine <- sin(lp2017a$lunar.day)
+lp2018a$lunar.sine <- sin(lp2018a$lunar.day)
+# Create cosine variable
+lp2017a$lunar.cos <- cos(lp2017a$lunar.day)
+lp2018a$lunar.cos <- cos(lp2018a$lunar.day)
+# Standardize lunar day variable (sine)
+lp2017a$lunar.sine.x <- rescale(lp2017a$lunar.sine)
+lp2018a$lunar.sine.x <- rescale(lp2018a$lunar.sine)
+# Standardize lunar day variable (cos)
+lp2017a$lunar.cos.x <- rescale(lp2017a$lunar.cos)
+lp2018a$lunar.cos.x <- rescale(lp2018a$lunar.cos)
 
 #saving these dataframes
-##save(lp2017, file="Raw_Data/LunarPhase2017.Rdata")
-#save(lp2018, file="Raw_Data/LunarPhase2018.Rdata")
+#save(lp2017, file="../Raw_Data/LunarPhase2017.Rdata")
+#save(lp2017a, file = "Raw_Data/LunarPhase2017_format.Rdata")
+#save(lp2018, file="../Raw_Data/LunarPhase2018.Rdata")
+#save(lp2018a, file = "Raw_Data/LunarPhase2018_format.Rdata")
 
 ##### 

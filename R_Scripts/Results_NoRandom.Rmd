@@ -1,0 +1,673 @@
+---
+title: "Results_No_Random_Rerun"
+author: "Sean Dimoff"
+date: 25/05/20
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(cowplot)
+library(rmarkdown)
+library(knitr)
+library(RColorBrewer)
+library(GGally)
+library(mctest)
+library(usdm)
+library(hms)
+library(dplyr)
+library(lme4)
+library(MASS)
+library(lmerTest)
+library(goft)
+library(magick)
+library(MuMIn)
+library(car)
+library(gridExtra)
+library(patchwork)
+#library(sjPlot)
+#library(sjlabelled)
+#library(sjmisc)
+
+
+#loading in SPL data
+
+load("../Raw_Data/SPLHF17long.Rdata")
+load("../Raw_Data/SPLHF18long.Rdata")
+
+
+load("../Raw_Data/SPLMF17long.Rdata")
+load("../Raw_Data/SPLMF18long.Rdata")
+
+
+load("../Raw_Data/SPLHFlong.Rdata")
+load("../Raw_Data/SPLMFlong.Rdata")
+
+load("../Raw_Data/SPLMF.long.wind.Rdata")
+
+#combined SPL and HF dataframes
+load("../Raw_Data/Snap.HF17.Rdata")
+load("../Raw_Data/Snap.HF18.Rdata")
+#changing site to a character
+Snap.HF17$Site.x <- as.character(Snap.HF17$Site.x)
+Snap.HF18$Site.x <- as.character(Snap.HF18$Site.x)
+
+load("../Raw_Data/Snap.HF.Rdata")
+
+##loading in the full dataframe with all data
+#load("../Raw_Data/AC.DF.Rdata")
+load("../Raw_Data/AC.DF1.Rdata")
+
+#loading in boat.list
+load("../Raw_Data/boatlist.Rdata")
+
+#loading in MF ACI data for diurnal plot
+load("../Raw_Data/ACI_MF_tot.Rdata")
+
+#loading in Selection tables
+sel.tbl <- read.csv("../Raw_Data/Knock_Selections.csv")
+
+#removing site/date id's from AC.DF1 that have boat noise in the files
+AC.DF1 <- AC.DF1[!(AC.DF1$st.id %in% boat.list),]
+
+#removes 4 from 40, 2 from 32, 1 from 35, and one from 5
+
+#making site a character
+AC.DF1$Site <- as.character(AC.DF1$Site)
+
+#writing scale funciton
+center_scale <- function(x) {
+  scale(x, scale = FALSE)
+}
+
+#making duplicate dataframes
+AC.DF1C <- AC.DF1
+
+Snap.HF17C <- Snap.HF17
+Snap.HF18C <- Snap.HF18
+
+#Creating centered AC.DF1 dataframe
+AC.DF1C$Snaps <- center_scale(AC.DF1C$Snaps)
+AC.DF1C$Tot_Knocks <- center_scale(AC.DF1C$Tot_Knocks)
+AC.DF1C$Num_Herbivory <- center_scale(AC.DF1C$Num_Herbivory)
+AC.DF1C$Num_L_calls <- center_scale(AC.DF1C$Num_L_calls)
+
+#creating centered Snap.HF17 and 18 dataframes
+Snap.HF17C$SPL_HF <- center_scale(Snap.HF17C$SPL_HF)
+Snap.HF18C$SPL_HF <- center_scale(Snap.HF18C$SPL_HF)
+
+
+#removing outliers from Snap.HF dataframe
+low.snap <- Snap.HF[Snap.HF$Snaps <1000, ]
+# Remove anything with fewer than 2 observers 
+Snap.HF <- Snap.HF[!(Snap.HF$ds.id %in% low.snap$ds.id),]
+
+#making a snap.hf dataframe to center
+Snap.HFC <- Snap.HF
+
+Snap.HFC$Snaps <- center_scale(Snap.HFC$Snaps)
+
+#subsetting only lm variables
+AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, ACI_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour, Year))
+
+#making Hour ordinal
+#AC.DF1Co$Hour_factor <- factor (AC.DF1$Hour, order = TRUE, levels = c("3", "9", "15", "21"))
+
+
+#splitting dataframe by site
+s5 <- filter(AC.DF1, Site == "5")
+s32 <- filter(AC.DF1, Site == "32")
+s35 <- filter(AC.DF1, Site == "35")
+s40 <- filter(AC.DF1, Site == "40")
+s8 <- filter(AC.DF1, Site == "8")
+
+#splitting dataframe by hour
+h3 <- filter(AC.DF1, Hour == "3")
+h9 <- filter(AC.DF1, Hour == "9")
+h15 <- filter(AC.DF1, Hour == "15")
+h21 <- filter(AC.DF1, Hour == "21")
+
+#creating new variable for site_year
+Snap.HF$site_year <- paste(Snap.HF$Site, Snap.HF$Year, sep= "_")
+AC.DF1Co$site_year <- paste(AC.DF1Co$Site, AC.DF1Co$Year, sep= "_")
+
+
+#Adding in continuous fishing pressure variable to dataframes used for modelling
+sites <- read.csv("../Raw_Data/KI_Sites_Sept2019.csv", header = TRUE, stringsAsFactors = FALSE)
+#renaming the first column so that it doesn't have unknown characters
+colnames(sites)[1] <- "site"
+
+Snap.HF$fp.cont <-  sites$continous.pressure.2km[match(Snap.HF$Site, sites$site)]
+AC.DF1Co$fp.cont <- sites$continous.pressure.2km[match(AC.DF1Co$Site, sites$site)]
+
+
+
+```
+
+**Exploratory Plots for 2017-2018 Acoustic/Fish Data**
+
+**Purpose** To rerun my models with local disturbance as a continuous variable and year as a categorical variable with no random variables.
+
+I have summarized results at the top here, but please scroll down if you would like to see the outputs of the linear models and further analysis into each of the selected models, how they compare with my results when I included random effects, and comparisons between "matching" models if the new selected models aren't the same as those selected when random effects were included.
+
+*Note* 
+
+Any models that use MF - are actually my low frequency models - this is just an artifact from the beginning of the project
+
+#Results Summarized
+
+**Overview:**
+
+SPL - 
+
+  Fishing pressure has a small effect on HF but no effect on LF
+
+  Year is significant and 2018 was ~3.5dB louder than 2017 across all frequencies
+      
+ACI - 
+      
+  Fishing pressure has a small effect on HF but no effect on LF
+      
+  There is no difference in ACI between 2017 and 2018 in either frequency band.
+      
+
+##Results Breakdown
+
+**High Frequency SPL:**
+
+  Fishing pressure is significant with a small effect size
+
+  Year is significant with 2018 ~ 3.5 dB louder than 2017
+  
+  Best models explain ~ 37% of variation
+
+
+**High Frequency ACI:**
+
+  Fishing pressure is significant with a small effect size
+
+  Year is not significant
+  
+  Best models explain ~ 7% of variation
+
+
+**Low Frequency SPL:**
+
+  Fishing pressure is not significant
+  
+  Year is significant with 2018 ~ 3.5 dB louder than 2017
+  
+  Best models explain ~ 54% of variation
+
+
+**Low Frequency ACI:**
+
+  Fishing pressure is not significant
+  
+  Year is not significant
+  
+  Best models explain ~ 2% of variation
+
+
+
+
+
+
+#Models
+## SPL HF Model
+
+
+```{r simple model, echo = FALSE}
+Snap.HF$Year <- as.character(Snap.HF$Year)
+simple.model <- lm(SPL_HF ~ Snaps + fp.cont + Year, data = Snap.HF)
+
+summary(simple.model)
+
+```
+
+```{r simple model 1.2, echo= FALSE}
+simple.model1 <- lm(SPL_HF ~ dn + fp.cont + Year, data = Snap.HF)
+
+
+
+
+```
+
+```{r simple model2, echo = FALSE}
+
+simple.model2 <- lm(SPL_HF ~ Snaps + dn + fp.cont + Year, data = Snap.HF)
+
+
+
+
+
+```
+
+```{r simple model4, echo = FALSE}
+
+simple.model4 <- lm(SPL_HF ~ Snaps*dn + fp.cont + Year, data = Snap.HF)
+
+
+```
+
+
+
+###Model Selection
+
+```{r hf spl selection, echo = TRUE}
+
+#coming up with several variations on the models presented above
+
+#testing each of the models
+
+splhftbl <- AICc(simple.model, simple.model1, simple.model2, simple.model4)
+
+splhftbl$minAIC <- 77944.11
+splhftbl$deltaAIC <- splhftbl$AICc - splhftbl$minAIC
+
+splhftbl
+summary(simple.model4)
+
+```
+
+**Same model is picked as when random effects are included**
+
+Simple model 4 is the most parsimonious model. This is also my most saturated model.
+
+Both Year and fp.cont are significant (3.4 dB louder in 2018) and fp.cont has a very small effect size (2.9 x10^-4).
+
+This model explains 37% of the variation in high frequency SPL.
+
+
+## ACI HF Model
+
+```{r hf aci step, echo = FALSE}
+aci.hf <- lm(ACI_HF ~ Snaps + fp.cont + Year, data = Snap.HF)
+
+
+
+```
+
+```{r hf aci day/night, echo = FALSE}
+aci.hf1a <- lm(ACI_HF ~ dn + fp.cont + Year, data = Snap.HF)
+
+
+
+```
+
+
+```{r hf aci step2, echo = FALSE}
+aci.hf2 <- lm(ACI_HF ~ Snaps + dn + fp.cont + Year , data = Snap.HF)
+
+
+
+```
+
+
+```{r hf aci step4, echo = FALSE}
+aci.hf4 <- lm(ACI_HF ~ Snaps*dn + fp.cont + Year, data = Snap.HF)
+
+
+```
+
+
+###Model Selection
+
+```{r model selection aci hf, echo = TRUE}
+
+acihftbl <- AICc(aci.hf, aci.hf1a, aci.hf2, aci.hf4)
+
+acihftbl$minAIC <- 319646.4
+acihftbl$deltaAIC <- acihftbl$AICc - acihftbl$minAIC
+
+acihftbl
+
+
+```
+
+**This is not the same model as when we included random effects**
+
+The most parsimonious model here is aci.hf.
+
+```{r model summary acihf, echo = TRUE}
+summary(aci.hf)
+
+```
+
+However, it only explains about 7% of the variation in ACI.
+
+fp.cont is significant with a small effect size (-.7)
+
+When random effects were included we chose the model that included an interaction between snaps and day/night. The summary for the "matching" model without random effects is below
+
+```{r model summary acihf4, echo = TRUE}
+summary(aci.hf4)
+
+```
+
+fishing pressure is significant but Year is not.
+
+Snaps is also significant but there is no significant change in their effect on ACI between day and night.
+
+This model explains only about 7% of variation in HF ACI as well.
+
+## LF SPL Model
+
+
+```{r simple1a mf model, echo = FALSE}
+
+simple1amf <- lm(SPL_Midrange ~ Tot_Knocks + fp.cont + Year, data = AC.DF1Co)
+
+
+
+```
+
+
+
+```{r simple1b mf model, echo = FALSE}
+
+simple1bmf <- lm(SPL_Midrange ~ Num_L_calls + fp.cont + Year , data = AC.DF1Co)
+
+
+
+```
+
+Long calls are not significant.
+
+```{r simple1c mf model, echo = FALSE}
+
+simple1cmf <- lm(SPL_Midrange ~ Num_Herbivory + fp.cont + Year, data = AC.DF1Co)
+
+
+```
+
+
+```{r simple2a mf model, echo = FALSE}
+
+simple2amf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + fp.cont + Year, data = AC.DF1Co)
+
+
+
+```
+
+
+```{r simple2b mf model, echo = FALSE}
+
+simple2bmf <- lm(SPL_Midrange ~ Tot_Knocks + Num_L_calls + fp.cont + Year, data = AC.DF1Co)
+
+
+
+```
+
+
+```{r simple2c mf model, echo = FALSE}
+
+simple2cmf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + fp.cont + Year, data = AC.DF1Co)
+
+
+
+```
+
+
+```{r simple3 mf model, echo = FALSE}
+
+simple3mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + fp.cont + Year, data = AC.DF1Co)
+
+
+```
+
+
+
+```{r simple4 mf model, echo = FALSE}
+
+simple4mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Tot_Knocks:Hour + fp.cont + Year, data = AC.DF1Co)
+#All call types affect MF SPL, however, only knocks changes its effect size throughout the day
+
+
+
+```
+
+
+
+```{r simple6a mf model, echo = FALSE}
+
+simple6amf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + fp.cont + Year + Tot_Knocks:Hour + Num_Herbivory:Hour, data = AC.DF1Co)
+
+
+```
+
+
+```{r simple6b mf model, echo = FALSE}
+
+simple6bmf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + fp.cont + Year +
+                  Tot_Knocks:Hour + Num_L_calls:Hour, data = AC.DF1Co)
+
+#All call types affect MF SPL, however, knocks and long calls change their effect sizes throughout the day
+
+
+```
+
+
+```{r simple7 mf model, echo = FALSE}
+
+simple7mf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + fp.cont + Year + Tot_Knocks:Hour + Num_Herbivory:Hour + Num_L_calls:Hour, data = AC.DF1Co)
+
+
+```
+
+```{r simple reduced mf models, echo = FALSE}
+
+
+
+
+reducemf3 <- lm(SPL_Midrange ~ Tot_Knocks + Hour + fp.cont + Year, data = AC.DF1Co)
+#only knocks and year affect MF SPL
+
+reducemf4 <- lm(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + fp.cont + Year, data = AC.DF1Co)
+#The effect of knocks on MF SPL changes throughout the day
+
+#reducemf5 <- lmer(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_L_calls + (1|Site)+(1|Year), data = AC.DF1Co)
+#model fails to converge
+
+reducemf6 <- lm(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + fp.cont + Year, data = AC.DF1Co)
+#the effect of knocks on MF SPL changes throughout the day and herbivory is also loud enough to affect MF SPL
+
+
+```
+
+
+
+###Model Selection
+
+
+```{r model selection mf spl, echo = TRUE}
+
+splmftbl <- AICc(simple1amf, simple1bmf, simple1cmf, simple2amf, simple2bmf, simple2cmf, simple3mf, simple4mf, simple6amf, simple6bmf, simple7mf, reducemf3, reducemf4, reducemf6)
+
+splmftbl$minAIC <- 881.7801
+splmftbl$deltaAIC <- splmftbl$AICc - splmftbl$minAIC
+
+splmftbl
+
+splmftbl.short <- subset(splmftbl, deltaAIC < 6)
+
+splmftbl.short
+
+
+
+```
+
+I think here reducemf6 is the most respresentative model - it is the most parsimonious model in the end, but also explains roughly the same amount of variation in the response variable.
+
+reducemf6: MF SPL ~ (Knocks * Hour) + Herbivory + Hour + Year + fp.cont
+
+```{r summary reducemf6, echo = TRUE}
+
+summary(reducemf6)
+
+```
+
+Explains 53.6% of variation in MF SPL.  
+
+**This is not the same model selected as when we included random effects**
+
+That model did not include herbivory.
+
+fishing pressure is not significant.
+Year is significant and 2018 is 3.5 dB louder than 2017.
+
+The interaction between knocks and 9AM is still significant and positive.
+
+
+
+
+Our "Best" model according to AIC is simple7mf:
+simple7mf is a maximal model with all three types of fish sound interacting with hour:
+
+simple7mf: MF SPL ~ (Knocks + Herbivory + Long Calls) * Hour + Year + fp.cont
+
+```{r summary simple7mf, echo = TRUE}
+
+summary(simple7mf)
+
+```
+
+
+Adds 7 df, but only increases AIC by .5
+Explains 56% of variation in MF SPL.
+
+
+Our matching model - the one that is the same as the chosen model in our results that included a random effect is below.
+
+```{r summary matching splmf, echo = TRUE}
+
+summary(reducemf4)
+
+```
+
+fishing pressure is not significant.
+Year is significant - 2018 is ~3.5 dB louder than 2017.
+
+
+## LF ACI Model
+
+```{r mf aci1, echo = FALSE}
+
+mf.aci1 <- lm(ACI_Midrange ~ Tot_Knocks + fp.cont + Year, data = AC.DF1Co)
+
+
+```
+
+
+```{r mf aci2a, echo = FALSE}
+
+mf.aci2a <- lm(ACI_Midrange ~ Tot_Knocks + Num_Herbivory + fp.cont + Year, data = AC.DF1Co)
+
+
+```
+
+
+```{r mf aci2b or Lon, echo = FALSE}
+
+mf.aci2b <- lm(ACI_Midrange ~ Tot_Knocks + Num_L_calls + fp.cont + Year, data = AC.DF1Co)
+
+
+```
+
+
+```{r mf aci3, echo = FALSE}
+
+mf.aci3 <- lm(ACI_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + fp.cont + Year, data = AC.DF1Co)
+
+```
+
+
+```{r mf aci4, echo = FALSE}
+
+mf.aci4 <- lm(ACI_Midrange ~ Tot_Knocks + Hour + fp.cont + Year, data = AC.DF1Co)
+
+#maximal model
+mf.maxaci <- lm(ACI_Midrange ~ (Tot_Knocks + Num_L_calls + Num_Herbivory)*Hour + fp.cont + Year, data = AC.DF1Co)
+
+#reduced models
+mf.acil <- lm(ACI_Midrange ~ Num_L_calls + fp.cont + Year, data = AC.DF1Co)
+
+mf.acih <- lm(ACI_Midrange ~Num_Herbivory + fp.cont + Year, data = AC.DF1Co)
+
+mf.acilh <- lm(ACI_Midrange ~ Num_L_calls*Hour + fp.cont + Year, data = AC.DF1Co)
+
+mf.acihh <- lm(ACI_Midrange ~ Num_Herbivory*Hour + fp.cont + Year, data = AC.DF1Co)
+
+
+
+```
+
+
+```{r mf aci6, echo = FALSE}
+
+fit.mfaci6 <- lm(ACI_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + fp.cont + Year, data = AC.DF1Co)
+
+
+
+```
+
+
+```{r mf aci7, echo = FALSE}
+
+fit.mfaci7 <- lm(ACI_Midrange ~ Tot_Knocks*Hour + Num_Herbivory + Num_L_calls + fp.cont + Year, data = AC.DF1Co)
+
+#intercept model
+
+#inter.mfaci <- lmer(ACI_Midrange ~ 1 + (1|site_year), data = AC.DF1Co)
+
+```
+
+###Model Selection
+
+```{r mf aci model selection, echo = TRUE}
+
+acimftbl <-AICc(mf.aci1, mf.aci2a, mf.aci2b, mf.aci3, mf.aci4, fit.mfaci6, fit.mfaci7, mf.maxaci, mf.acil, mf.acih, mf.acilh, mf.acihh)
+
+acimftbl$minAIC <- 4056.459
+acimftbl$deltaAIC <- acimftbl$AICc - acimftbl$minAIC
+
+acimftbl
+
+acimftbl.short <- subset(acimftbl, deltaAIC < 6)
+
+acimftbl.short
+
+summary(mf.maxaci)
+
+```
+
+**The selected model is different from the selected model including random effects**
+
+The model with the lowest AIC here is my simplest model including only knocks, fishing pressure, and year.  
+```{r summary mf.aci1, echo = TRUE}
+summary(mf.aci1)
+
+```
+This model only explains 2% of variation in low frequency ACI.  
+
+This also does not significantly explain ACI (p > 0.05). (if 2% variation wasn't little enough evidence).\
+
+Fishing pressure is not significant
+Year is not significant
+
+
+
+My maximal model (which matches my chosen model with random effects included), includes all call types and their interaction with hour.
+
+```{r summary mf.maxaci, echo = TRUE}
+summary(mf.maxaci)
+
+```
+
+It explains effectively 0% of variation in low frequency ACI when adjusted for the number of variables.
+
+
