@@ -1464,7 +1464,7 @@ This shows that the pattern exists at pretty much all sites except for 5.
 ```{r hf diurnal trends, echo = FALSE}
 #High frequency SPL
 hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme( legend.position = "none") + 
-  labs(y = "High Frequency", title = "SPL") + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) +  
+  labs(y = "High Frequency", title = "SPL (dB)") + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) +  
   theme_cowplot() + 
   theme(axis.title.x = element_blank()) + 
   theme(axis.title.y = element_text(size = 15)) +
@@ -1543,7 +1543,7 @@ four.plot<- plot_grid(hf.dplot, hfa.dplot, mf.dplot.F, mfa.dplot.F,
 
 
 
-#ggsave(file = "../Figures/Fourplot_FINAL.pdf", width = 11, height = 7, four.plot)
+#ggsave(file = "../Figures/Fourplot_FINAL2.pdf", width = 11, height = 7, four.plot)
 four.plot
 ```
 

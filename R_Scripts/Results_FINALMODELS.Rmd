@@ -102,10 +102,8 @@ low.snap <- Snap.HF[Snap.HF$Snaps <1000, ]
 # Remove anything with fewer than 2 observers 
 Snap.HF <- Snap.HF[!(Snap.HF$ds.id %in% low.snap$ds.id),]
 
-#making a snap.hf dataframe to center
-Snap.HFC <- Snap.HF
-
-Snap.HFC$Snaps <- rescale(Snap.HFC$Snaps, "center")
+#Centering snaps
+Snap.HF$Snaps <- rescale(Snap.HF$Snaps, "center")
 
 #subsetting only lm variables
 AC.DF1Co <- subset(AC.DF1C, select = c(SPL_Midrange, ACI_Midrange, Tot_Knocks, Num_L_calls, Num_Herbivory, Site, Hour, Year, Date))
@@ -262,7 +260,7 @@ This model only explains 1.2% of variation in LF ACI.
 Snap.HF$Year <- as.character(Snap.HF$Year)
 
 simple.model <- lm(SPL_HF ~ Snaps + Year + lunar.phase.sine + fp.cont, data = Snap.HF)
-
+summary(simple.model)
 ```
 
 
@@ -275,7 +273,7 @@ simple.model1<- lm(SPL_HF ~ Snaps + dn + Year + lunar.phase.sine + fp.cont, data
 ```{r simple model3 sin vs. year, echo = TRUE}
 
 simple.model3 <- lm(SPL_HF ~ Snaps*dn + lunar.phase.sine + Year + fp.cont, data = Snap.HF)
-
+plot(simple.model3)
 ```
 
 ###Model Selection
@@ -292,6 +290,8 @@ splhftbl$minAIC <- 77923.39
 splhftbl$deltaAIC <- splhftbl$AICc - splhftbl$minAIC
 
 splhftbl
+summary(simple.model)
+summary(simple.model1)
 summary(simple.model3)
 
 ```
@@ -312,6 +312,8 @@ acihftbl$minAIC <- 319647.7
 acihftbl$deltaAIC <- acihftbl$AICc - acihftbl$minAIC
 acihftbl
 
+summary(aci.hf)
+summary(aci.hf2)
 summary(aci.hf1)
 
 ```
@@ -355,7 +357,7 @@ simple4mf<- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + 
 
 simplemaxmf <- lm(SPL_Midrange ~ Tot_Knocks + Num_Herbivory + Num_L_calls + Hour + Year + Tot_Knocks:Hour + Num_Herbivory:Hour + Num_L_calls:Hour + lunar.phase.sine + fp.cont, data = AC.DF1Co)
 
-
+summary(simplemaxmf)
 ```
 
 ```{r simple year reduced mf models, echo = TRUE}
@@ -368,7 +370,7 @@ reducemf4 <- lm(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Year + luna
 
 reducemf6 <- lm(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + Year + lunar.phase.sine + fp.cont, data = AC.DF1Co)
 
-
+reducemf7 <- lm(SPL_Midrange ~ Tot_Knocks + Hour + Tot_Knocks:Hour + Num_Herbivory + Year, data = AC.DF1Co)
 #the effect of knocks on MF SPL changes throughout the day and herbivory is also loud enough to affect MF SPL
 
 
@@ -392,7 +394,11 @@ splmftbl.short <- subset(splmftbl, deltaAIC < 6)
 
 splmftbl.short
 
+summary(simplemaxmf)
 summary(reducemf6)
+summary(reducemf7)
+summary(simple4mf)
+
 
 ```
 
@@ -457,7 +463,7 @@ acimftbl.short
 
 ```{r summary sine aci year mf, echo = TRUE}
 summary(mf.aci2)
-
+summary(mf.aci3)
 summary(mf.aci1)
 ```
 
