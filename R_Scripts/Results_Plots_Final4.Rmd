@@ -1464,13 +1464,14 @@ This shows that the pattern exists at pretty much all sites except for 5.
 ```{r hf diurnal trends, echo = FALSE}
 #High frequency SPL
 hf.dplot <- ggplot(SPLHF.long518, aes(x=Time, y=SPL_HF)) + geom_point() + theme( legend.position = "none") + 
-  labs(y = "High Frequency", title = "SPL (dB)") + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) +  
+  labs(y = "SPL 1-22 kHz (dB re 1 μ Pa)") + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) +  
   theme_cowplot() + 
   theme(axis.title.x = element_blank()) + 
-  theme(axis.title.y = element_text(size = 15)) +
+  theme(axis.title.y = element_text(size = 14)) +
   theme(axis.text.y = element_text(size = 12)) + 
   theme(plot.title = element_text(hjust = 0.5, size = 15))+
   theme(title = element_text(size = 15)) + 
+  theme(axis.title.y = element_text(hjust = -.1)) +
   geom_text(x=0, y=135, label="A)")
 
 hf.dplot
@@ -1479,10 +1480,12 @@ hf.dplot
 
 hfa.dplot <- ggplot(Snap.HFT518, aes(x=Time3, y =ACI_HF)) + geom_point() + theme( legend.position = "none") + 
   scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00")) + 
+  scale_y_continuous(breaks = c(55000, 60000, 65000, 70000, 75000)) +
   theme_cowplot() + 
-  theme(axis.title.x = element_blank(), axis.title.y = element_blank()) + 
-  labs(title = "ACI") +
+  theme(axis.title.x = element_blank()) + 
+  labs(y = "ACI 1-22kHz") +
   theme(plot.title = element_text(hjust = 0.5, size = 15)) +
+  theme(axis.title.y = element_text(size = 14)) +
   theme(axis.text.y = element_text(size = 12)) +
   theme(title = element_text(size = 15))
 
@@ -1498,13 +1501,14 @@ mf.dplot <- ggplot(SPLMF.long518, aes(x=Time, y=SPL_MF)) + geom_point() + theme(
 
 mf.dplot.F <- mf.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
 
-mf.dplot.F <- mf.dplot.F + theme_cowplot() + labs(y = "Low Frequency")
+mf.dplot.F <- mf.dplot.F + theme_cowplot() + labs(y = "SPL 0.16-1 kHz (dB re 1 μPa)")
 
 mf.dplot.F <- mf.dplot.F + 
   theme(axis.text.x = element_text(size = 12)) + 
   theme(axis.title.x = element_text (size = 15)) +
-  theme(axis.title.y = element_text (size = 15)) + 
-  theme(axis.text.y = element_text (size = 12))
+  theme(axis.title.y = element_text (size = 14)) + 
+  theme(axis.text.y = element_text (size = 12)) +
+  theme(axis.title.y = element_text(hjust = -.1))
 
 mf.dplot.F
 #ggsave(file = "../Figures/SPLLFDiurnal.pdf", width = 22, height = 7, mf.dplot.F)
@@ -1516,13 +1520,13 @@ mfa.dplot <- ggplot(ACI_MF_tot518, aes(x=Time, y =ACI_Midrange)) + geom_point() 
 
 mfa.dplot.F <- mfa.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
 
-mfa.dplot.F <- mfa.dplot.F + theme_cowplot()
+mfa.dplot.F <- mfa.dplot.F + theme_cowplot() + labs(y = "AIC 0.16-1 kHz")
 
 mfa.dplot.F <- mfa.dplot.F + 
   theme(axis.text.x = element_text(size = 12)) + 
   theme(axis.title.x = element_text (size = 15)) +
-  theme(axis.text.y = element_text(size = 12)) +
-  theme(axis.title.y = element_blank())
+  theme(axis.text.y = element_text(size = 12)) + 
+  theme(axis.title.y = element_text(size = 14))
 
 mfa.dplot.F
 
@@ -1543,7 +1547,7 @@ four.plot<- plot_grid(hf.dplot, hfa.dplot, mf.dplot.F, mfa.dplot.F,
 
 
 
-#ggsave(file = "../Figures/Fourplot_FINAL2.pdf", width = 11, height = 7, four.plot)
+#ggsave(file = "../Figures/Fourplot_FINAL4.pdf", width = 11, height = 7, four.plot)
 four.plot
 ```
 

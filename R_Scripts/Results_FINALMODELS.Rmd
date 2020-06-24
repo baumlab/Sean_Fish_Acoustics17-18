@@ -274,6 +274,7 @@ simple.model1<- lm(SPL_HF ~ Snaps + dn + Year + lunar.phase.sine + fp.cont, data
 
 simple.model3 <- lm(SPL_HF ~ Snaps*dn + lunar.phase.sine + Year + fp.cont, data = Snap.HF)
 plot(simple.model3)
+summary(simple.model3)
 ```
 
 ###Model Selection
