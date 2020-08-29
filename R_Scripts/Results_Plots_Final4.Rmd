@@ -1320,7 +1320,7 @@ levels(AC.DF1$Hour)
 ## Knock Intensity Plot ####
 ```{r knock intensity plot, echo = FALSE}
 sel.tbl$Hour <- as.factor(sel.tbl$Hour)
-knocks.bp <- ggplot(sel.tbl, aes(Hour, RL)) + geom_boxplot() + theme_classic() + ylab("Knock Volume (dB)") + 
+knocks.bp <- ggplot(sel.tbl, aes(Hour, RL)) + geom_boxplot() + theme_classic() + ylab("Sound Pressure Level (dB)") + 
   theme(axis.title.x = element_text(size = 17)) + 
   theme(axis.title.y = element_text(size = 17)) +
   theme(axis.text.x = element_text(size = 15)) + 
@@ -1328,7 +1328,7 @@ knocks.bp <- ggplot(sel.tbl, aes(Hour, RL)) + geom_boxplot() + theme_classic() +
 
 knocks.bp
 
-#ggsave(file = "../Figures/knocksbp.pdf", width = 11, height = 7, knocks.bp)
+ggsave(file = "../Figures/knocksbp.eps", width = 11, height = 7, knocks.bp)
 
 #confidence interval plot
 
@@ -1341,13 +1341,13 @@ RL.av$L.SE <- RL.av$RL - RL.av$SE
 
 
 
-knock.ci <- ggplot(RL.av, aes(Hour, RL)) + 
+#knock.ci <- ggplot(RL.av, aes(Hour, RL)) + 
   geom_errorbar(aes(ymin = L.SE, ymax = U.SE), color = "black", width = 0.15) +
   geom_point(aes(fill = Hour), color = "black", pch = 21, size = 6) +
   labs(x = "Hour", y = "Knock Volume (dB)")
 knock.ci
 
-#ggsave(file = "../Figures/knockci.pdf", width = 11, height = 7, knock.ci)
+#ggsave(file = "../Figures/knockci.eps", width = 11, height = 7, knock.ci)
 
 
 
@@ -1520,7 +1520,7 @@ mfa.dplot <- ggplot(ACI_MF_tot518, aes(x=Time, y =ACI_Midrange)) + geom_point() 
 
 mfa.dplot.F <- mfa.dplot + scale_x_discrete(breaks = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"))
 
-mfa.dplot.F <- mfa.dplot.F + theme_cowplot() + labs(y = "AIC 0.16-1 kHz")
+mfa.dplot.F <- mfa.dplot.F + theme_cowplot() + labs(y = "ACI 0.16-1 kHz")
 
 mfa.dplot.F <- mfa.dplot.F + 
   theme(axis.text.x = element_text(size = 12)) + 
@@ -1547,7 +1547,10 @@ four.plot<- plot_grid(hf.dplot, hfa.dplot, mf.dplot.F, mfa.dplot.F,
 
 
 
+#ggsave(file = "../Figures/Fourplot_FINAL4.eps", width = 11, height = 7, four.plot)
+
 #ggsave(file = "../Figures/Fourplot_FINAL4.pdf", width = 11, height = 7, four.plot)
+
 four.plot
 ```
 
